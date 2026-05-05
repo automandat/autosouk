@@ -212,13 +212,16 @@ export default function MandatPage() {
   const toggle = (x:string) => setSelected(prev => prev.includes(x) ? prev.filter(i => i !== x) : [...prev, x]);
 
   const toggleCustom = (key:string) => {
-    setCustomFields(prev => ({
-      ...prev,
-      [key]: {
-        checked: !prev[key]?.checked,
-        value: prev[key]?.value || ""
-      }
-    }));
+    setCustomFields(prev => {
+      const nextChecked = !prev[key]?.checked;
+      return {
+        ...prev,
+        [key]: {
+          checked: nextChecked,
+          value: nextChecked ? (prev[key]?.value || "") : ""
+        }
+      };
+    });
   };
 
   const setCustomValue = (key:string, value:string) => {
@@ -251,7 +254,7 @@ export default function MandatPage() {
     return { tone:"black", badge:"Prix du marché ✓", label:"Prix cohérent avec les comparables collectés." };
   }, [desired, avg]);
 
-  const required = [form.first, form.last, form.phone, form.city, brand, displayModel, displayEngine, displayTrim, form.year, form.mileage, form.fuel, form.gearbox, form.condition, form.ownership, form.desired, form.floor];
+  const required = [form.first, form.last, form.phone, form.city, brand, displayModel, displayEngine, displayTrim, form.year, form.mileage, form.fuel, form.gearbox, form.condition, form.ownership, form.desired, form.floor, form.instantPrice];
   const completion = Math.round(required.filter(Boolean).length / required.length * 100);
 
   const description = useMemo(() => {
@@ -358,12 +361,42 @@ export default function MandatPage() {
             <Field label="Garantie"><select defaultValue=""><option>Non renseigné</option><option>Oui</option><option>Non</option></select></Field>
           </div>
 
-          <Section id="pricing" title="Prix & benchmark" subtitle="Le prix est comparé aux données marché mensuelles." />
-          <div className="critical">🔒 <strong>Le prix plancher reste confidentiel.</strong> Il n’est jamais montré aux acheteurs.</div>
-          <div className="grid">
-            <Field label="Prix souhaité, en dirhams" required><input type="number" placeholder="Ex. 160000" onChange={e=>set("desired",e.target.value)} /></Field>
-            <Field label="Prix plancher minimum, en dirhams" required><input type="number" placeholder="Ex. 145000" onChange={e=>set("floor",e.target.value)} /></Field>
+          <Section id="pricing" title="Prix de vente" subtitle="Positionnez votre véhicule avec trois niveaux de décision clairs : minimum accepté, cible souhaitée et prix de vente immédiate." />
+          <div className="critical">🔒 <strong>Le prix minimum accepté reste confidentiel.</strong> Il n’est jamais montré aux acheteurs.</div>
+
+          <div className="pricingGrid">
+            <div className="priceBox">
+              <div className="priceLabel">Prix minimum accepté <span>*</span></div>
+              <input
+                type="number"
+                placeholder="Ex. 145000"
+                onChange={e=>set("floor", e.target.value)}
+              />
+              <p>Prix minimum souhaité pour la voiture. En dessous, vous ne souhaitez pas vendre.</p>
+            </div>
+
+            <div className="priceBox priceBoxMain">
+              <div className="priceBadge">Prix de référence</div>
+              <div className="priceLabel">Prix souhaité <span>*</span></div>
+              <input
+                type="number"
+                placeholder="Ex. 160000"
+                onChange={e=>set("desired", e.target.value)}
+              />
+              <p>Prix affiché comme base de discussion avec les acheteurs.</p>
+            </div>
+
+            <div className="priceBox">
+              <div className="priceLabel">Prix immédiat <span>*</span></div>
+              <input
+                type="number"
+                placeholder="Ex. 155000"
+                onChange={e=>set("instantPrice", e.target.value)}
+              />
+              <p>Prix auquel vous êtes prêt à vendre sans attendre d’autre offre.</p>
+            </div>
           </div>
+
           <Field label="Remarques vendeur"><textarea placeholder="Première main, carnet complet, pneus neufs, défauts éventuels..." /></Field>
 
           <Section id="media" title="Photos guidées" subtitle="Une annonce forte commence par des preuves visuelles structurées." />
@@ -396,15 +429,29 @@ export default function MandatPage() {
         .hero{max-width:1420px;margin:auto;padding:46px 28px 26px;display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:end}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#b8924a;font-weight:950;margin-bottom:14px}h1{font-family:Georgia,serif;font-size:clamp(44px,6vw,76px);line-height:.98;margin:0 0 18px;letter-spacing:-.04em;max-width:860px}h1 em{color:#b8924a}.hero p{font-size:18px;line-height:1.7;color:#657181;max-width:760px}.heroGlass{background:rgba(255,255,255,.85);border:1px solid white;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px);border-radius:30px;padding:26px}.heroMetric{display:flex;justify-content:space-between;align-items:center}.heroMetric span{color:#657181;font-weight:800}.heroMetric strong{font-size:34px;color:#b8924a}.track{height:10px;background:#e5eaf0;border-radius:999px;overflow:hidden;margin:14px 0 18px}.track div{height:100%;border-radius:999px;background:linear-gradient(90deg,#9c7632,#d9ad62)}.heroList{display:grid;gap:10px}.heroList span{background:#f7f9fb;border:1px solid #e1e7ef;border-radius:14px;padding:10px 12px;color:#3f4a58;font-weight:800}
         .workspace{max-width:1420px;margin:auto;padding:24px 28px 80px;display:grid;grid-template-columns:220px minmax(0,1fr) 360px;gap:24px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.leftNav{background:rgba(255,255,255,.82);border:1px solid #dce3eb;border-radius:24px;padding:14px;box-shadow:0 15px 40px rgba(31,41,55,.08);backdrop-filter:blur(12px)}.navTitle{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#8090a3;font-weight:950;margin:4px 8px 12px}.leftNav a{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:14px;text-decoration:none;color:#5f6f82;font-weight:900;font-size:13px}.leftNav a small{color:#b8924a}.leftNav a.active{background:#161b22;color:white}.leftNav a.active small{color:#d9ad62}
         .panel{background:white;border:1px solid #dce3eb;border-radius:28px;padding:30px;box-shadow:0 30px 90px rgba(31,41,55,.10);overflow:hidden}.sectionTitle{scroll-margin-top:30px;margin:34px 0 20px;padding-top:18px;border-top:1px solid #e3e9f0}.sectionTitle:first-child{margin-top:0;border-top:0}.sectionTitle h2{font-size:24px;margin:0 0 4px;font-weight:950;letter-spacing:-.02em}.sectionTitle p{margin:0;color:#728196;font-size:14px}.grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:20px 22px;align-items:start}.field{display:grid;gap:8px;min-width:0}.field label{font-weight:950;font-size:12px;color:#101820}.req{color:#b8924a}input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1.5px solid #cfd8e3;background:#f8fafc;border-radius:12px;padding:13px 14px;font-size:14px;color:#101820;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{background:white;border-color:#b8924a;box-shadow:0 0 0 4px rgba(184,146,74,.13)}.pillGroup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pill{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.pill input{width:auto}.colorGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:22px}.colorItem{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:800}.swatch{width:15px;height:15px;border-radius:4px;border:1px solid #9aa6b4}
-        .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.customOther{align-items:center}
-.customOther input[type="text"]{border:0;background:transparent;padding:0;font-size:12px;box-shadow:none}
-.customOther input[type="text"]:disabled{opacity:.45;cursor:not-allowed}
-.customOther input[type="text"]:focus{box-shadow:none;border:0;background:transparent}
+        .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.customOtherGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-top:12px}
+.customOtherBox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;background:#fff;border:1.5px solid #dce3eb;border-radius:14px;padding:10px 12px}
+.customOtherBox.active{background:#fff9ee;border-color:#d9ad62}
+.customOtherCheck{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:950;color:#5f6f82;white-space:nowrap}
+.customOtherCheck input{width:auto}
+.customOtherInput{height:38px;border:1.5px solid #cfd8e3!important;background:#f8fafc!important;border-radius:10px!important;padding:9px 11px!important;font-size:13px!important}
+.customOtherInput:disabled{background:#eef2f6!important;color:#9aa6b4!important;cursor:not-allowed;opacity:1}
+.customOtherInput:focus{background:white!important;border-color:#b8924a!important;box-shadow:0 0 0 3px rgba(184,146,74,.12)!important}
 .critical{background:#fff2f0;border:1.5px solid #f2aaa2;color:#b42318;border-radius:14px;padding:15px 16px;margin-bottom:20px;font-weight:900}.critical strong{font-weight:950;color:#b42318}
-        .photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
+        .pricingGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.22fr) minmax(0,1fr);gap:18px;margin:20px 0 24px;align-items:stretch}
+.priceBox{background:#f8fafc;border:1.5px solid #dce3eb;border-radius:20px;padding:18px;display:grid;gap:10px;min-width:0}
+.priceBoxMain{background:linear-gradient(180deg,#fffaf0,#ffffff);border:2px solid #d9ad62;box-shadow:0 16px 40px rgba(184,146,74,.16);transform:translateY(-6px)}
+.priceBadge{justify-self:start;background:#17110c;color:#d9ad62;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.06em}
+.priceLabel{font-size:14px;font-weight:950;color:#101820}
+.priceLabel span{color:#b8924a}
+.priceBox input{font-size:20px;font-weight:900;background:white;border-radius:16px;padding:17px 18px}
+.priceBoxMain input{font-size:24px}
+.priceBox p{margin:0;color:#728196;font-size:12px;line-height:1.45}
+@media(max-width:900px){.pricingGrid{grid-template-columns:1fr}.priceBoxMain{transform:none}}
+.photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
         .marketCard{background:rgba(255,255,255,.88);border:1px solid #dce3eb;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px)}.marketHeader{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:18px}.marketHeader span{font-size:22px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b8924a;background:#fff6e8;border:1px solid #efd8ae;border-radius:999px;padding:7px 9px}.marketIdentity{background:#161b22;color:white;border-radius:18px;padding:15px;margin-bottom:15px}.marketIdentity strong{display:block;font-size:15px}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.marketStats strong{display:block;margin-top:4px;font-size:13px}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px 1fr 34px;gap:8px;align-items:center;font-size:11px;color:#5f6f82}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.sourceNote{font-size:11px;color:#8090a3;line-height:1.5}
         .signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal strong{display:block;margin-bottom:4px}.signal p{margin:0;line-height:1.5;font-size:13px}.signal.green{background:#edf7f2;border-color:#c3e6d4;color:#2d8653}.signal.red{background:#fff2f0;border-color:#f2aaa2;color:#b42318}.signal.black{background:#f3f0ec;border-color:#d8c8b5;color:#17110c}.signal.neutral{background:#f8fafc;border-color:#dce3eb;color:#728196}
-        @media(max-width:1280px){.workspace{grid-template-columns:210px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.grid{grid-template-columns:repeat(2,minmax(220px,1fr))}.optionsGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.topRight .draft{display:none}.hero,.workspace{grid-template-columns:1fr}.leftNav,.rightRail{position:static}.grid,.photoGrid,.optionsGrid,.colorGrid{grid-template-columns:1fr}.panel{padding:22px}.final{flex-direction:column;align-items:flex-start}.final button{width:100%}}
+        @media(max-width:1280px){.workspace{grid-template-columns:210px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.grid{grid-template-columns:repeat(2,minmax(220px,1fr))}.optionsGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.topRight .draft{display:none}.hero,.workspace{grid-template-columns:1fr}.leftNav,.rightRail{position:static}.grid,.photoGrid,.optionsGrid,.colorGrid,.customOtherGrid{grid-template-columns:1fr}.panel{padding:22px}.final{flex-direction:column;align-items:flex-start}.final button{width:100%}}
       `}</style>
     </main>
   );
@@ -445,6 +492,7 @@ function OptionBlock({
   return (
     <div className="optionBlock">
       <h3>{title}</h3>
+
       <div className="optionsGrid">
         {items.map(option => (
           <label key={option} className={`optionItem ${selected.includes(option) ? "selected" : ""}`}>
@@ -452,24 +500,37 @@ function OptionBlock({
             <span>{option}</span>
           </label>
         ))}
-
-        {customKeys.map((key, index) => (
-          <label key={key} className={`optionItem customOther ${customFields[key]?.checked ? "selected" : ""}`}>
-            <input
-              type="checkbox"
-              checked={customFields[key]?.checked || false}
-              onChange={()=>toggleCustom(key)}
-            />
-            <input
-              type="text"
-              placeholder={`Autre ${index + 1}`}
-              disabled={!customFields[key]?.checked}
-              value={customFields[key]?.value || ""}
-              onChange={(e)=>setCustomValue(key, e.target.value)}
-            />
-          </label>
-        ))}
       </div>
+
+      {customKeys.length > 0 && (
+        <div className="customOtherGrid">
+          {customKeys.map((key, index) => {
+            const isChecked = customFields[key]?.checked || false;
+
+            return (
+              <div key={key} className={`customOtherBox ${isChecked ? "active" : ""}`}>
+                <label className="customOtherCheck">
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={()=>toggleCustom(key)}
+                  />
+                  <span>Autre {index + 1}</span>
+                </label>
+
+                <input
+                  className="customOtherInput"
+                  type="text"
+                  placeholder="Préciser l’équipement"
+                  disabled={!isChecked}
+                  value={customFields[key]?.value || ""}
+                  onChange={(e)=>setCustomValue(key, e.target.value)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
