@@ -198,7 +198,20 @@ const EXTERIOR_OPTIONS = [
   "Feux de jour LED","Phares antibrouillard","Attelage fixe","Attelage pivotant","Barres de toit","Vitres arrière surteintées"
 ];
 
-const PHOTOS = ["Avant","Arrière","Profil gauche","Profil droit","Tableau de bord","Compteur kilométrique","Sièges avant","Sièges arrière","Coffre","Jantes / pneus","Défauts visibles"];
+const PHOTOS = [
+  "Avant 3/4",
+  "Arrière 3/4",
+  "Profil gauche",
+  "Profil droit",
+  "Intérieur avant",
+  "Intérieur arrière",
+  "Tableau de bord",
+  "Compteur kilométrique",
+  "Coffre",
+  "Jantes / pneus",
+  "Moteur",
+  "Défauts visibles"
+];
 
 const STEPS = [
   ["identity","Identité"],
@@ -462,7 +475,15 @@ export default function MandatPage() {
 
           <Field label="Remarques vendeur"><textarea placeholder="Première main, carnet complet, pneus neufs, défauts éventuels..." /></Field>
 
-          <Section id="media" title="Photos guidées" subtitle="Une annonce forte commence par des preuves visuelles structurées." />
+          <Section id="media" title="Photos guidées" subtitle="Parcours type inspection : chaque photo doit montrer un angle précis du véhicule pour rassurer l’acheteur." />
+          <div className="photoQualityPanel">
+            <div>
+              <strong>Checklist qualité photo</strong>
+              <p>Photos en lumière naturelle, véhicule entier visible, pas de filtre, plaque masquée si nécessaire.</p>
+            </div>
+            <span>{PHOTOS.length} photos recommandées</span>
+          </div>
+
           <div className="photoGrid">{PHOTOS.map((p,i)=>
             <label className="upload" key={p}>
               <b>{String(i+1).padStart(2,"0")}</b>
@@ -537,6 +558,16 @@ export default function MandatPage() {
 .colorItem.selected{position:relative}
 .colorItem.selected:after{content:"✓";position:absolute;right:8px;top:8px;background:#161b22;color:#d9ad62;width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:950}
 
+
+.photoQualityPanel{display:flex;justify-content:space-between;align-items:center;gap:16px;background:#fff6e8;border:1.5px solid #efd8ae;border-radius:18px;padding:16px 18px;margin-bottom:18px}
+.photoQualityPanel strong{display:block;font-size:15px;font-weight:950;color:#7a5720}
+.photoQualityPanel p{margin:4px 0 0;color:#7a5720;font-size:13px;line-height:1.45}
+.photoQualityPanel span{background:#161b22;color:#d9ad62;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:950;white-space:nowrap}
+.engine3d .car3d{width:92px;height:58px;transform:translate(-50%,-50%) rotateX(64deg) rotateZ(0deg);background:linear-gradient(135deg,#1f2937,#64748b);border-radius:12px}
+.engine3d .engineBlock{display:block;position:absolute;left:27px;top:15px;width:40px;height:24px;border-radius:6px;background:#d9ad62;border:2px solid #8b6b2f;box-shadow:0 6px 14px rgba(0,0,0,.18)}
+.engine3d .hood3d{right:20px;top:-16px;width:54px;height:24px;background:rgba(255,255,255,.34);border:2px solid #b8924a;transform:rotateX(35deg)}
+.engine3d .cameraBeam{left:38px;bottom:16px;width:70px;height:52px;border-color:#b8924a}
+@media(max-width:900px){.photoQualityPanel{flex-direction:column;align-items:flex-start}.photoQualityPanel span{white-space:normal}}
 .photoGuide3d{height:96px;border-radius:16px;background:radial-gradient(circle at 30% 18%,#ffffff,#edf3f9 70%);border:1px solid #dce3eb;position:relative;overflow:hidden;margin:2px 0 4px;perspective:520px}
 .car3d{position:absolute;left:50%;top:53%;width:96px;height:42px;transform-style:preserve-3d;transform:translate(-50%,-50%) rotateX(58deg) rotateZ(-18deg);background:linear-gradient(135deg,#dfe7f0,#ffffff);border:2px solid #7b8794;border-radius:18px 28px 14px 14px;box-shadow:18px 16px 28px rgba(31,41,55,.18)}
 .roof3d{position:absolute;left:27px;top:-18px;width:44px;height:28px;background:linear-gradient(135deg,#cbd5e1,#ffffff);border:2px solid #7b8794;border-radius:14px 16px 6px 6px}
@@ -582,16 +613,17 @@ function ColorGrid({items, selectedColor, onPick}:{items:string[]; selectedColor
 
 function photoInstruction(label:string) {
   const instructions:Record<string,string> = {
-    "Avant":"Face avant entière visible",
-    "Arrière":"Arrière entier visible",
-    "Profil gauche":"Côté gauche complet",
-    "Profil droit":"Côté droit complet",
-    "Tableau de bord":"Vue conducteur complète",
+    "Avant 3/4":"Placez-vous légèrement de face, véhicule entier visible",
+    "Arrière 3/4":"Placez-vous légèrement à l’arrière, véhicule entier visible",
+    "Profil gauche":"Côté gauche complet, roues incluses",
+    "Profil droit":"Côté droit complet, roues incluses",
+    "Intérieur avant":"Sièges avant, volant et console centrale visibles",
+    "Intérieur arrière":"Banquette arrière entière visible",
+    "Tableau de bord":"Vue conducteur, écran et volant visibles",
     "Compteur kilométrique":"Kilométrage net et lisible",
-    "Sièges avant":"Deux sièges avant visibles",
-    "Sièges arrière":"Banquette arrière visible",
     "Coffre":"Coffre ouvert, volume visible",
-    "Jantes / pneus":"Gros plan jante et pneu",
+    "Jantes / pneus":"Gros plan jante et état du pneu",
+    "Moteur":"Capot ouvert, moteur propre et bien éclairé",
     "Défauts visibles":"Photo rapprochée de chaque défaut"
   };
   return instructions[label] || "Photo nette requise";
@@ -603,12 +635,13 @@ function PhotoGuide({label,index}:{label:string; index:number}) {
     label.includes("Arrière") ? "rear3d" :
     label.includes("gauche") ? "left3d" :
     label.includes("droit") ? "right3d" :
+    label.includes("Intérieur avant") ? "frontSeats3d" :
+    label.includes("Intérieur arrière") ? "rearSeats3d" :
     label.includes("Tableau") ? "dash3d" :
     label.includes("Compteur") ? "odo3d" :
-    label.includes("Sièges avant") ? "frontSeats3d" :
-    label.includes("Sièges arrière") ? "rearSeats3d" :
     label.includes("Coffre") ? "trunk3d" :
     label.includes("Jantes") ? "wheel3d" :
+    label.includes("Moteur") ? "engine3d" :
     "defect3d";
 
   return (
@@ -618,6 +651,7 @@ function PhotoGuide({label,index}:{label:string; index:number}) {
         <span className="roof3d" />
         <span className="hood3d" />
         <span className="glass3d" />
+        <span className="engineBlock" />
         <span className="wheel3d w1" />
         <span className="wheel3d w2" />
       </div>
