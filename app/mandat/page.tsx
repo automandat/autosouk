@@ -402,7 +402,7 @@ export default function MandatPage() {
           </div>
 
           <Section id="exterior" title="Extérieur" subtitle="Couleur, jantes, toit, aides de stationnement et équipements extérieurs." />
-          <ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={(v)=>{setExteriorColor(v); set("exteriorColor", v);}} />
+          <ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={(v)=>{const next = exteriorColor === v ? "" : v; setExteriorColor(next); set("exteriorColor", next);}} />
           <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selected} toggle={toggle} customKeys={["ext_other1","ext_other2","ext_other3"]} customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
 
           <Section id="interior" title="Intérieur" subtitle="Couleurs, matériaux, confort et équipements d’habitacle." />
@@ -442,32 +442,20 @@ export default function MandatPage() {
           <div className="pricingGrid">
             <div className="priceBox">
               <div className="priceLabel">Prix minimum accepté <span>*</span></div>
-              <input
-                type="number"
-                placeholder="Ex. 145000"
-                onChange={e=>set("floor", e.target.value)}
-              />
+              <div className="moneyInput"><input type="number" placeholder="Ex. 145000" onChange={e=>set("floor", e.target.value)} /><span>Dirhams</span></div>
               <p>Prix minimum souhaité pour la voiture. En dessous, vous ne souhaitez pas vendre.</p>
             </div>
 
             <div className="priceBox priceBoxMain">
               <div className="priceBadge">Prix de référence</div>
               <div className="priceLabel">Prix souhaité <span>*</span></div>
-              <input
-                type="number"
-                placeholder="Ex. 160000"
-                onChange={e=>set("desired", e.target.value)}
-              />
+              <div className="moneyInput"><input type="number" placeholder="Ex. 160000" onChange={e=>set("desired", e.target.value)} /><span>Dirhams</span></div>
               <p>Prix affiché comme base de discussion avec les acheteurs.</p>
             </div>
 
             <div className="priceBox">
               <div className="priceLabel">Prix immédiat <span>*</span></div>
-              <input
-                type="number"
-                placeholder="Ex. 155000"
-                onChange={e=>set("instantPrice", e.target.value)}
-              />
+              <div className="moneyInput"><input type="number" placeholder="Ex. 155000" onChange={e=>set("instantPrice", e.target.value)} /><span>Dirhams</span></div>
               <p>Prix auquel vous êtes prêt à vendre sans attendre d’autre offre.</p>
             </div>
           </div>
@@ -541,7 +529,35 @@ export default function MandatPage() {
 .priceBoxMain input{font-size:24px}
 .priceBox p{margin:0;color:#728196;font-size:12px;line-height:1.45}
 @media(max-width:900px){.pricingGrid{grid-template-columns:1fr}.priceBoxMain{transform:none}}
-.photoGuide{height:86px;border-radius:14px;background:linear-gradient(145deg,#eef3f8,#ffffff);border:1px solid #dce3eb;position:relative;overflow:hidden;margin:2px 0 4px}.guideCar{position:absolute;left:50%;top:50%;width:86px;height:34px;transform:translate(-50%,-50%);border:2px solid #8b98a8;border-radius:18px 24px 12px 12px;background:rgba(255,255,255,.65)}.guideWindow{position:absolute;left:24px;top:5px;width:36px;height:12px;border-radius:8px;background:#cfd8e3}.guideWheel{position:absolute;bottom:-8px;width:16px;height:16px;border-radius:50%;background:#5f6f82}.leftWheel{left:14px}.rightWheel{right:14px}.guideFocus{position:absolute;border:2px solid #b8924a;border-radius:12px;background:rgba(184,146,74,.11)}.photoGuide small{position:absolute;right:8px;top:7px;background:#161b22;color:#d9ad62;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:950}.photoGuide.front .guideCar,.photoGuide.rear .guideCar{width:52px;height:44px;border-radius:16px}.photoGuide.front .guideFocus,.photoGuide.rear .guideFocus{left:50%;top:50%;width:62px;height:54px;transform:translate(-50%,-50%)}.photoGuide.left .guideFocus,.photoGuide.right .guideFocus{left:28px;top:22px;width:122px;height:42px}.photoGuide.dash .guideFocus{left:28px;top:20px;width:120px;height:46px}.photoGuide.odo .guideFocus{left:58px;top:24px;width:58px;height:34px}.photoGuide.frontSeats .guideFocus,.photoGuide.rearSeats .guideFocus{left:37px;top:18px;width:104px;height:52px}.photoGuide.trunk .guideFocus{left:48px;top:18px;width:84px;height:52px}.photoGuide.wheel .guideFocus{right:34px;bottom:14px;width:44px;height:44px;border-radius:50%}.photoGuide.defect .guideFocus{left:70px;top:20px;width:42px;height:42px;border-radius:50%;border-color:#b42318;background:rgba(180,35,24,.08)}.photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
+.photoGuide{height:86px;border-radius:14px;background:linear-gradient(145deg,#eef3f8,#ffffff);border:1px solid #dce3eb;position:relative;overflow:hidden;margin:2px 0 4px}.guideCar{position:absolute;left:50%;top:50%;width:86px;height:34px;transform:translate(-50%,-50%);border:2px solid #8b98a8;border-radius:18px 24px 12px 12px;background:rgba(255,255,255,.65)}.guideWindow{position:absolute;left:24px;top:5px;width:36px;height:12px;border-radius:8px;background:#cfd8e3}.guideWheel{position:absolute;bottom:-8px;width:16px;height:16px;border-radius:50%;background:#5f6f82}.leftWheel{left:14px}.rightWheel{right:14px}.guideFocus{position:absolute;border:2px solid #b8924a;border-radius:12px;background:rgba(184,146,74,.11)}.photoGuide small{position:absolute;right:8px;top:7px;background:#161b22;color:#d9ad62;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:950}.photoGuide.front .guideCar,.photoGuide.rear .guideCar{width:52px;height:44px;border-radius:16px}.photoGuide.front .guideFocus,.photoGuide.rear .guideFocus{left:50%;top:50%;width:62px;height:54px;transform:translate(-50%,-50%)}.photoGuide.left .guideFocus,.photoGuide.right .guideFocus{left:28px;top:22px;width:122px;height:42px}.photoGuide.dash .guideFocus{left:28px;top:20px;width:120px;height:46px}.photoGuide.odo .guideFocus{left:58px;top:24px;width:58px;height:34px}.photoGuide.frontSeats .guideFocus,.photoGuide.rearSeats .guideFocus{left:37px;top:18px;width:104px;height:52px}.photoGuide.trunk .guideFocus{left:48px;top:18px;width:84px;height:52px}.photoGuide.wheel .guideFocus{right:34px;bottom:14px;width:44px;height:44px;border-radius:50%}.photoGuide.defect .guideFocus{left:70px;top:20px;width:42px;height:42px;border-radius:50%;border-color:#b42318;background:rgba(180,35,24,.08)}
+.moneyInput{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;background:white;border:1.5px solid #cfd8e3;border-radius:16px;overflow:hidden}
+.moneyInput input{border:0!important;background:white!important;border-radius:0!important;box-shadow:none!important;font-size:20px!important;font-weight:900!important}
+.moneyInput span{height:100%;display:flex;align-items:center;padding:0 14px;background:#eef2f6;border-left:1px solid #dce3eb;color:#5f6f82;font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.04em;user-select:none;pointer-events:none}
+.priceBoxMain .moneyInput input{font-size:24px!important}
+.colorItem.selected{position:relative}
+.colorItem.selected:after{content:"✓";position:absolute;right:8px;top:8px;background:#161b22;color:#d9ad62;width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:950}
+
+.photoGuide3d{height:96px;border-radius:16px;background:radial-gradient(circle at 30% 18%,#ffffff,#edf3f9 70%);border:1px solid #dce3eb;position:relative;overflow:hidden;margin:2px 0 4px;perspective:520px}
+.car3d{position:absolute;left:50%;top:53%;width:96px;height:42px;transform-style:preserve-3d;transform:translate(-50%,-50%) rotateX(58deg) rotateZ(-18deg);background:linear-gradient(135deg,#dfe7f0,#ffffff);border:2px solid #7b8794;border-radius:18px 28px 14px 14px;box-shadow:18px 16px 28px rgba(31,41,55,.18)}
+.roof3d{position:absolute;left:27px;top:-18px;width:44px;height:28px;background:linear-gradient(135deg,#cbd5e1,#ffffff);border:2px solid #7b8794;border-radius:14px 16px 6px 6px}
+.hood3d{position:absolute;right:-14px;top:8px;width:30px;height:24px;background:linear-gradient(135deg,#eef2f6,#ffffff);border:2px solid #7b8794;border-radius:8px}
+.glass3d{position:absolute;left:36px;top:-12px;width:24px;height:12px;background:#9fb4c8;border-radius:8px;opacity:.9}
+.wheel3d{position:absolute;bottom:-10px;width:18px;height:18px;border-radius:50%;background:#27313c;border:3px solid #95a1af}
+.w1{left:14px}.w2{right:8px}
+.cameraBeam{position:absolute;inset:auto auto 12px 12px;width:64px;height:42px;border:2px solid #b8924a;border-right:0;border-top:0;border-radius:0 0 0 18px;opacity:.95}
+.angleTag{position:absolute;right:8px;top:8px;background:#161b22;color:#d9ad62;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:950}
+.front3d .car3d{transform:translate(-50%,-50%) rotateX(62deg) rotateZ(0deg);width:64px;height:52px}
+.rear3d .car3d{transform:translate(-50%,-50%) rotateX(62deg) rotateZ(180deg);width:64px;height:52px}
+.left3d .car3d{transform:translate(-50%,-50%) rotateX(58deg) rotateZ(-18deg)}
+.right3d .car3d{transform:translate(-50%,-50%) rotateX(58deg) rotateZ(18deg)}
+.dash3d .car3d,.odo3d .car3d{width:100px;height:50px;transform:translate(-50%,-50%) rotateX(65deg) rotateZ(0deg);border-radius:12px;background:linear-gradient(135deg,#1f2937,#64748b)}
+.dash3d .cameraBeam,.odo3d .cameraBeam{left:44px;bottom:16px;width:72px;height:48px}
+.frontSeats3d .car3d,.rearSeats3d .car3d{width:96px;height:54px;transform:translate(-50%,-50%) rotateX(64deg) rotateZ(0deg);background:linear-gradient(135deg,#e8ddd0,#ffffff)}
+.trunk3d .car3d{transform:translate(-50%,-50%) rotateX(62deg) rotateZ(180deg);width:74px;height:54px}
+.wheel3d .car3d{transform:translate(-48%,-50%) rotateX(58deg) rotateZ(-18deg)}
+.wheel3d .cameraBeam{right:22px;left:auto;bottom:20px;width:42px;height:42px;border-radius:50%;border:2px solid #b8924a}
+.defect3d .car3d{opacity:.62}.defect3d .cameraBeam{left:72px;bottom:24px;width:42px;height:42px;border-radius:50%;border:2px solid #b42318}
+.photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
         .marketCard{background:rgba(255,255,255,.88);border:1px solid #dce3eb;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px)}.marketHeader{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:18px}.marketHeader span{font-size:22px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b8924a;background:#fff6e8;border:1px solid #efd8ae;border-radius:999px;padding:7px 9px}.marketIdentity{background:#161b22;color:white;border-radius:18px;padding:15px;margin-bottom:15px}.marketIdentity strong{display:block;font-size:15px}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.marketStats strong{display:block;margin-top:4px;font-size:13px}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px 1fr 34px;gap:8px;align-items:center;font-size:11px;color:#5f6f82}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.sourceNote{font-size:11px;color:#8090a3;line-height:1.5}
         .signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal strong{display:block;margin-bottom:4px}.signal p{margin:0;line-height:1.5;font-size:13px}.signal.green{background:#edf7f2;border-color:#c3e6d4;color:#2d8653}.signal.red{background:#fff2f0;border-color:#f2aaa2;color:#b42318}.signal.black{background:#f3f0ec;border-color:#d8c8b5;color:#17110c}.signal.neutral{background:#f8fafc;border-color:#dce3eb;color:#728196}
         @media(max-width:1280px){.workspace{grid-template-columns:210px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.grid{grid-template-columns:repeat(2,minmax(220px,1fr))}.optionsGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.topRight .draft{display:none}.hero,.workspace{grid-template-columns:1fr}.leftNav,.rightRail{position:static}.grid,.photoGrid,.optionsGrid,.colorGrid,.customOtherGrid{grid-template-columns:1fr}.panel{padding:22px}.final{flex-direction:column;align-items:flex-start}.final button{width:100%}}
@@ -582,8 +598,32 @@ function photoInstruction(label:string) {
 }
 
 function PhotoGuide({label,index}:{label:string; index:number}) {
-  const carClass = label.includes("Avant") ? "front" : label.includes("Arrière") ? "rear" : label.includes("gauche") ? "left" : label.includes("droit") ? "right" : label.includes("Tableau") ? "dash" : label.includes("Compteur") ? "odo" : label.includes("Sièges avant") ? "frontSeats" : label.includes("Sièges arrière") ? "rearSeats" : label.includes("Coffre") ? "trunk" : label.includes("Jantes") ? "wheel" : "defect";
-  return <div className={`photoGuide ${carClass}`}><div className="guideCar"><span className="guideWindow" /><span className="guideWheel leftWheel" /><span className="guideWheel rightWheel" /></div><div className="guideFocus" /><small>{index + 1}</small></div>;
+  const view =
+    label.includes("Avant") ? "front3d" :
+    label.includes("Arrière") ? "rear3d" :
+    label.includes("gauche") ? "left3d" :
+    label.includes("droit") ? "right3d" :
+    label.includes("Tableau") ? "dash3d" :
+    label.includes("Compteur") ? "odo3d" :
+    label.includes("Sièges avant") ? "frontSeats3d" :
+    label.includes("Sièges arrière") ? "rearSeats3d" :
+    label.includes("Coffre") ? "trunk3d" :
+    label.includes("Jantes") ? "wheel3d" :
+    "defect3d";
+
+  return (
+    <div className={`photoGuide3d ${view}`}>
+      <div className="cameraBeam" />
+      <div className="car3d">
+        <span className="roof3d" />
+        <span className="hood3d" />
+        <span className="glass3d" />
+        <span className="wheel3d w1" />
+        <span className="wheel3d w2" />
+      </div>
+      <div className="angleTag">Angle {index + 1}</div>
+    </div>
+  );
 }
 
 function OptionBlock({
