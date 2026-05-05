@@ -199,18 +199,19 @@ const EXTERIOR_OPTIONS = [
 ];
 
 const PHOTOS = [
-  "Avant 3/4",
-  "Arrière 3/4",
-  "Profil gauche",
-  "Profil droit",
-  "Intérieur avant",
-  "Intérieur arrière",
-  "Tableau de bord",
-  "Compteur kilométrique",
-  "Coffre",
-  "Jantes / pneus",
-  "Moteur",
-  "Défauts visibles"
+  { label: "Arrière", image: "/photo-guides/arriere.png", instruction: "Arrière complet du véhicule", multiple: false },
+  { label: "Avant", image: "/photo-guides/avant.png", instruction: "Avant complet du véhicule", multiple: false },
+  { label: "Coffre", image: "/photo-guides/coffre.png", instruction: "Coffre ouvert, volume visible", multiple: false },
+  { label: "Compteur kilométrique", image: "/photo-guides/compteur-kilometrique.png", instruction: "Kilométrage net et lisible", multiple: false },
+  { label: "Jantes", image: "/photo-guides/jantes.png", instruction: "Jante et état du pneu visibles", multiple: false },
+  { label: "Moteur", image: "/photo-guides/moteur.png", instruction: "Capot ouvert, moteur visible", multiple: false },
+  { label: "Profil droit", image: "/photo-guides/profil-droit.png", instruction: "Côté droit complet, roues incluses", multiple: false },
+  { label: "Profil gauche", image: "/photo-guides/profil-gauche.png", instruction: "Côté gauche complet, roues incluses", multiple: false },
+  { label: "Siège conducteur", image: "/photo-guides/siege-conducteur.png", instruction: "Siège conducteur et commandes visibles", multiple: false },
+  { label: "Siège passager", image: "/photo-guides/siege-passager.png", instruction: "Siège passager visible", multiple: false },
+  { label: "Sièges arrières", image: "/photo-guides/sieges-arrieres.png", instruction: "Banquette arrière entière visible", multiple: false },
+  { label: "Tableau de bord", image: "/photo-guides/tableau-de-bord.png", instruction: "Volant, écran et console visibles", multiple: false },
+  { label: "Défauts constatés", image: "/photo-guides/defauts.png", instruction: "Ajoutez toutes les photos nécessaires des rayures, chocs ou défauts", multiple: true }
 ];
 
 const STEPS = [
@@ -481,18 +482,38 @@ export default function MandatPage() {
               <strong>Checklist qualité photo</strong>
               <p>Photos en lumière naturelle, véhicule entier visible, pas de filtre, plaque masquée si nécessaire.</p>
             </div>
-            <span>{PHOTOS.length} photos recommandées</span>
+            <span>12 photos obligatoires + défauts illimités</span>
           </div>
 
-          <div className="photoGrid">{PHOTOS.map((p,i)=>
-            <label className="upload" key={p}>
-              <b>{String(i+1).padStart(2,"0")}</b>
-              <PhotoGuide label={p} index={i} />
-              <span>{p}</span>
-              <small>{photoInstruction(p)}</small>
-              <input type="file" accept="image/*" />
-            </label>
-          )}</div>
+          <div className="photoGrid">
+            {PHOTOS.map((photo, i) => (
+              <label className={`upload ${photo.multiple ? "uploadDefects" : ""}`} key={photo.label}>
+                <b>{String(i + 1).padStart(2, "0")}</b>
+
+                <img
+                  src={photo.image}
+                  alt={photo.label}
+                  className="photoGuideImage"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+
+                <span>{photo.label}</span>
+                <small>{photo.instruction}</small>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple={photo.multiple}
+                />
+
+                {photo.multiple && (
+                  <em>Upload multiple autorisé</em>
+                )}
+              </label>
+            ))}
+          </div>
 
           <Section id="documents" title="Documents publics" subtitle="Facultatif, mais fortement recommandé pour obtenir un badge Verified." />
           <label className="check"><input type="checkbox" checked={docs} onChange={e=>setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
@@ -588,6 +609,11 @@ export default function MandatPage() {
 .wheel3d .car3d{transform:translate(-48%,-50%) rotateX(58deg) rotateZ(-18deg)}
 .wheel3d .cameraBeam{right:22px;left:auto;bottom:20px;width:42px;height:42px;border-radius:50%;border:2px solid #b8924a}
 .defect3d .car3d{opacity:.62}.defect3d .cameraBeam{left:72px;bottom:24px;width:42px;height:42px;border-radius:50%;border:2px solid #b42318}
+
+.photoGuideImage{width:100%;height:130px;object-fit:contain;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:12px;transition:.2s ease}
+.upload:hover .photoGuideImage{transform:scale(1.02);border-color:#d9ad62}
+.uploadDefects{border-color:#f2aaa2;background:#fff7f6}
+.uploadDefects em{display:inline-flex;align-self:flex-start;background:#fff2f0;color:#b42318;border:1px solid #f2aaa2;border-radius:999px;padding:5px 9px;font-size:11px;font-style:normal;font-weight:950}
 .photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
         .marketCard{background:rgba(255,255,255,.88);border:1px solid #dce3eb;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px)}.marketHeader{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:18px}.marketHeader span{font-size:22px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b8924a;background:#fff6e8;border:1px solid #efd8ae;border-radius:999px;padding:7px 9px}.marketIdentity{background:#161b22;color:white;border-radius:18px;padding:15px;margin-bottom:15px}.marketIdentity strong{display:block;font-size:15px}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.marketStats strong{display:block;margin-top:4px;font-size:13px}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px 1fr 34px;gap:8px;align-items:center;font-size:11px;color:#5f6f82}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.sourceNote{font-size:11px;color:#8090a3;line-height:1.5}
         .signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal strong{display:block;margin-bottom:4px}.signal p{margin:0;line-height:1.5;font-size:13px}.signal.green{background:#edf7f2;border-color:#c3e6d4;color:#2d8653}.signal.red{background:#fff2f0;border-color:#f2aaa2;color:#b42318}.signal.black{background:#f3f0ec;border-color:#d8c8b5;color:#17110c}.signal.neutral{background:#f8fafc;border-color:#dce3eb;color:#728196}
@@ -611,54 +637,7 @@ function ColorGrid({items, selectedColor, onPick}:{items:string[]; selectedColor
   return <div className={`colorGrid ${selectedColor ? "hasSelection" : ""}`}>{items.map(x=><button key={x} type="button" className={`colorItem ${selectedColor === x ? "selected" : ""}`} onClick={()=>onPick(x)}><span className="swatch" style={{background:colors[x]||"#ddd"}} /><span>{x}</span></button>)}</div>;
 }
 
-function photoInstruction(label:string) {
-  const instructions:Record<string,string> = {
-    "Avant 3/4":"Placez-vous légèrement de face, véhicule entier visible",
-    "Arrière 3/4":"Placez-vous légèrement à l’arrière, véhicule entier visible",
-    "Profil gauche":"Côté gauche complet, roues incluses",
-    "Profil droit":"Côté droit complet, roues incluses",
-    "Intérieur avant":"Sièges avant, volant et console centrale visibles",
-    "Intérieur arrière":"Banquette arrière entière visible",
-    "Tableau de bord":"Vue conducteur, écran et volant visibles",
-    "Compteur kilométrique":"Kilométrage net et lisible",
-    "Coffre":"Coffre ouvert, volume visible",
-    "Jantes / pneus":"Gros plan jante et état du pneu",
-    "Moteur":"Capot ouvert, moteur propre et bien éclairé",
-    "Défauts visibles":"Photo rapprochée de chaque défaut"
-  };
-  return instructions[label] || "Photo nette requise";
-}
 
-function PhotoGuide({label,index}:{label:string; index:number}) {
-  const view =
-    label.includes("Avant") ? "front3d" :
-    label.includes("Arrière") ? "rear3d" :
-    label.includes("gauche") ? "left3d" :
-    label.includes("droit") ? "right3d" :
-    label.includes("Intérieur avant") ? "frontSeats3d" :
-    label.includes("Intérieur arrière") ? "rearSeats3d" :
-    label.includes("Tableau") ? "dash3d" :
-    label.includes("Compteur") ? "odo3d" :
-    label.includes("Coffre") ? "trunk3d" :
-    label.includes("Jantes") ? "wheel3d" :
-    label.includes("Moteur") ? "engine3d" :
-    "defect3d";
-
-  return (
-    <div className={`photoGuide3d ${view}`}>
-      <div className="cameraBeam" />
-      <div className="car3d">
-        <span className="roof3d" />
-        <span className="hood3d" />
-        <span className="glass3d" />
-        <span className="engineBlock" />
-        <span className="wheel3d w1" />
-        <span className="wheel3d w2" />
-      </div>
-      <div className="angleTag">Angle {index + 1}</div>
-    </div>
-  );
-}
 
 function OptionBlock({
   title,
