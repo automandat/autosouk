@@ -356,9 +356,27 @@ export default function MandatPage() {
           </div>
 
           <Section id="main" title="Données principales" subtitle="Marque, modèle, version, type de véhicule et données administratives." />
-          <div className="mainDataLayout">
-            <div className="mainDataForm">
-              <div className="grid">
+          <div className="brandShowcaseWide">
+            <div className="brandLogoSlot">
+              {brand && !brandLogoMissing && getBrandLogo(brand) ? (
+                <img
+                  src={getBrandLogo(brand) || ""}
+                  alt={brand}
+                  className="brandPngLogo"
+                  onError={() => setBrandLogoMissing(true)}
+                />
+              ) : (
+                <div className="brandFallback">
+                  <span>{brand ? brand.slice(0, 2).toUpperCase() : "AS"}</span>
+                </div>
+              )}
+            </div>
+            <div className="brandShowcaseCopy">
+              <strong>{brand || "Sélectionnez une marque"}</strong>
+              <small>{brand ? "Logo constructeur affiché automatiquement si disponible dans /public/brands." : "Le logo apparaîtra ici après sélection de la marque."}</small>
+            </div>
+          </div>
+          <div className="grid">
             <Field label="Marque" required><select value={brand} onChange={e=>{setBrand(e.target.value);setModel("");setEngine("");setTrim("");}}><option value="">Sélectionner une marque</option>{Object.keys(MODELS).sort().map(x=><option key={x}>{x}</option>)}</select></Field>
             <Field label="Modèle" required><select value={model} disabled={!brand} onChange={e=>{setModel(e.target.value);setEngine("");setTrim("");}}><option value="">{brand ? "Sélectionner un modèle" : "Choisissez une marque"}</option>{models.map(x=><option key={x}>{x}</option>)}</select></Field>
             {model === "Autre" && <Field label="Autre modèle"><input placeholder="Préciser le modèle" value={otherModel} onChange={e=>setOtherModel(e.target.value)} /></Field>}
@@ -370,35 +388,6 @@ export default function MandatPage() {
             <Field label="Nombre de sièges"><select defaultValue=""><option>Tous</option><option>2</option><option>4</option><option>5</option><option>7</option><option>9+</option></select></Field>
             <Field label="Année" required><select defaultValue="" onChange={e=>set("year",e.target.value)}><option value="" disabled>Sélectionner</option>{YEARS.map(x=><option key={x}>{x}</option>)}</select></Field>
             <Field label="Kilométrage" required><select defaultValue="" onChange={e=>set("mileage",e.target.value)}><option value="" disabled>Sélectionner</option>{MILEAGES.map(x=><option key={x}>{x}</option>)}</select></Field>
-          </div>
-              </div>
-            </div>
-
-            <aside className="brandShowcase">
-              <div className="brandShowcaseInner">
-                {brand && !brandLogoMissing && getBrandLogo(brand) ? (
-                  <img
-                    src={getBrandLogo(brand) || ""}
-                    alt={brand}
-                    className="brandPngLogo"
-                    onError={() => setBrandLogoMissing(true)}
-                  />
-                ) : (
-                  <div className="brandFallback">
-                    <span>{brand ? brand.slice(0, 2).toUpperCase() : "AS"}</span>
-                  </div>
-                )}
-
-                <div className="brandShowcaseText">
-                  <strong>{brand || "Sélectionnez une marque"}</strong>
-                  <small>
-                    {brand
-                      ? "Logo constructeur affiché automatiquement si le PNG est disponible."
-                      : "Le logo apparaîtra ici après sélection."}
-                  </small>
-                </div>
-              </div>
-            </aside>
           </div>
 
           <Section id="technical" title="Données techniques" subtitle="Carburant, transmission, puissance, cylindrée et caractéristiques mécaniques." />
@@ -522,17 +511,15 @@ export default function MandatPage() {
         .hero{max-width:1420px;margin:auto;padding:46px 28px 26px;display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:end}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#b8924a;font-weight:950;margin-bottom:14px}h1{font-family:Georgia,serif;font-size:clamp(44px,6vw,76px);line-height:.98;margin:0 0 18px;letter-spacing:-.04em;max-width:860px}h1 em{color:#b8924a}.hero p{font-size:18px;line-height:1.7;color:#657181;max-width:760px}.heroGlass{background:rgba(255,255,255,.85);border:1px solid white;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px);border-radius:30px;padding:26px}.heroMetric{display:flex;justify-content:space-between;align-items:center}.heroMetric span{color:#657181;font-weight:800}.heroMetric strong{font-size:34px;color:#b8924a}.track{height:10px;background:#e5eaf0;border-radius:999px;overflow:hidden;margin:14px 0 18px}.track div{height:100%;border-radius:999px;background:linear-gradient(90deg,#9c7632,#d9ad62)}.heroList{display:grid;gap:10px}.heroList span{background:#f7f9fb;border:1px solid #e1e7ef;border-radius:14px;padding:10px 12px;color:#3f4a58;font-weight:800}
         .workspace{max-width:1420px;margin:auto;padding:24px 28px 80px;display:grid;grid-template-columns:220px minmax(0,1fr) 360px;gap:24px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.leftNav{background:rgba(255,255,255,.82);border:1px solid #dce3eb;border-radius:24px;padding:14px;box-shadow:0 15px 40px rgba(31,41,55,.08);backdrop-filter:blur(12px)}.navTitle{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#8090a3;font-weight:950;margin:4px 8px 12px}.leftNav a{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:14px;text-decoration:none;color:#5f6f82;font-weight:900;font-size:13px}.leftNav a small{color:#b8924a}.leftNav a.active{background:#161b22;color:white}.leftNav a.active small{color:#d9ad62}
         .panel{background:white;border:1px solid #dce3eb;border-radius:28px;padding:30px;box-shadow:0 30px 90px rgba(31,41,55,.10);overflow:hidden}.sectionTitle{scroll-margin-top:30px;margin:34px 0 20px;padding-top:18px;border-top:1px solid #e3e9f0}.sectionTitle:first-child{margin-top:0;border-top:0}.sectionTitle h2{font-size:24px;margin:0 0 4px;font-weight:950;letter-spacing:-.02em}.sectionTitle p{margin:0;color:#728196;font-size:14px}
-.mainDataLayout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start}
-.mainDataForm{min-width:0}
-.brandShowcase{position:sticky;top:20px;align-self:start}
-.brandShowcaseInner{min-height:245px;background:linear-gradient(145deg,#ffffff,#f8fafc);border:1.5px solid #dce3eb;border-radius:22px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 18px 48px rgba(31,41,55,.08)}
-.brandPngLogo{max-width:190px;max-height:105px;object-fit:contain;filter:grayscale(.08);opacity:.94;transition:.2s ease}
+.brandShowcaseWide{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:center;background:linear-gradient(145deg,#ffffff,#f8fafc);border:1.5px solid #dce3eb;border-radius:22px;padding:18px;margin:0 0 24px;box-shadow:0 16px 40px rgba(31,41,55,.07)}
+.brandLogoSlot{height:118px;display:flex;align-items:center;justify-content:center;background:#ffffff;border:1px solid #e3e9f0;border-radius:18px;overflow:hidden}
+.brandPngLogo{max-width:175px;max-height:86px;object-fit:contain;filter:grayscale(.08);opacity:.95;transition:.2s ease}
 .brandPngLogo:hover{filter:none;opacity:1;transform:scale(1.03)}
-.brandFallback{width:112px;height:112px;border-radius:28px;background:#161b22;color:#d9ad62;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:950;letter-spacing:-.05em;box-shadow:0 18px 38px rgba(22,27,34,.18)}
-.brandShowcaseText{margin-top:18px;display:grid;gap:6px}
-.brandShowcaseText strong{font-size:17px}
-.brandShowcaseText small{font-size:12px;color:#728196;line-height:1.45}
-@media(max-width:1280px){.mainDataLayout{grid-template-columns:1fr}.brandShowcase{position:static;order:-1}.brandShowcaseInner{min-height:160px}}
+.brandFallback{width:86px;height:86px;border-radius:22px;background:#161b22;color:#d9ad62;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:950;letter-spacing:-.05em}
+.brandShowcaseCopy{display:grid;gap:5px}
+.brandShowcaseCopy strong{font-size:18px;font-weight:950}
+.brandShowcaseCopy small{font-size:12px;color:#728196;line-height:1.45}
+@media(max-width:900px){.brandShowcaseWide{grid-template-columns:1fr}.brandLogoSlot{height:110px}}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:20px 22px;align-items:start}.field{display:grid;gap:8px;min-width:0}.field label{font-weight:950;font-size:12px;color:#101820}.req{color:#b8924a}input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1.5px solid #cfd8e3;background:#f8fafc;border-radius:12px;padding:13px 14px;font-size:14px;color:#101820;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{background:white;border-color:#b8924a;box-shadow:0 0 0 4px rgba(184,146,74,.13)}.pillGroup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pill{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.pill input{width:auto}.colorGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:22px}.colorItem{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:900;border:1.5px solid #dce3eb;background:#f8fafc;border-radius:12px;padding:10px;cursor:pointer;transition:.16s;color:#101820}.colorGrid.hasSelection .colorItem{opacity:.35;filter:grayscale(.85)}.colorGrid.hasSelection .colorItem.selected{opacity:1;filter:none;background:#fff6e8;border-color:#d9ad62;box-shadow:0 8px 24px rgba(184,146,74,.16);transform:translateY(-1px)}.swatch{width:16px;height:16px;border-radius:5px;border:1px solid #9aa6b4;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
         .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.customOtherGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-top:12px}
 .customOtherBox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;background:#fff;border:1.5px solid #dce3eb;border-radius:14px;padding:10px 12px}
