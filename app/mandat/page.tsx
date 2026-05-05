@@ -306,7 +306,6 @@ export default function MandatPage() {
             <Field label="Motorisation" required><select value={engine} disabled={!brand || !model} onChange={e=>setEngine(e.target.value)}><option value="">{brand && model ? "Sélectionner" : "Choisissez marque et modèle"}</option>{engines.map(x=><option key={x}>{x}</option>)}</select></Field>
             <Field label="Finition (Pack M, Pack AMG, R Line...)" required><input placeholder="Ex. Pack M, AMG Line, R Line..." value={trim} onChange={e=>setTrim(e.target.value)} /></Field>
             {engine === "Autre" && <Field label="Autre motorisation"><input value={otherEngine} onChange={e=>setOtherEngine(e.target.value)} placeholder="Ex. 300e, 20d..." /></Field>}
-            {trim === "Autre" && <Field label="Autre finition"><input value={trim} onChange={e=>setOtherTrim(e.target.value)} placeholder="Ex. AMG Line, Pack M..." /></Field>}
             <Field label="Type de véhicule"><PillGroup items={VEHICLE_TYPES} onPick={(v)=>set("type",v)} /></Field>
             <Field label="Nombre de portes"><select defaultValue=""><option>Tous</option><option>2 portes</option><option>3 portes</option><option>4 portes</option><option>5 portes</option></select></Field>
             <Field label="Nombre de sièges"><select defaultValue=""><option>Tous</option><option>2</option><option>4</option><option>5</option><option>7</option><option>9+</option></select></Field>
