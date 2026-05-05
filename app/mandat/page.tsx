@@ -314,9 +314,10 @@ export default function MandatPage() {
   const description = useMemo(() => {
     const customOptions = Object.values(customFields).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
     const allOptions = [...selected, ...customOptions];
+    const exterior = exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : "";
     const opts = allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : "";
     return `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${displayTrim ? ` finition ${displayTrim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${exterior}${opts}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g," ").trim();
-  }, [brand, displayModel, displayEngine, displayTrim, form, selected, customFields]);
+  }, [brand, displayModel, displayEngine, displayTrim, form, selected, customFields, exteriorColor]);
 
   return (
     <main className="page">
