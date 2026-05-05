@@ -20,7 +20,7 @@ const MODELS: Record<string, string[]> = {
   "Kia":["Ceed","Cerato","Picanto","Rio","Seltos","Sorento","Sportage","Stonic","Autre"],
   "Land Rover":["Defender","Discovery","Range Rover","Range Rover Evoque","Range Rover Sport","Velar","Autre"],
   "Mazda":["2","3","6","CX-3","CX-30","CX-5","Autre"],
-  "Mercedes-Benz":["Classe A","Classe B","Classe C","C300e","Classe CLA","Classe E","Classe GLA","Classe GLC","Classe GLE","Classe S","Vito","Autre"],
+  "Mercedes-Benz":["Classe A","Classe B","Classe C","Classe CLA","Classe E","Classe GLA","Classe GLB","Classe GLC","Classe GLE","Classe GLS","Classe S","Classe V","Vito","Autre"],
   "Mini":["Cooper","Countryman","Clubman","Autre"],
   "Nissan":["Juke","Micra","Navara","Qashqai","X-Trail","Autre"],
   "Opel":["Astra","Corsa","Crossland","Grandland","Mokka","Autre"],
@@ -38,15 +38,71 @@ const MODELS: Record<string, string[]> = {
 };
 
 const ENGINE_BY_BRAND_MODEL: Record<string, string[]> = {
-  "Mercedes-Benz|Classe C":["180","200","220d","250","300","300e","350e","43 AMG","63 AMG","Autre"],
-  "Mercedes-Benz|C300e":["300e","Autre"],
-  "BMW|Série 5":["518d","520i","520d","525d","528i","530i","530d","530e","535d","540i","M550i","M5","Autre"],
-  "BMW|Série 3":["316i","318i","318d","320i","320d","325i","325d","328i","330i","330d","330e","M340i","M3","Autre"],
-  "Audi|A3":["30 TFSI","35 TFSI","35 TDI","40 TFSI","40 TDI","S3","RS3","Autre"],
-  "Volkswagen|Golf VII":["1.0 TSI","1.2 TSI","1.4 TSI","1.6 TDI","2.0 TDI","GTI","GTD","R","Autre"],
-  "Dacia|Logan":["1.0 SCe","1.0 TCe","1.5 dCi","1.6 MPI","ECO-G","Autre"],
-  "Peugeot|3008":["1.2 PureTech","1.6 PureTech","1.5 BlueHDi","2.0 BlueHDi","Hybrid 225","Hybrid4 300","Autre"],
-  "Renault|Clio":["0.9 TCe","1.0 SCe","1.0 TCe","1.2 16V","1.3 TCe","1.5 dCi","E-Tech Hybrid","RS","Autre"]
+  "Mercedes-Benz|Classe A": ["A160", "A180", "A200", "A220", "A250", "A250e", "A35 AMG", "A45 AMG", "Autre"],
+  "Mercedes-Benz|Classe B": ["B160", "B180", "B200", "B220", "B250e", "Autre"],
+  "Mercedes-Benz|Classe C": ["C180", "C200", "C220d", "C250", "C300", "C300e", "C350e", "C400", "C43 AMG", "C63 AMG", "Autre"],
+  "Mercedes-Benz|Classe CLA": ["CLA180", "CLA200", "CLA220d", "CLA250", "CLA250e", "CLA35 AMG", "CLA45 AMG", "Autre"],
+  "Mercedes-Benz|Classe E": ["E200", "E220d", "E250", "E300", "E300e", "E350e", "E400d", "E450", "E53 AMG", "E63 AMG", "Autre"],
+  "Mercedes-Benz|Classe GLA": ["GLA180", "GLA200", "GLA220d", "GLA250", "GLA35 AMG", "GLA45 AMG", "Autre"],
+  "Mercedes-Benz|Classe GLB": ["GLB180", "GLB200", "GLB220d", "GLB250", "GLB35 AMG", "Autre"],
+  "Mercedes-Benz|Classe GLC": ["GLC200", "GLC220d", "GLC250", "GLC300", "GLC300e", "GLC350e", "GLC43 AMG", "GLC63 AMG", "Autre"],
+  "Mercedes-Benz|Classe GLE": ["GLE250d", "GLE300d", "GLE350d", "GLE350e", "GLE400d", "GLE450", "GLE53 AMG", "GLE63 AMG", "Autre"],
+  "Mercedes-Benz|Classe GLS": ["GLS350d", "GLS400d", "GLS450", "GLS580", "GLS63 AMG", "Autre"],
+  "Mercedes-Benz|Classe S": ["S350d", "S400d", "S450", "S500", "S560", "S580e", "S63 AMG", "Autre"],
+
+  "BMW|Série 1": ["116i", "116d", "118i", "118d", "120i", "120d", "125i", "125d", "128ti", "M135i", "Autre"],
+  "BMW|Série 2": ["216i", "216d", "218i", "218d", "220i", "220d", "225i", "225e", "230i", "M235i", "M240i", "Autre"],
+  "BMW|Série 3": ["316i", "316d", "318i", "318d", "320i", "320d", "325i", "325d", "328i", "330i", "330d", "330e", "335i", "335d", "340i", "M340i", "M3", "Autre"],
+  "BMW|Série 4": ["418i", "418d", "420i", "420d", "425d", "428i", "430i", "430d", "435i", "435d", "440i", "M440i", "M4", "Autre"],
+  "BMW|Série 5": ["518d", "520i", "520d", "523i", "525i", "525d", "528i", "530i", "530d", "530e", "535i", "535d", "540i", "545e", "550i", "M550d", "M550i", "M5", "Autre"],
+  "BMW|Série 7": ["730d", "730i", "740d", "740i", "740e", "745e", "750i", "750d", "760Li", "Autre"],
+  "BMW|X1": ["16d", "18i", "18d", "20i", "20d", "23d", "25e", "28i", "Autre"],
+  "BMW|X3": ["18d", "20i", "20d", "25d", "28i", "30i", "30d", "30e", "35i", "35d", "M40i", "M40d", "X3M", "Autre"],
+  "BMW|X5": ["25d", "30d", "35i", "40i", "40d", "45e", "50i", "M50d", "M50i", "X5M", "Autre"],
+
+  "Audi|A1": ["25 TFSI", "30 TFSI", "35 TFSI", "40 TFSI", "Autre"],
+  "Audi|A3": ["30 TFSI", "35 TFSI", "35 TDI", "40 TFSI", "40 TDI", "45 TFSI e", "S3", "RS3", "Autre"],
+  "Audi|A4": ["35 TFSI", "35 TDI", "40 TFSI", "40 TDI", "45 TFSI", "50 TDI", "S4", "RS4", "Autre"],
+  "Audi|A5": ["35 TFSI", "35 TDI", "40 TFSI", "40 TDI", "45 TFSI", "50 TDI", "S5", "RS5", "Autre"],
+  "Audi|A6": ["40 TDI", "45 TFSI", "45 TDI", "50 TDI", "55 TFSI", "55 TFSI e", "S6", "RS6", "Autre"],
+  "Audi|Q3": ["35 TFSI", "35 TDI", "40 TFSI", "40 TDI", "45 TFSI", "RS Q3", "Autre"],
+  "Audi|Q5": ["35 TDI", "40 TDI", "45 TFSI", "50 TFSI e", "55 TFSI e", "SQ5", "Autre"],
+  "Audi|Q7": ["45 TDI", "50 TDI", "55 TFSI", "55 TFSI e", "60 TFSI e", "SQ7", "Autre"],
+
+  "Volkswagen|Golf": ["1.0 TSI", "1.2 TSI", "1.4 TSI", "1.5 TSI", "1.6 TDI", "2.0 TDI", "eTSI", "GTE", "GTI", "GTD", "R", "Autre"],
+  "Volkswagen|Golf VII": ["1.0 TSI", "1.2 TSI", "1.4 TSI", "1.5 TSI", "1.6 TDI", "2.0 TDI", "GTE", "GTI", "GTD", "R", "Autre"],
+  "Volkswagen|Polo": ["1.0 MPI", "1.0 TSI", "1.2 TSI", "1.4 TDI", "1.6 TDI", "GTI", "Autre"],
+  "Volkswagen|Tiguan": ["1.4 TSI", "1.5 TSI", "2.0 TSI", "1.6 TDI", "2.0 TDI", "eHybrid", "R", "Autre"],
+
+  "Dacia|Logan": ["1.0 SCe", "1.0 TCe", "1.2 16V", "1.5 dCi", "1.6 MPI", "ECO-G", "Autre"],
+  "Dacia|Sandero": ["1.0 SCe", "1.0 TCe", "1.2 16V", "1.5 dCi", "ECO-G", "Autre"],
+  "Dacia|Sandero Stepway": ["1.0 SCe", "1.0 TCe", "1.5 dCi", "ECO-G", "Autre"],
+  "Dacia|Duster": ["1.0 TCe", "1.2 TCe", "1.3 TCe", "1.5 dCi", "1.6 SCe", "ECO-G", "Autre"],
+
+  "Renault|Clio": ["0.9 TCe", "1.0 SCe", "1.0 TCe", "1.2 16V", "1.3 TCe", "1.5 dCi", "E-Tech Hybrid", "RS", "Autre"],
+  "Renault|Captur": ["0.9 TCe", "1.0 TCe", "1.3 TCe", "1.5 dCi", "E-Tech Hybrid", "E-Tech Plug-in", "Autre"],
+  "Renault|Megane": ["1.2 TCe", "1.3 TCe", "1.5 dCi", "1.6 dCi", "2.0 TCe", "E-Tech", "RS", "Autre"],
+
+  "Peugeot|208": ["1.2 PureTech", "1.5 BlueHDi", "e-208", "GTi", "Autre"],
+  "Peugeot|308": ["1.2 PureTech", "1.6 PureTech", "1.5 BlueHDi", "2.0 BlueHDi", "Hybrid 180", "Hybrid 225", "GTi", "Autre"],
+  "Peugeot|3008": ["1.2 PureTech", "1.6 PureTech", "1.5 BlueHDi", "2.0 BlueHDi", "Hybrid 225", "Hybrid4 300", "Autre"],
+  "Peugeot|5008": ["1.2 PureTech", "1.6 PureTech", "1.5 BlueHDi", "2.0 BlueHDi", "Autre"],
+
+  "Toyota|Yaris": ["1.0 VVT-i", "1.3 VVT-i", "1.5 VVT-i", "Hybrid", "GR Yaris", "Autre"],
+  "Toyota|Corolla": ["1.2 Turbo", "1.6 VVT-i", "1.8 Hybrid", "2.0 Hybrid", "Autre"],
+  "Toyota|RAV4": ["2.0 VVT-i", "2.2 D-4D", "2.5 Hybrid", "Plug-in Hybrid", "Autre"],
+
+  "Hyundai|i10": ["1.0 MPI", "1.2 MPI", "Autre"],
+  "Hyundai|i20": ["1.0 T-GDi", "1.2 MPI", "1.4 CRDi", "Autre"],
+  "Hyundai|Tucson": ["1.6 GDi", "1.6 T-GDi", "1.6 CRDi", "2.0 CRDi", "Hybrid", "Plug-in Hybrid", "Autre"],
+
+  "Kia|Picanto": ["1.0 MPI", "1.2 MPI", "Autre"],
+  "Kia|Rio": ["1.0 T-GDi", "1.2 MPI", "1.4 MPI", "1.4 CRDi", "Autre"],
+  "Kia|Sportage": ["1.6 GDi", "1.6 T-GDi", "1.6 CRDi", "2.0 CRDi", "Hybrid", "Plug-in Hybrid", "Autre"],
+
+  "Porsche|911": ["Carrera", "Carrera S", "Carrera 4", "Carrera 4S", "Targa", "Turbo", "Turbo S", "GT3", "GT3 RS", "Autre"],
+  "Porsche|Cayenne": ["Cayenne", "Cayenne S", "Cayenne E-Hybrid", "Cayenne GTS", "Cayenne Turbo", "Autre"],
+  "Porsche|Macan": ["Macan", "Macan S", "Macan GTS", "Macan Turbo", "Autre"]
 };
 
 const TRIMS_BY_BRAND_MODEL: Record<string, string[]> = {
@@ -94,19 +150,7 @@ const EXTERIOR_OPTIONS = [
   "Feux de jour LED","Phares antibrouillard","Attelage fixe","Attelage pivotant","Barres de toit","Vitres arrière surteintées"
 ];
 
-const PHOTOS = [
-  "Avant",
-  "Arrière",
-  "Profil gauche",
-  "Profil droit",
-  "Tableau de bord",
-  "Compteur kilométrique",
-  "Sièges avant",
-  "Sièges arrière",
-  "Coffre",
-  "Jantes / pneus",
-  "Défauts visibles"
-];
+const PHOTOS = ["Avant","Arrière","Profil gauche","Profil droit","Tableau de bord","Compteur kilométrique","Sièges avant","Sièges arrière","Coffre","Jantes / pneus","Défauts visibles"];
 
 const STEPS = [
   ["identity","Identité"],
@@ -250,7 +294,7 @@ export default function MandatPage() {
 
           <Section id="technical" title="Données techniques" subtitle="Carburant, transmission, puissance, cylindrée et caractéristiques mécaniques." />
           <div className="grid">
-            <Field label="Carburant" required><select defaultValue="" onChange={e=>set("fuel",e.target.value)}><option value="" disabled>Sélectionner</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Hybride rechargeable</option><option>Électrique</option><option>GPL</option><option>Hydrogène</option><option>Bioéthanol</option></select></Field>
+            <Field label="Carburant" required><select defaultValue="" onChange={e=>set("fuel",e.target.value)}><option value="" disabled>Sélectionner</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Hybride rechargeable</option><option>Électrique</option><option>GPL</option><option>Hydrogène</option><option>Bioéthanol</option><option>Gaz naturel CNG</option><option>Autre</option></select></Field>
             <Field label="Transmission" required><select defaultValue="" onChange={e=>set("gearbox",e.target.value)}><option value="" disabled>Sélectionner</option><option>Boîte manuelle</option><option>Boîte automatique</option><option>Boîte semi-automatique</option></select></Field>
             <Field label="Motricité"><select defaultValue=""><option>Tous</option><option>Traction avant</option><option>Propulsion</option><option>4x4</option></select></Field>
             <Field label="Puissance"><input placeholder="Ex. 204 ch DIN" /></Field>
@@ -317,19 +361,15 @@ export default function MandatPage() {
       </section>
 
       <style>{`
-        *{box-sizing:border-box}html{scroll-behavior:smooth}.sectionTitle,.grid,.field,.pillGroup,.optionsGrid,.photoGrid,.colorGrid,.marketStats,.chart{min-width:0}
-.field > *,.optionItem,.pill,.upload,.marketStats div{min-width:0}
-.optionItem span,.pill,.upload span,.field label{overflow-wrap:anywhere}
-select{white-space:normal}
-.page{min-height:100vh;background:#eef2f6;color:#15110d;font-family:Inter,Arial,sans-serif;background-image:linear-gradient(135deg,#f6f2ec,#e8edf3)}.topbar{height:76px;display:flex;justify-content:space-between;align-items:center;max-width:1420px;margin:auto;padding:0 28px}.logo{font-family:Georgia,serif;font-size:30px;font-weight:800;text-decoration:none;color:#17110c}.logo span{color:#b8924a}.topRight{display:flex;gap:12px;align-items:center}.draft{background:rgba(45,134,83,.1);border:1px solid rgba(45,134,83,.22);color:#2d8653;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:800}.back{background:white;color:#17110c;text-decoration:none;padding:10px 16px;border-radius:999px;border:1px solid #d2d9e2;font-weight:800}
+        *{box-sizing:border-box}html{scroll-behavior:smooth}.page{min-height:100vh;background:#eef2f6;color:#15110d;font-family:Inter,Arial,sans-serif;background-image:linear-gradient(135deg,#f6f2ec,#e8edf3)}.topbar{height:76px;display:flex;justify-content:space-between;align-items:center;max-width:1420px;margin:auto;padding:0 28px}.logo{font-family:Georgia,serif;font-size:30px;font-weight:800;text-decoration:none;color:#17110c}.logo span{color:#b8924a}.topRight{display:flex;gap:12px;align-items:center}.draft{background:rgba(45,134,83,.1);border:1px solid rgba(45,134,83,.22);color:#2d8653;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:800}.back{background:white;color:#17110c;text-decoration:none;padding:10px 16px;border-radius:999px;border:1px solid #d2d9e2;font-weight:800}
         .hero{max-width:1420px;margin:auto;padding:46px 28px 26px;display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:end}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#b8924a;font-weight:950;margin-bottom:14px}h1{font-family:Georgia,serif;font-size:clamp(44px,6vw,76px);line-height:.98;margin:0 0 18px;letter-spacing:-.04em;max-width:860px}h1 em{color:#b8924a}.hero p{font-size:18px;line-height:1.7;color:#657181;max-width:760px}.heroGlass{background:rgba(255,255,255,.85);border:1px solid white;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px);border-radius:30px;padding:26px}.heroMetric{display:flex;justify-content:space-between;align-items:center}.heroMetric span{color:#657181;font-weight:800}.heroMetric strong{font-size:34px;color:#b8924a}.track{height:10px;background:#e5eaf0;border-radius:999px;overflow:hidden;margin:14px 0 18px}.track div{height:100%;border-radius:999px;background:linear-gradient(90deg,#9c7632,#d9ad62)}.heroList{display:grid;gap:10px}.heroList span{background:#f7f9fb;border:1px solid #e1e7ef;border-radius:14px;padding:10px 12px;color:#3f4a58;font-weight:800}
-        .workspace{max-width:1420px;margin:auto;padding:24px 28px 80px;display:grid;grid-template-columns:220px minmax(0,1fr) 360px;gap:24px;align-items:start;overflow:visible}.leftNav,.rightRail{position:sticky;top:22px}.leftNav{background:rgba(255,255,255,.82);border:1px solid #dce3eb;border-radius:24px;padding:14px;box-shadow:0 15px 40px rgba(31,41,55,.08);backdrop-filter:blur(12px)}.navTitle{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#8090a3;font-weight:950;margin:4px 8px 12px}.leftNav a{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:14px;text-decoration:none;color:#5f6f82;font-weight:900;font-size:13px}.leftNav a small{color:#b8924a}.leftNav a.active{background:#161b22;color:white}.leftNav a.active small{color:#d9ad62}
-        .panel{background:white;border:1px solid #dce3eb;border-radius:28px;padding:30px;box-shadow:0 30px 90px rgba(31,41,55,.10);overflow:hidden;min-width:0;width:100%}.sectionTitle{scroll-margin-top:30px;margin:34px 0 20px;padding-top:18px;border-top:1px solid #e3e9f0}.sectionTitle:first-child{margin-top:0;border-top:0}.sectionTitle h2{font-size:24px;margin:0 0 4px;font-weight:950;letter-spacing:-.02em}.sectionTitle p{margin:0;color:#728196;font-size:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:22px 24px;align-items:start;width:100%;min-width:0}.field{display:grid;gap:8px;min-width:0;width:100%;max-width:100%;align-self:start}.field label{font-weight:950;font-size:12px;color:#101820}.req{color:#b8924a}input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1.5px solid #cfd8e3;background:#f8fafc;border-radius:12px;padding:13px 14px;font-size:14px;color:#101820;outline:none;appearance:auto}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{background:white;border-color:#b8924a;box-shadow:0 0 0 4px rgba(184,146,74,.13)}.pillGroup{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:8px;width:100%;min-width:0}.pill{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.pill input{width:auto}.colorGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:22px;width:100%;min-width:0}.colorItem{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:800}.swatch{width:15px;height:15px;border-radius:4px;border:1px solid #9aa6b4}
-        .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;width:100%;min-width:0}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.critical{background:#fff2f0;border:1.5px solid #f2aaa2;color:#b42318;border-radius:14px;padding:15px 16px;margin-bottom:20px;font-weight:900}.critical strong{font-weight:950;color:#b42318}
-        .photoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:14px;width:100%;min-width:0}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
-        .marketCard{background:rgba(255,255,255,.88);border:1px solid #dce3eb;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px);min-width:0;width:100%}.marketHeader{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:18px}.marketHeader span{font-size:22px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b8924a;background:#fff6e8;border:1px solid #efd8ae;border-radius:999px;padding:7px 9px}.marketIdentity{background:#161b22;color:white;border-radius:18px;padding:15px;margin-bottom:15px}.marketIdentity strong{display:block;font-size:15px}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.marketStats strong{display:block;margin-top:4px;font-size:13px}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px minmax(0,1fr) 34px;gap:8px;align-items:center;font-size:11px;color:#5f6f82;min-width:0}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.sourceNote{font-size:11px;color:#8090a3;line-height:1.5}
+        .workspace{max-width:1420px;margin:auto;padding:24px 28px 80px;display:grid;grid-template-columns:220px minmax(0,1fr) 360px;gap:24px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.leftNav{background:rgba(255,255,255,.82);border:1px solid #dce3eb;border-radius:24px;padding:14px;box-shadow:0 15px 40px rgba(31,41,55,.08);backdrop-filter:blur(12px)}.navTitle{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#8090a3;font-weight:950;margin:4px 8px 12px}.leftNav a{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:14px;text-decoration:none;color:#5f6f82;font-weight:900;font-size:13px}.leftNav a small{color:#b8924a}.leftNav a.active{background:#161b22;color:white}.leftNav a.active small{color:#d9ad62}
+        .panel{background:white;border:1px solid #dce3eb;border-radius:28px;padding:30px;box-shadow:0 30px 90px rgba(31,41,55,.10);overflow:hidden}.sectionTitle{scroll-margin-top:30px;margin:34px 0 20px;padding-top:18px;border-top:1px solid #e3e9f0}.sectionTitle:first-child{margin-top:0;border-top:0}.sectionTitle h2{font-size:24px;margin:0 0 4px;font-weight:950;letter-spacing:-.02em}.sectionTitle p{margin:0;color:#728196;font-size:14px}.grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:20px 22px;align-items:start}.field{display:grid;gap:8px;min-width:0}.field label{font-weight:950;font-size:12px;color:#101820}.req{color:#b8924a}input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1.5px solid #cfd8e3;background:#f8fafc;border-radius:12px;padding:13px 14px;font-size:14px;color:#101820;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{background:white;border-color:#b8924a;box-shadow:0 0 0 4px rgba(184,146,74,.13)}.pillGroup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pill{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.pill input{width:auto}.colorGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:22px}.colorItem{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:800}.swatch{width:15px;height:15px;border-radius:4px;border:1px solid #9aa6b4}
+        .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.critical{background:#fff2f0;border:1.5px solid #f2aaa2;color:#b42318;border-radius:14px;padding:15px 16px;margin-bottom:20px;font-weight:900}.critical strong{font-weight:950;color:#b42318}
+        .photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
+        .marketCard{background:rgba(255,255,255,.88);border:1px solid #dce3eb;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px)}.marketHeader{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:18px}.marketHeader span{font-size:22px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b8924a;background:#fff6e8;border:1px solid #efd8ae;border-radius:999px;padding:7px 9px}.marketIdentity{background:#161b22;color:white;border-radius:18px;padding:15px;margin-bottom:15px}.marketIdentity strong{display:block;font-size:15px}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.marketStats strong{display:block;margin-top:4px;font-size:13px}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px 1fr 34px;gap:8px;align-items:center;font-size:11px;color:#5f6f82}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.sourceNote{font-size:11px;color:#8090a3;line-height:1.5}
         .signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal strong{display:block;margin-bottom:4px}.signal p{margin:0;line-height:1.5;font-size:13px}.signal.green{background:#edf7f2;border-color:#c3e6d4;color:#2d8653}.signal.red{background:#fff2f0;border-color:#f2aaa2;color:#b42318}.signal.black{background:#f3f0ec;border-color:#d8c8b5;color:#17110c}.signal.neutral{background:#f8fafc;border-color:#dce3eb;color:#728196}
-        @media(max-width:1280px){.workspace{grid-template-columns:210px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}.optionsGrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}}@media(max-width:900px){.topRight .draft{display:none}.hero,.workspace{grid-template-columns:1fr;padding:18px}.leftNav,.rightRail{position:static}.grid,.photoGrid,.optionsGrid,.colorGrid,.pillGroup{grid-template-columns:1fr}.panel{padding:22px;border-radius:22px}.final{flex-direction:column;align-items:flex-start}.final button{width:100%}}
+        @media(max-width:1280px){.workspace{grid-template-columns:210px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.grid{grid-template-columns:repeat(2,minmax(220px,1fr))}.optionsGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.topRight .draft{display:none}.hero,.workspace{grid-template-columns:1fr}.leftNav,.rightRail{position:static}.grid,.photoGrid,.optionsGrid,.colorGrid{grid-template-columns:1fr}.panel{padding:22px}.final{flex-direction:column;align-items:flex-start}.final button{width:100%}}
       `}</style>
     </main>
   );
