@@ -194,9 +194,9 @@ export default function MandatPage() {
   const [trim,setTrim] = useState("");
   const [otherModel,setOtherModel] = useState("");
   const [otherEngine,setOtherEngine] = useState("");
-  const [otherTrim,setOtherTrim] = useState("");
   const [docs,setDocs] = useState(false);
   const [selected,setSelected] = useState<string[]>([]);
+  const [customFields,setCustomFields] = useState<Record<string, {checked:boolean, value:string}>>({});
   const [form,setForm] = useState<Record<string,string>>({});
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
@@ -206,10 +206,30 @@ export default function MandatPage() {
 
   const displayModel = model === "Autre" ? otherModel : model;
   const displayEngine = engine === "Autre" ? otherEngine : engine;
-  const displayTrim = trim === "Autre" ? otherTrim : trim;
+  const displayTrim = trim;
 
   const set = (k:string,v:string) => setForm(prev => ({...prev,[k]:v}));
   const toggle = (x:string) => setSelected(prev => prev.includes(x) ? prev.filter(i => i !== x) : [...prev, x]);
+
+  const toggleCustom = (key:string) => {
+    setCustomFields(prev => ({
+      ...prev,
+      [key]: {
+        checked: !prev[key]?.checked,
+        value: prev[key]?.value || ""
+      }
+    }));
+  };
+
+  const setCustomValue = (key:string, value:string) => {
+    setCustomFields(prev => ({
+      ...prev,
+      [key]: {
+        checked: true,
+        value
+      }
+    }));
+  };
 
   useEffect(() => {
     const sections = STEPS.map(([id]) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
@@ -235,9 +255,11 @@ export default function MandatPage() {
   const completion = Math.round(required.filter(Boolean).length / required.length * 100);
 
   const description = useMemo(() => {
-    const opts = selected.length ? ` Équipements notables : ${selected.slice(0, 10).join(", ")}.` : "";
+    const customOptions = Object.values(customFields).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
+    const allOptions = [...selected, ...customOptions];
+    const opts = allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : "";
     return `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${displayTrim ? ` finition ${displayTrim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${opts}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g," ").trim();
-  }, [brand, displayModel, displayEngine, displayTrim, form, selected]);
+  }, [brand, displayModel, displayEngine, displayTrim, form, selected, customFields]);
 
   return (
     <main className="page">
@@ -282,9 +304,9 @@ export default function MandatPage() {
             <Field label="Modèle" required><select value={model} disabled={!brand} onChange={e=>{setModel(e.target.value);setEngine("");setTrim("");}}><option value="">{brand ? "Sélectionner un modèle" : "Choisissez une marque"}</option>{models.map(x=><option key={x}>{x}</option>)}</select></Field>
             {model === "Autre" && <Field label="Autre modèle"><input placeholder="Préciser le modèle" value={otherModel} onChange={e=>setOtherModel(e.target.value)} /></Field>}
             <Field label="Motorisation" required><select value={engine} disabled={!brand || !model} onChange={e=>setEngine(e.target.value)}><option value="">{brand && model ? "Sélectionner" : "Choisissez marque et modèle"}</option>{engines.map(x=><option key={x}>{x}</option>)}</select></Field>
-            <Field label="Finition" required><select value={trim} disabled={!brand || !model} onChange={e=>setTrim(e.target.value)}><option value="">{brand && model ? "Sélectionner" : "Choisissez marque et modèle"}</option>{trims.map(x=><option key={x}>{x}</option>)}</select></Field>
+            <Field label="Finition (Pack M, Pack AMG, R Line...)" required><input placeholder="Ex. Pack M, AMG Line, R Line..." value={trim} onChange={e=>setTrim(e.target.value)} /></Field>
             {engine === "Autre" && <Field label="Autre motorisation"><input value={otherEngine} onChange={e=>setOtherEngine(e.target.value)} placeholder="Ex. 300e, 20d..." /></Field>}
-            {trim === "Autre" && <Field label="Autre finition"><input value={otherTrim} onChange={e=>setOtherTrim(e.target.value)} placeholder="Ex. AMG Line, Pack M..." /></Field>}
+            {trim === "Autre" && <Field label="Autre finition"><input value={trim} onChange={e=>setOtherTrim(e.target.value)} placeholder="Ex. AMG Line, Pack M..." /></Field>}
             <Field label="Type de véhicule"><PillGroup items={VEHICLE_TYPES} onPick={(v)=>set("type",v)} /></Field>
             <Field label="Nombre de portes"><select defaultValue=""><option>Tous</option><option>2 portes</option><option>3 portes</option><option>4 portes</option><option>5 portes</option></select></Field>
             <Field label="Nombre de sièges"><select defaultValue=""><option>Tous</option><option>2</option><option>4</option><option>5</option><option>7</option><option>9+</option></select></Field>
@@ -304,18 +326,28 @@ export default function MandatPage() {
 
           <Section id="exterior" title="Extérieur" subtitle="Couleur, jantes, toit, aides de stationnement et équipements extérieurs." />
           <ColorGrid items={BODY_COLORS} />
-          <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selected} toggle={toggle} />
+          <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selected} toggle={toggle} customKeys={["ext_other1","ext_other2","ext_other3"]} customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
 
           <Section id="interior" title="Intérieur" subtitle="Couleurs, matériaux, confort et équipements d’habitacle." />
           <div className="grid">
-            <Field label="Couleur intérieure"><PillGroup items={INTERIOR_COLORS} onPick={(v)=>set("interiorColor",v)} /></Field>
-            <Field label="Matériau intérieur"><PillGroup items={INTERIOR_MATERIALS} onPick={(v)=>set("interiorMaterial",v)} /></Field>
+            <Field label="Couleur intérieure">
+              <PillGroup items={INTERIOR_COLORS} onPick={(v)=>set("interiorColor",v)} />
+              {form.interiorColor === "Autres" && (
+                <input placeholder="Préciser la couleur intérieure" onChange={(e)=>set("interiorColorOther", e.target.value)} />
+              )}
+            </Field>
+            <Field label="Matériau intérieur">
+              <PillGroup items={INTERIOR_MATERIALS} onPick={(v)=>set("interiorMaterial",v)} />
+              {form.interiorMaterial === "Autres" && (
+                <input placeholder="Préciser le matériau intérieur" onChange={(e)=>set("interiorMaterialOther", e.target.value)} />
+              )}
+            </Field>
           </div>
-          <OptionBlock title="Confort & intérieur" items={COMFORT_OPTIONS} selected={selected} toggle={toggle} />
-          <OptionBlock title="Infotainment" items={INFOTAINMENT_OPTIONS} selected={selected} toggle={toggle} />
+          <OptionBlock title="Confort & intérieur" items={COMFORT_OPTIONS} selected={selected} toggle={toggle} customKeys={["comfort_other1","comfort_other2","comfort_other3"]} customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
+          <OptionBlock title="Infotainment" items={INFOTAINMENT_OPTIONS} selected={selected} toggle={toggle} customKeys={["info_other1","info_other2","info_other3"]} customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
 
           <Section id="options" title="Sécurité & aides à la conduite" subtitle="Options structurées en cases à cocher, comme les meilleures plateformes." />
-          <OptionBlock title="Sécurité" items={SAFETY_OPTIONS} selected={selected} toggle={toggle} />
+          <OptionBlock title="Sécurité" items={SAFETY_OPTIONS} selected={selected} toggle={toggle} customKeys={["safety_other1","safety_other2","safety_other3"]} customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
 
           <Section id="condition" title="État, vendeur & historique" subtitle="Ces informations réduisent les questions inutiles et renforcent la confiance." />
           <div className="grid">
@@ -323,7 +355,7 @@ export default function MandatPage() {
             <Field label="Vendeur"><select defaultValue=""><option>Particulier</option><option>Concessionnaire</option><option>Voiture de société</option></select></Field>
             <Field label="Propriétaires précédents"><select defaultValue=""><option>Tous</option><option>1</option><option>2</option><option>3+</option></select></Field>
             <Field label="Entretien"><select defaultValue=""><option>Carnet complet</option><option>Factures disponibles</option><option>Révision complète</option><option>Historique partiel</option><option>Non disponible</option></select></Field>
-            <Field label="Véhicule non-fumeur"><select defaultValue=""><option>Non renseigné</option><option>Oui</option><option>Non</option></select></Field>
+            <Field label="Véhicule fumeur ?"><select defaultValue=""><option value="" disabled>Sélectionner</option><option>Oui</option><option>Non</option></select></Field>
             <Field label="Garantie"><select defaultValue=""><option>Non renseigné</option><option>Oui</option><option>Non</option></select></Field>
           </div>
 
@@ -365,7 +397,11 @@ export default function MandatPage() {
         .hero{max-width:1420px;margin:auto;padding:46px 28px 26px;display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:end}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#b8924a;font-weight:950;margin-bottom:14px}h1{font-family:Georgia,serif;font-size:clamp(44px,6vw,76px);line-height:.98;margin:0 0 18px;letter-spacing:-.04em;max-width:860px}h1 em{color:#b8924a}.hero p{font-size:18px;line-height:1.7;color:#657181;max-width:760px}.heroGlass{background:rgba(255,255,255,.85);border:1px solid white;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px);border-radius:30px;padding:26px}.heroMetric{display:flex;justify-content:space-between;align-items:center}.heroMetric span{color:#657181;font-weight:800}.heroMetric strong{font-size:34px;color:#b8924a}.track{height:10px;background:#e5eaf0;border-radius:999px;overflow:hidden;margin:14px 0 18px}.track div{height:100%;border-radius:999px;background:linear-gradient(90deg,#9c7632,#d9ad62)}.heroList{display:grid;gap:10px}.heroList span{background:#f7f9fb;border:1px solid #e1e7ef;border-radius:14px;padding:10px 12px;color:#3f4a58;font-weight:800}
         .workspace{max-width:1420px;margin:auto;padding:24px 28px 80px;display:grid;grid-template-columns:220px minmax(0,1fr) 360px;gap:24px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.leftNav{background:rgba(255,255,255,.82);border:1px solid #dce3eb;border-radius:24px;padding:14px;box-shadow:0 15px 40px rgba(31,41,55,.08);backdrop-filter:blur(12px)}.navTitle{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#8090a3;font-weight:950;margin:4px 8px 12px}.leftNav a{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:14px;text-decoration:none;color:#5f6f82;font-weight:900;font-size:13px}.leftNav a small{color:#b8924a}.leftNav a.active{background:#161b22;color:white}.leftNav a.active small{color:#d9ad62}
         .panel{background:white;border:1px solid #dce3eb;border-radius:28px;padding:30px;box-shadow:0 30px 90px rgba(31,41,55,.10);overflow:hidden}.sectionTitle{scroll-margin-top:30px;margin:34px 0 20px;padding-top:18px;border-top:1px solid #e3e9f0}.sectionTitle:first-child{margin-top:0;border-top:0}.sectionTitle h2{font-size:24px;margin:0 0 4px;font-weight:950;letter-spacing:-.02em}.sectionTitle p{margin:0;color:#728196;font-size:14px}.grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:20px 22px;align-items:start}.field{display:grid;gap:8px;min-width:0}.field label{font-weight:950;font-size:12px;color:#101820}.req{color:#b8924a}input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1.5px solid #cfd8e3;background:#f8fafc;border-radius:12px;padding:13px 14px;font-size:14px;color:#101820;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{background:white;border-color:#b8924a;box-shadow:0 0 0 4px rgba(184,146,74,.13)}.pillGroup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pill{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.pill input{width:auto}.colorGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:22px}.colorItem{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:800}.swatch{width:15px;height:15px;border-radius:4px;border:1px solid #9aa6b4}
-        .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.critical{background:#fff2f0;border:1.5px solid #f2aaa2;color:#b42318;border-radius:14px;padding:15px 16px;margin-bottom:20px;font-weight:900}.critical strong{font-weight:950;color:#b42318}
+        .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.customOther{align-items:center}
+.customOther input[type="text"]{border:0;background:transparent;padding:0;font-size:12px;box-shadow:none}
+.customOther input[type="text"]:disabled{opacity:.45;cursor:not-allowed}
+.customOther input[type="text"]:focus{box-shadow:none;border:0;background:transparent}
+.critical{background:#fff2f0;border:1.5px solid #f2aaa2;color:#b42318;border-radius:14px;padding:15px 16px;margin-bottom:20px;font-weight:900}.critical strong{font-weight:950;color:#b42318}
         .photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
         .marketCard{background:rgba(255,255,255,.88);border:1px solid #dce3eb;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px)}.marketHeader{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:18px}.marketHeader span{font-size:22px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b8924a;background:#fff6e8;border:1px solid #efd8ae;border-radius:999px;padding:7px 9px}.marketIdentity{background:#161b22;color:white;border-radius:18px;padding:15px;margin-bottom:15px}.marketIdentity strong{display:block;font-size:15px}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.marketStats strong{display:block;margin-top:4px;font-size:13px}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px 1fr 34px;gap:8px;align-items:center;font-size:11px;color:#5f6f82}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.sourceNote{font-size:11px;color:#8090a3;line-height:1.5}
         .signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal strong{display:block;margin-bottom:4px}.signal p{margin:0;line-height:1.5;font-size:13px}.signal.green{background:#edf7f2;border-color:#c3e6d4;color:#2d8653}.signal.red{background:#fff2f0;border-color:#f2aaa2;color:#b42318}.signal.black{background:#f3f0ec;border-color:#d8c8b5;color:#17110c}.signal.neutral{background:#f8fafc;border-color:#dce3eb;color:#728196}
@@ -388,6 +424,53 @@ function ColorGrid({items}:{items:string[]}) {
   const colors:Record<string,string> = {Beige:"#d7b98c",Bleu:"#3267d6",Brun:"#7a4f16",Jaune:"#f1d000",Or:"#c9a227",Vert:"#73b63a",Gris:"#a8a8a8",Orange:"#f97316",Rouge:"#ef4444",Noir:"#2f3437",Argent:"#d8d8d8",Violet:"#8b5cf6",Blanc:"#fff",Mat:"#e5e7eb",Métallique:"#cbd5e1"};
   return <div className="colorGrid">{items.map(x=><label key={x} className="colorItem"><span className="swatch" style={{background:colors[x]||"#ddd"}} />{x}</label>)}</div>;
 }
-function OptionBlock({title,items,selected,toggle}:{title:string;items:string[];selected:string[];toggle:(v:string)=>void}) {
-  return <div className="optionBlock"><h3>{title}</h3><div className="optionsGrid">{items.map(option=><label key={option} className={`optionItem ${selected.includes(option) ? "selected" : ""}`}><input type="checkbox" checked={selected.includes(option)} onChange={()=>toggle(option)} /><span>{option}</span></label>)}</div></div>;
+function OptionBlock({
+  title,
+  items,
+  selected,
+  toggle,
+  customKeys = [],
+  customFields,
+  toggleCustom,
+  setCustomValue
+}: {
+  title:string;
+  items:string[];
+  selected:string[];
+  toggle:(v:string)=>void;
+  customKeys?:string[];
+  customFields:Record<string, {checked:boolean, value:string}>;
+  toggleCustom:(key:string)=>void;
+  setCustomValue:(key:string, value:string)=>void;
+}) {
+  return (
+    <div className="optionBlock">
+      <h3>{title}</h3>
+      <div className="optionsGrid">
+        {items.map(option => (
+          <label key={option} className={`optionItem ${selected.includes(option) ? "selected" : ""}`}>
+            <input type="checkbox" checked={selected.includes(option)} onChange={()=>toggle(option)} />
+            <span>{option}</span>
+          </label>
+        ))}
+
+        {customKeys.map((key, index) => (
+          <label key={key} className={`optionItem customOther ${customFields[key]?.checked ? "selected" : ""}`}>
+            <input
+              type="checkbox"
+              checked={customFields[key]?.checked || false}
+              onChange={()=>toggleCustom(key)}
+            />
+            <input
+              type="text"
+              placeholder={`Autre ${index + 1}`}
+              disabled={!customFields[key]?.checked}
+              value={customFields[key]?.value || ""}
+              onChange={(e)=>setCustomValue(key, e.target.value)}
+            />
+          </label>
+        ))}
+      </div>
+    </div>
+  );
 }
