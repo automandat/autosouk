@@ -12,8 +12,8 @@ export default function Home() {
         </p>
 
         <div className="actions">
-          <a className="btn primary" href="#mandat">Confier mon véhicule</a>
-          <a className="btn secondary" href="#catalogue">Voir les annonces</a>
+          <a className="btn primary" href="/mandat">Confier mon véhicule</a>
+          <a className="btn secondary" href="/catalogue">Voir les annonces</a>
         </div>
 
         <div className="cards">
