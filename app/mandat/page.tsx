@@ -94,6 +94,20 @@ const EXTERIOR_OPTIONS = [
   "Feux de jour LED","Phares antibrouillard","Attelage fixe","Attelage pivotant","Barres de toit","Vitres arrière surteintées"
 ];
 
+const PHOTOS = [
+  "Avant",
+  "Arrière",
+  "Profil gauche",
+  "Profil droit",
+  "Tableau de bord",
+  "Compteur kilométrique",
+  "Sièges avant",
+  "Sièges arrière",
+  "Coffre",
+  "Jantes / pneus",
+  "Défauts visibles"
+];
+
 const STEPS = [
   ["identity","Identité"],
   ["main","Données principales"],
