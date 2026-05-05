@@ -3,6 +3,21 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+function getBrandLogo(brand: string) {
+  if (!brand) return null;
+
+  const normalized = brand
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return `/brands/${normalized}.png`;
+}
+
+
 const CITIES = [
   "Casablanca","Rabat","Marrakech","Fès","Tanger","Agadir","Meknès","Oujda","Kénitra","Tétouan","Safi","Mohammedia","El Jadida","Béni Mellal","Nador","Khouribga","Settat","Taza","Larache","Ksar El Kébir","Khemisset","Guelmim","Berrechid","Wad Zem","Fquih Ben Salah","Taourirt","Berkane","Sidi Slimane","Errachidia","Guercif","Ouarzazate","Tiznit","Taroudant","Essaouira","Al Hoceïma","Chefchaouen","Sidi Kacem","Youssoufia","Tan-Tan","Dakhla","Laâyoune","Boujdour","Ifrane","Azrou","Midelt","Zagora","Tinghir","Skhirat","Temara","Salé","Bouskoura","Nouaceur","Mediouna","Dar Bouazza","Autre"
 ];
@@ -34,6 +49,39 @@ const MODELS: Record<string, string[]> = {
   "Toyota":["Auris","C-HR","Camry","Corolla","Hilux","Land Cruiser","Prado","RAV4","Yaris","Yaris Cross","Autre"],
   "Volkswagen":["Caddy","Golf","Golf VII","Golf VIII","Jetta","Passat","Polo","T-Cross","T-Roc","Tiguan","Touareg","Autre"],
   "Volvo":["S60","S90","XC40","XC60","XC90","Autre"],
+  "Abarth":["Autre"],
+  "Alfa Romeo":["Autre"],
+  "BAIC":["Autre"],
+  "BYD":["Autre"],
+  "Changan":["Autre"],
+  "Chery":["Autre"],
+  "Cupra":["Autre"],
+  "Deepal":["Autre"],
+  "DFSK":["Autre"],
+  "Dongfeng":["Autre"],
+  "DS Automobiles":["Autre"],
+  "Exeed":["Autre"],
+  "Geely":["Autre"],
+  "GWM":["Autre"],
+  "JAC":["Autre"],
+  "Jaecoo":["Autre"],
+  "Jaguar":["Autre"],
+  "Jetour":["Autre"],
+  "KGM":["Autre"],
+  "Leapmotor":["Autre"],
+  "Lexus":["Autre"],
+  "Lynk & Co":["Autre"],
+  "Mahindra":["Autre"],
+  "Maserati":["Autre"],
+  "MG":["Autre"],
+  "Mitsubishi":["Autre"],
+  "Omoda":["Autre"],
+  "ROX":["Autre"],
+  "Seres":["Autre"],
+  "Smart":["Autre"],
+  "Soueast":["Autre"],
+  "Xpeng":["Autre"],
+  "Zeekr":["Autre"],
   "Autre":["Autre"]
 };
 
@@ -198,6 +246,8 @@ export default function MandatPage() {
   const [selected,setSelected] = useState<string[]>([]);
   const [customFields,setCustomFields] = useState<Record<string, {checked:boolean, value:string}>>({});
   const [form,setForm] = useState<Record<string,string>>({});
+  const [exteriorColor,setExteriorColor] = useState("");
+  const [brandLogoMissing,setBrandLogoMissing] = useState(false);
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const key = `${brand}|${model}`;
@@ -209,6 +259,10 @@ export default function MandatPage() {
   const displayTrim = trim;
 
   const set = (k:string,v:string) => setForm(prev => ({...prev,[k]:v}));
+
+  useEffect(() => {
+    setBrandLogoMissing(false);
+  }, [brand]);
   const toggle = (x:string) => setSelected(prev => prev.includes(x) ? prev.filter(i => i !== x) : [...prev, x]);
 
   const toggleCustom = (key:string) => {
@@ -261,7 +315,7 @@ export default function MandatPage() {
     const customOptions = Object.values(customFields).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
     const allOptions = [...selected, ...customOptions];
     const opts = allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : "";
-    return `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${displayTrim ? ` finition ${displayTrim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${opts}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g," ").trim();
+    return `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${displayTrim ? ` finition ${displayTrim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${exterior}${opts}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g," ").trim();
   }, [brand, displayModel, displayEngine, displayTrim, form, selected, customFields]);
 
   return (
@@ -302,7 +356,9 @@ export default function MandatPage() {
           </div>
 
           <Section id="main" title="Données principales" subtitle="Marque, modèle, version, type de véhicule et données administratives." />
-          <div className="grid">
+          <div className="mainDataLayout">
+            <div className="mainDataForm">
+              <div className="grid">
             <Field label="Marque" required><select value={brand} onChange={e=>{setBrand(e.target.value);setModel("");setEngine("");setTrim("");}}><option value="">Sélectionner une marque</option>{Object.keys(MODELS).sort().map(x=><option key={x}>{x}</option>)}</select></Field>
             <Field label="Modèle" required><select value={model} disabled={!brand} onChange={e=>{setModel(e.target.value);setEngine("");setTrim("");}}><option value="">{brand ? "Sélectionner un modèle" : "Choisissez une marque"}</option>{models.map(x=><option key={x}>{x}</option>)}</select></Field>
             {model === "Autre" && <Field label="Autre modèle"><input placeholder="Préciser le modèle" value={otherModel} onChange={e=>setOtherModel(e.target.value)} /></Field>}
@@ -314,6 +370,35 @@ export default function MandatPage() {
             <Field label="Nombre de sièges"><select defaultValue=""><option>Tous</option><option>2</option><option>4</option><option>5</option><option>7</option><option>9+</option></select></Field>
             <Field label="Année" required><select defaultValue="" onChange={e=>set("year",e.target.value)}><option value="" disabled>Sélectionner</option>{YEARS.map(x=><option key={x}>{x}</option>)}</select></Field>
             <Field label="Kilométrage" required><select defaultValue="" onChange={e=>set("mileage",e.target.value)}><option value="" disabled>Sélectionner</option>{MILEAGES.map(x=><option key={x}>{x}</option>)}</select></Field>
+          </div>
+              </div>
+            </div>
+
+            <aside className="brandShowcase">
+              <div className="brandShowcaseInner">
+                {brand && !brandLogoMissing && getBrandLogo(brand) ? (
+                  <img
+                    src={getBrandLogo(brand) || ""}
+                    alt={brand}
+                    className="brandPngLogo"
+                    onError={() => setBrandLogoMissing(true)}
+                  />
+                ) : (
+                  <div className="brandFallback">
+                    <span>{brand ? brand.slice(0, 2).toUpperCase() : "AS"}</span>
+                  </div>
+                )}
+
+                <div className="brandShowcaseText">
+                  <strong>{brand || "Sélectionnez une marque"}</strong>
+                  <small>
+                    {brand
+                      ? "Logo constructeur affiché automatiquement si le PNG est disponible."
+                      : "Le logo apparaîtra ici après sélection."}
+                  </small>
+                </div>
+              </div>
+            </aside>
           </div>
 
           <Section id="technical" title="Données techniques" subtitle="Carburant, transmission, puissance, cylindrée et caractéristiques mécaniques." />
@@ -327,7 +412,7 @@ export default function MandatPage() {
           </div>
 
           <Section id="exterior" title="Extérieur" subtitle="Couleur, jantes, toit, aides de stationnement et équipements extérieurs." />
-          <ColorGrid items={BODY_COLORS} />
+          <ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={(v)=>{setExteriorColor(v); set("exteriorColor", v);}} />
           <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selected} toggle={toggle} customKeys={["ext_other1","ext_other2","ext_other3"]} customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
 
           <Section id="interior" title="Intérieur" subtitle="Couleurs, matériaux, confort et équipements d’habitacle." />
@@ -400,7 +485,15 @@ export default function MandatPage() {
           <Field label="Remarques vendeur"><textarea placeholder="Première main, carnet complet, pneus neufs, défauts éventuels..." /></Field>
 
           <Section id="media" title="Photos guidées" subtitle="Une annonce forte commence par des preuves visuelles structurées." />
-          <div className="photoGrid">{PHOTOS.map((p,i)=><label className="upload" key={p}><b>{String(i+1).padStart(2,"0")}</b><span>{p}</span><small>Ajouter une photo</small><input type="file" accept="image/*" /></label>)}</div>
+          <div className="photoGrid">{PHOTOS.map((p,i)=>
+            <label className="upload" key={p}>
+              <b>{String(i+1).padStart(2,"0")}</b>
+              <PhotoGuide label={p} index={i} />
+              <span>{p}</span>
+              <small>{photoInstruction(p)}</small>
+              <input type="file" accept="image/*" />
+            </label>
+          )}</div>
 
           <Section id="documents" title="Documents publics" subtitle="Facultatif, mais fortement recommandé pour obtenir un badge Verified." />
           <label className="check"><input type="checkbox" checked={docs} onChange={e=>setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
@@ -428,7 +521,19 @@ export default function MandatPage() {
         *{box-sizing:border-box}html{scroll-behavior:smooth}.page{min-height:100vh;background:#eef2f6;color:#15110d;font-family:Inter,Arial,sans-serif;background-image:linear-gradient(135deg,#f6f2ec,#e8edf3)}.topbar{height:76px;display:flex;justify-content:space-between;align-items:center;max-width:1420px;margin:auto;padding:0 28px}.logo{font-family:Georgia,serif;font-size:30px;font-weight:800;text-decoration:none;color:#17110c}.logo span{color:#b8924a}.topRight{display:flex;gap:12px;align-items:center}.draft{background:rgba(45,134,83,.1);border:1px solid rgba(45,134,83,.22);color:#2d8653;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:800}.back{background:white;color:#17110c;text-decoration:none;padding:10px 16px;border-radius:999px;border:1px solid #d2d9e2;font-weight:800}
         .hero{max-width:1420px;margin:auto;padding:46px 28px 26px;display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:end}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#b8924a;font-weight:950;margin-bottom:14px}h1{font-family:Georgia,serif;font-size:clamp(44px,6vw,76px);line-height:.98;margin:0 0 18px;letter-spacing:-.04em;max-width:860px}h1 em{color:#b8924a}.hero p{font-size:18px;line-height:1.7;color:#657181;max-width:760px}.heroGlass{background:rgba(255,255,255,.85);border:1px solid white;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px);border-radius:30px;padding:26px}.heroMetric{display:flex;justify-content:space-between;align-items:center}.heroMetric span{color:#657181;font-weight:800}.heroMetric strong{font-size:34px;color:#b8924a}.track{height:10px;background:#e5eaf0;border-radius:999px;overflow:hidden;margin:14px 0 18px}.track div{height:100%;border-radius:999px;background:linear-gradient(90deg,#9c7632,#d9ad62)}.heroList{display:grid;gap:10px}.heroList span{background:#f7f9fb;border:1px solid #e1e7ef;border-radius:14px;padding:10px 12px;color:#3f4a58;font-weight:800}
         .workspace{max-width:1420px;margin:auto;padding:24px 28px 80px;display:grid;grid-template-columns:220px minmax(0,1fr) 360px;gap:24px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.leftNav{background:rgba(255,255,255,.82);border:1px solid #dce3eb;border-radius:24px;padding:14px;box-shadow:0 15px 40px rgba(31,41,55,.08);backdrop-filter:blur(12px)}.navTitle{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#8090a3;font-weight:950;margin:4px 8px 12px}.leftNav a{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:14px;text-decoration:none;color:#5f6f82;font-weight:900;font-size:13px}.leftNav a small{color:#b8924a}.leftNav a.active{background:#161b22;color:white}.leftNav a.active small{color:#d9ad62}
-        .panel{background:white;border:1px solid #dce3eb;border-radius:28px;padding:30px;box-shadow:0 30px 90px rgba(31,41,55,.10);overflow:hidden}.sectionTitle{scroll-margin-top:30px;margin:34px 0 20px;padding-top:18px;border-top:1px solid #e3e9f0}.sectionTitle:first-child{margin-top:0;border-top:0}.sectionTitle h2{font-size:24px;margin:0 0 4px;font-weight:950;letter-spacing:-.02em}.sectionTitle p{margin:0;color:#728196;font-size:14px}.grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:20px 22px;align-items:start}.field{display:grid;gap:8px;min-width:0}.field label{font-weight:950;font-size:12px;color:#101820}.req{color:#b8924a}input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1.5px solid #cfd8e3;background:#f8fafc;border-radius:12px;padding:13px 14px;font-size:14px;color:#101820;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{background:white;border-color:#b8924a;box-shadow:0 0 0 4px rgba(184,146,74,.13)}.pillGroup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pill{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.pill input{width:auto}.colorGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:22px}.colorItem{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:800}.swatch{width:15px;height:15px;border-radius:4px;border:1px solid #9aa6b4}
+        .panel{background:white;border:1px solid #dce3eb;border-radius:28px;padding:30px;box-shadow:0 30px 90px rgba(31,41,55,.10);overflow:hidden}.sectionTitle{scroll-margin-top:30px;margin:34px 0 20px;padding-top:18px;border-top:1px solid #e3e9f0}.sectionTitle:first-child{margin-top:0;border-top:0}.sectionTitle h2{font-size:24px;margin:0 0 4px;font-weight:950;letter-spacing:-.02em}.sectionTitle p{margin:0;color:#728196;font-size:14px}
+.mainDataLayout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start}
+.mainDataForm{min-width:0}
+.brandShowcase{position:sticky;top:20px;align-self:start}
+.brandShowcaseInner{min-height:245px;background:linear-gradient(145deg,#ffffff,#f8fafc);border:1.5px solid #dce3eb;border-radius:22px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 18px 48px rgba(31,41,55,.08)}
+.brandPngLogo{max-width:190px;max-height:105px;object-fit:contain;filter:grayscale(.08);opacity:.94;transition:.2s ease}
+.brandPngLogo:hover{filter:none;opacity:1;transform:scale(1.03)}
+.brandFallback{width:112px;height:112px;border-radius:28px;background:#161b22;color:#d9ad62;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:950;letter-spacing:-.05em;box-shadow:0 18px 38px rgba(22,27,34,.18)}
+.brandShowcaseText{margin-top:18px;display:grid;gap:6px}
+.brandShowcaseText strong{font-size:17px}
+.brandShowcaseText small{font-size:12px;color:#728196;line-height:1.45}
+@media(max-width:1280px){.mainDataLayout{grid-template-columns:1fr}.brandShowcase{position:static;order:-1}.brandShowcaseInner{min-height:160px}}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:20px 22px;align-items:start}.field{display:grid;gap:8px;min-width:0}.field label{font-weight:950;font-size:12px;color:#101820}.req{color:#b8924a}input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1.5px solid #cfd8e3;background:#f8fafc;border-radius:12px;padding:13px 14px;font-size:14px;color:#101820;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{background:white;border-color:#b8924a;box-shadow:0 0 0 4px rgba(184,146,74,.13)}.pillGroup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pill{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.pill input{width:auto}.colorGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:22px}.colorItem{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:900;border:1.5px solid #dce3eb;background:#f8fafc;border-radius:12px;padding:10px;cursor:pointer;transition:.16s;color:#101820}.colorGrid.hasSelection .colorItem{opacity:.35;filter:grayscale(.85)}.colorGrid.hasSelection .colorItem.selected{opacity:1;filter:none;background:#fff6e8;border-color:#d9ad62;box-shadow:0 8px 24px rgba(184,146,74,.16);transform:translateY(-1px)}.swatch{width:16px;height:16px;border-radius:5px;border:1px solid #9aa6b4;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
         .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px;margin:0 0 12px}.optionsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.optionItem{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid #dce3eb;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer}.optionItem input{width:auto;margin-top:1px}.optionItem.selected{background:#fff6e8;border-color:#d9ad62;color:#7a5720}.customOtherGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-top:12px}
 .customOtherBox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;background:#fff;border:1.5px solid #dce3eb;border-radius:14px;padding:10px 12px}
 .customOtherBox.active{background:#fff9ee;border-color:#d9ad62}
@@ -448,7 +553,7 @@ export default function MandatPage() {
 .priceBoxMain input{font-size:24px}
 .priceBox p{margin:0;color:#728196;font-size:12px;line-height:1.45}
 @media(max-width:900px){.pricingGrid{grid-template-columns:1fr}.priceBoxMain{transform:none}}
-.photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
+.photoGuide{height:86px;border-radius:14px;background:linear-gradient(145deg,#eef3f8,#ffffff);border:1px solid #dce3eb;position:relative;overflow:hidden;margin:2px 0 4px}.guideCar{position:absolute;left:50%;top:50%;width:86px;height:34px;transform:translate(-50%,-50%);border:2px solid #8b98a8;border-radius:18px 24px 12px 12px;background:rgba(255,255,255,.65)}.guideWindow{position:absolute;left:24px;top:5px;width:36px;height:12px;border-radius:8px;background:#cfd8e3}.guideWheel{position:absolute;bottom:-8px;width:16px;height:16px;border-radius:50%;background:#5f6f82}.leftWheel{left:14px}.rightWheel{right:14px}.guideFocus{position:absolute;border:2px solid #b8924a;border-radius:12px;background:rgba(184,146,74,.11)}.photoGuide small{position:absolute;right:8px;top:7px;background:#161b22;color:#d9ad62;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:950}.photoGuide.front .guideCar,.photoGuide.rear .guideCar{width:52px;height:44px;border-radius:16px}.photoGuide.front .guideFocus,.photoGuide.rear .guideFocus{left:50%;top:50%;width:62px;height:54px;transform:translate(-50%,-50%)}.photoGuide.left .guideFocus,.photoGuide.right .guideFocus{left:28px;top:22px;width:122px;height:42px}.photoGuide.dash .guideFocus{left:28px;top:20px;width:120px;height:46px}.photoGuide.odo .guideFocus{left:58px;top:24px;width:58px;height:34px}.photoGuide.frontSeats .guideFocus,.photoGuide.rearSeats .guideFocus{left:37px;top:18px;width:104px;height:52px}.photoGuide.trunk .guideFocus{left:48px;top:18px;width:84px;height:52px}.photoGuide.wheel .guideFocus{right:34px;bottom:14px;width:44px;height:44px;border-radius:50%}.photoGuide.defect .guideFocus{left:70px;top:20px;width:42px;height:42px;border-radius:50%;border-color:#b42318;background:rgba(180,35,24,.08)}.photoGrid{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}.upload{background:#f8fafc;border:1.5px dashed #cfd8e3;border-radius:16px;padding:15px;min-height:140px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.upload:hover{background:#fff9ee;border-color:#b8924a}.upload b{color:#b8924a}.upload span{font-weight:950}.upload small{color:#728196}.upload input{padding:8px;border-radius:10px;background:white;font-size:12px}.check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:14px;padding:15px;font-weight:900}.check input{width:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:18px;padding:20px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:20px;font-size:16px;line-height:1.75;color:#27313c}.final{margin-top:34px;background:#161b22;color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:22px}.final p{color:rgba(255,255,255,.62);margin:6px 0 0}.final button{background:#b8924a;color:white;border:0;border-radius:14px;padding:15px 22px;font-weight:950;cursor:pointer;white-space:nowrap}
         .marketCard{background:rgba(255,255,255,.88);border:1px solid #dce3eb;border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(31,41,55,.12);backdrop-filter:blur(14px)}.marketHeader{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:18px}.marketHeader span{font-size:22px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b8924a;background:#fff6e8;border:1px solid #efd8ae;border-radius:999px;padding:7px 9px}.marketIdentity{background:#161b22;color:white;border-radius:18px;padding:15px;margin-bottom:15px}.marketIdentity strong{display:block;font-size:15px}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.marketStats strong{display:block;margin-top:4px;font-size:13px}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px 1fr 34px;gap:8px;align-items:center;font-size:11px;color:#5f6f82}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.sourceNote{font-size:11px;color:#8090a3;line-height:1.5}
         .signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal strong{display:block;margin-bottom:4px}.signal p{margin:0;line-height:1.5;font-size:13px}.signal.green{background:#edf7f2;border-color:#c3e6d4;color:#2d8653}.signal.red{background:#fff2f0;border-color:#f2aaa2;color:#b42318}.signal.black{background:#f3f0ec;border-color:#d8c8b5;color:#17110c}.signal.neutral{background:#f8fafc;border-color:#dce3eb;color:#728196}
         @media(max-width:1280px){.workspace{grid-template-columns:210px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.grid{grid-template-columns:repeat(2,minmax(220px,1fr))}.optionsGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.topRight .draft{display:none}.hero,.workspace{grid-template-columns:1fr}.leftNav,.rightRail{position:static}.grid,.photoGrid,.optionsGrid,.colorGrid,.customOtherGrid{grid-template-columns:1fr}.panel{padding:22px}.final{flex-direction:column;align-items:flex-start}.final button{width:100%}}
@@ -466,10 +571,33 @@ function Field({label,required,children}:{label:string;required?:boolean;childre
 function PillGroup({items,onPick}:{items:string[];onPick:(v:string)=>void}) {
   return <div className="pillGroup">{items.map(x=><label key={x} className="pill"><input type="radio" name={items.join("-")} onChange={()=>onPick(x)} />{x}</label>)}</div>;
 }
-function ColorGrid({items}:{items:string[]}) {
+function ColorGrid({items, selectedColor, onPick}:{items:string[]; selectedColor:string; onPick:(v:string)=>void}) {
   const colors:Record<string,string> = {Beige:"#d7b98c",Bleu:"#3267d6",Brun:"#7a4f16",Jaune:"#f1d000",Or:"#c9a227",Vert:"#73b63a",Gris:"#a8a8a8",Orange:"#f97316",Rouge:"#ef4444",Noir:"#2f3437",Argent:"#d8d8d8",Violet:"#8b5cf6",Blanc:"#fff",Mat:"#e5e7eb",Métallique:"#cbd5e1"};
-  return <div className="colorGrid">{items.map(x=><label key={x} className="colorItem"><span className="swatch" style={{background:colors[x]||"#ddd"}} />{x}</label>)}</div>;
+  return <div className={`colorGrid ${selectedColor ? "hasSelection" : ""}`}>{items.map(x=><button key={x} type="button" className={`colorItem ${selectedColor === x ? "selected" : ""}`} onClick={()=>onPick(x)}><span className="swatch" style={{background:colors[x]||"#ddd"}} /><span>{x}</span></button>)}</div>;
 }
+
+function photoInstruction(label:string) {
+  const instructions:Record<string,string> = {
+    "Avant":"Face avant entière visible",
+    "Arrière":"Arrière entier visible",
+    "Profil gauche":"Côté gauche complet",
+    "Profil droit":"Côté droit complet",
+    "Tableau de bord":"Vue conducteur complète",
+    "Compteur kilométrique":"Kilométrage net et lisible",
+    "Sièges avant":"Deux sièges avant visibles",
+    "Sièges arrière":"Banquette arrière visible",
+    "Coffre":"Coffre ouvert, volume visible",
+    "Jantes / pneus":"Gros plan jante et pneu",
+    "Défauts visibles":"Photo rapprochée de chaque défaut"
+  };
+  return instructions[label] || "Photo nette requise";
+}
+
+function PhotoGuide({label,index}:{label:string; index:number}) {
+  const carClass = label.includes("Avant") ? "front" : label.includes("Arrière") ? "rear" : label.includes("gauche") ? "left" : label.includes("droit") ? "right" : label.includes("Tableau") ? "dash" : label.includes("Compteur") ? "odo" : label.includes("Sièges avant") ? "frontSeats" : label.includes("Sièges arrière") ? "rearSeats" : label.includes("Coffre") ? "trunk" : label.includes("Jantes") ? "wheel" : "defect";
+  return <div className={`photoGuide ${carClass}`}><div className="guideCar"><span className="guideWindow" /><span className="guideWheel leftWheel" /><span className="guideWheel rightWheel" /></div><div className="guideFocus" /><small>{index + 1}</small></div>;
+}
+
 function OptionBlock({
   title,
   items,
