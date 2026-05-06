@@ -309,6 +309,7 @@ export default function MandatPage() {
   };
 
   const handleDesiredPriceChange = (value: string) => {
+    if (Number(value) < 0) value = "";
     setPriceDesired(value);
     setValue("desired", value);
     setPriceMinError("");
@@ -321,6 +322,7 @@ export default function MandatPage() {
   };
 
   const handleMinPriceChange = (value: string) => {
+    if (Number(value) < 0) value = "";
     setPriceMin(value);
     setValue("floor", value);
     setPriceMinError("");
@@ -354,6 +356,7 @@ export default function MandatPage() {
 
   const handleInstantPriceChange = (value: string) => {
     if (instantLocked) return;
+    if (Number(value) < 0) value = "";
     setPriceInstant(value);
     setValue("instantPrice", value);
     setPriceInstantError("");
@@ -541,6 +544,9 @@ export default function MandatPage() {
               <div className={`moneyInput ${priceMinError ? "priceInvalid shakeField" : ""}`}>
                 <input
                   type="number"
+                  min="0"
+                  inputMode="numeric"
+                  onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }}
                   value={priceMin}
                   placeholder={priceMinError || "Ex. 145000"}
                   onChange={e => handleMinPriceChange(e.target.value)}
@@ -558,6 +564,9 @@ export default function MandatPage() {
               <div className="moneyInput moneyInputDesired">
                 <input
                   type="number"
+                  min="0"
+                  inputMode="numeric"
+                  onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }}
                   value={priceDesired}
                   placeholder="Ex. 160000"
                   onChange={e => handleDesiredPriceChange(e.target.value)}
@@ -579,6 +588,9 @@ export default function MandatPage() {
               <div className={`moneyInput ${priceInstantError ? "priceInvalid shakeField" : ""}`}>
                 <input
                   type="number"
+                  min="0"
+                  inputMode="numeric"
+                  onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }}
                   value={priceInstant}
                   placeholder={priceInstantError || "Ex. 155000"}
                   disabled={!instantEnabled || instantLocked}
@@ -1422,6 +1434,51 @@ export default function MandatPage() {
           }
         }
 
+
+        /* V23 - Smooth immediate-price check animation + no negative price UX */
+        .instantFlyingCheck{
+          will-change:transform, opacity!important;
+          animation:singleCheckTravelV23 1.18s cubic-bezier(.22,1,.36,1) forwards!important;
+        }
+
+        @keyframes singleCheckTravelV23{
+          0%{
+            opacity:0;
+            transform:translate3d(-165px,135px,0) scale(.32);
+          }
+          12%{
+            opacity:1;
+            transform:translate3d(-165px,135px,0) scale(2.85);
+          }
+          34%{
+            opacity:1;
+            transform:translate3d(-132px,108px,0) scale(2.35);
+          }
+          56%{
+            opacity:1;
+            transform:translate3d(-86px,70px,0) scale(1.70);
+          }
+          78%{
+            opacity:1;
+            transform:translate3d(-34px,28px,0) scale(1.18);
+          }
+          100%{
+            opacity:1;
+            transform:translate3d(0,0,0) scale(1);
+          }
+        }
+
+        .pricingGridExact input[type="number"]{
+          appearance:textfield;
+          -moz-appearance:textfield;
+        }
+
+        .pricingGridExact input[type="number"]::-webkit-outer-spin-button,
+        .pricingGridExact input[type="number"]::-webkit-inner-spin-button{
+          -webkit-appearance:none;
+          margin:0;
+        }
+
       `}</style>
     </main>
   );
@@ -1459,5 +1516,5 @@ function OptionBlock({ title, items, selected, toggle, customPrefix, customField
 }
 
 function PriceBox({ label, placeholder, text, onChange, main }: { label: string; placeholder: string; text: string; onChange: (value: string) => void; main?: boolean }) {
-  return <div className={`priceBox ${main ? "priceBoxMain" : ""}`}>{main && <div className="priceBadge">Prix de référence</div>}<div className="priceLabel">{label} <span>*</span></div><div className="moneyInput"><input type="number" placeholder={placeholder} onChange={e => onChange(e.target.value)} /><span>Dirhams</span></div><p>{text}</p></div>;
+  return <div className={`priceBox ${main ? "priceBoxMain" : ""}`}>{main && <div className="priceBadge">Prix de référence</div>}<div className="priceLabel">{label} <span>*</span></div><div className="moneyInput"><input type="number" min="0" inputMode="numeric" placeholder={placeholder} onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }} onChange={e => onChange(Number(e.target.value) < 0 ? "" : e.target.value)} /><span>Dirhams</span></div><p>{text}</p></div>;
 }
