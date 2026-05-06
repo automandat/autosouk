@@ -376,6 +376,8 @@ export default function MandatPage() {
   const [maxUnlockedStep, setMaxUnlockedStep] = useState(7);
   const [isRecipeMode, setIsRecipeMode] = useState(true);
   const [draftSavedAt, setDraftSavedAt] = useState("");
+  const [showInsights, setShowInsights] = useState(false);
+  const [hideHelpPanels, setHideHelpPanels] = useState(false);
   const [descriptionStyle, setDescriptionStyle] = useState("Premium");
   const [publicationMode, setPublicationMode] = useState("Premium");
   const [validationAttempted, setValidationAttempted] = useState(false);
@@ -846,7 +848,7 @@ export default function MandatPage() {
         <Link href="/" className="logo">Auto<span>Souk</span></Link>
         <div className="topRight">
           <span className="draft">Brouillon sauvegardé{draftSavedAt ? ` · ${draftSavedAt}` : ""}</span>
-          <Link href="/" className="back">Retour au site</Link>
+          <button type="button" className="toggleHelpPanelsTop" onClick={() => setHideHelpPanels(prev => !prev)}>{hideHelpPanels ? "Afficher les aides" : "Masquer les aides"}</button><Link href="/" className="back">Retour au site</Link>
         </div>
       </nav>
 
@@ -863,7 +865,7 @@ export default function MandatPage() {
         </div>
       </section>
 
-      <section className="workspace">
+      <section className={`workspace ${hideHelpPanels ? "withoutInsights" : ""}`}>
         <aside className="leftNav">
           <div className="navTitle">Publication</div>
           <label className="modeSwitch">
@@ -886,6 +888,13 @@ export default function MandatPage() {
             </button>
           ))}
         </aside>
+
+        <div className="formColumn">
+          <div className="formZoneBanner">
+            <span>Zone de saisie</span>
+            <strong>Les champs à compléter sont uniquement dans ce bloc.</strong>
+            <p>Les panneaux d’aide et d’aperçu sont séparés pour éviter toute confusion pendant la publication.</p>
+          </div>
 
         <form className="panel stepPanel">
           <div className="stepHeader">
@@ -1314,46 +1323,70 @@ export default function MandatPage() {
             </div>
           </div>
         </form>
+        </div>
 
-        <aside className="rightRail">
-          <div className="livePreviewCard">
-            <div className="livePreviewMedia">
-              {previewPhoto ? <img src={previewPhoto} alt="Photo principale" /> : <div className="livePreviewEmpty">Photo principale</div>}
+        <aside className={`rightRail ${showInsights ? "expandedInsights" : "collapsedInsights"}`}>
+          <div className="infoRailHeader">
+            <div>
+              <span className="infoRailEyebrow">Lecture seule</span>
+              <strong>Aperçu & indicateurs</strong>
+              <p>Bloc informatif uniquement. Aucune action n'est requise ici.</p>
             </div>
-            <div className="livePreviewBody">
-              <div className="livePreviewBrand">
-                {brand && !brandLogoMissing && getBrandLogo(brand) && <img src={getBrandLogo(brand) || ""} alt={brand} onError={() => setBrandLogoMissing(true)} />}
-                <span>{brand || "Marque"} {displayModel || "Modèle"}</span>
+            <div className="railActions">
+              <button type="button" className="toggleInsightsBtn" onClick={() => setShowInsights(prev => !prev)}>
+                {showInsights ? "Masquer" : "Afficher"}
+              </button>
+              <button type="button" className="hideRailInlineBtn" onClick={() => setHideHelpPanels(true)}>
+                Fermer les aides
+              </button>
+            </div>
+          </div>
+
+          <div className="infoRailHint">Ces cartes servent à vous guider pendant la saisie. Les champs à remplir se trouvent uniquement dans la colonne centrale.</div>
+
+          <div className="infoCardsWrap">
+            <div className="livePreviewCard">
+              <div className="cardReadOnlyTag">Aperçu</div>
+              <div className="livePreviewMedia">
+                {previewPhoto ? <img src={previewPhoto} alt="Photo principale" /> : <div className="livePreviewEmpty">Photo principale</div>}
               </div>
-              <strong>{displayEngine || "Motorisation"} {trim || ""}</strong>
-              <p>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.fuel || "Carburant"} · {form.city || "Ville"}</p>
-              <b>{priceDesired ? formatDh(Number(priceDesired)) : "Prix à renseigner"}</b><div className="dynamicBadges">{dynamicBadges.slice(0, 5).map(badge => <span key={badge}>{badge}</span>)}</div>
-              <small className="scoreMini">Score annonce : {qualityScore}/100</small>{docs && <small className="verifiedMini">Verified potentiel</small>}
+              <div className="livePreviewBody">
+                <div className="livePreviewBrand">
+                  {brand && !brandLogoMissing && getBrandLogo(brand) && <img src={getBrandLogo(brand) || ""} alt={brand} onError={() => setBrandLogoMissing(true)} />}
+                  <span>{brand || "Marque"} {displayModel || "Modèle"}</span>
+                </div>
+                <strong>{displayEngine || "Motorisation"} {trim || ""}</strong>
+                <p>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.fuel || "Carburant"} · {form.city || "Ville"}</p>
+                <b>{priceDesired ? formatDh(Number(priceDesired)) : "Prix à renseigner"}</b><div className="dynamicBadges">{dynamicBadges.slice(0, 5).map(badge => <span key={badge}>{badge}</span>)}</div>
+                <small className="scoreMini">Score annonce : {qualityScore}/100</small>{docs && <small className="verifiedMini">Verified potentiel</small>}
+              </div>
             </div>
-          </div>
 
-          <div className="qualityCard">
-            <div className="qualityHeader">
-              <span>Qualité annonce</span>
-              <strong>{qualityScore}/100</strong>
+            <div className="qualityCard">
+              <div className="cardReadOnlyTag">Indicateur</div>
+              <div className="qualityHeader">
+                <span>Qualité annonce</span>
+                <strong>{qualityScore}/100</strong>
+              </div>
+              <div className="qualityTrack"><div style={{ width: `${qualityScore}%` }} /></div>
+              <b>{qualityLabel}</b>
+              <p>{uploadedRequiredPhotos}/{requiredPhotoLabels.length} photos obligatoires ajoutées · {missingItems.length ? `${missingItems.length} point(s) à compléter` : "Dossier prêt pour revue"}</p><div className="scoreDetailList">{detailedScores.map(s => <span key={s.label}><b>{s.label}</b><em>{s.value}%</em></span>)}</div>{scoreRecommendations.length > 0 && <div className="scoreRecommendations">{scoreRecommendations.slice(0, 2).map(r => <small key={r}>{r}</small>)}</div>}
             </div>
-            <div className="qualityTrack"><div style={{ width: `${qualityScore}%` }} /></div>
-            <b>{qualityLabel}</b>
-            <p>{uploadedRequiredPhotos}/{requiredPhotoLabels.length} photos obligatoires ajoutées · {missingItems.length ? `${missingItems.length} point(s) à compléter` : "Dossier prêt pour revue"}</p><div className="scoreDetailList">{detailedScores.map(s => <span key={s.label}><b>{s.label}</b><em>{s.value}%</em></span>)}</div>{scoreRecommendations.length > 0 && <div className="scoreRecommendations">{scoreRecommendations.slice(0, 2).map(r => <small key={r}>{r}</small>)}</div>}
-          </div>
 
-          <div className="marketCard">
-            <div className="marketHeader"><span>Argus AutoSouk</span><b>Benchmark mensuel</b></div>
-            <div className="marketIdentity"><strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong><small>{trim || "Finition"} · {form.year || "Année"} · {form.mileage || "Kilométrage"}</small></div>
-            <div className="pricePercentileBox"><strong>{priceDesired ? `${Math.min(99, Math.max(1, Math.round((MARKET_PRICES.filter(p => p <= Number(priceDesired)).length / MARKET_PRICES.length) * 100)))}e percentile` : "Position à calculer"}</strong><span>{priceDesired ? `Écart médiane : ${Math.round(((Number(priceDesired) - median(MARKET_PRICES)) / median(MARKET_PRICES)) * 100)}%` : "Renseignez un prix souhaité"}</span></div><div className="recommendedBox">
-              <small>Fourchette recommandée</small>
-              <strong>{formatDh(recommendedLow)} – {formatDh(recommendedHigh)}</strong>
-              <span>Délai estimé : {estimatedDelay}</span>
+            <div className="marketCard">
+              <div className="cardReadOnlyTag">Indicateur</div>
+              <div className="marketHeader"><span>Argus AutoSouk</span><b>Benchmark mensuel</b></div>
+              <div className="marketIdentity"><strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong><small>{trim || "Finition"} · {form.year || "Année"} · {form.mileage || "Kilométrage"}</small></div>
+              <div className="pricePercentileBox"><strong>{priceDesired ? `${Math.min(99, Math.max(1, Math.round((MARKET_PRICES.filter(p => p <= Number(priceDesired)).length / MARKET_PRICES.length) * 100)))}e percentile` : "Position à calculer"}</strong><span>{priceDesired ? `Écart médiane : ${Math.round(((Number(priceDesired) - median(MARKET_PRICES)) / median(MARKET_PRICES)) * 100)}%` : "Renseignez un prix souhaité"}</span></div><div className="recommendedBox">
+                <small>Fourchette recommandée</small>
+                <strong>{formatDh(recommendedLow)} – {formatDh(recommendedHigh)}</strong>
+                <span>Délai estimé : {estimatedDelay}</span>
+              </div>
+              <div className="marketStats"><div><small>Min</small><strong>{formatDh(Math.min(...MARKET_PRICES))}</strong></div><div><small>Moy.</small><strong>{formatDh(average)}</strong></div><div><small>Médiane</small><strong>{formatDh(median(MARKET_PRICES))}</strong></div><div><small>Max</small><strong>{formatDh(Math.max(...MARKET_PRICES))}</strong></div></div>
+              <div className="chart">{buildHistogram(MARKET_PRICES).map((bar, i) => <div className="barRow" key={i}><span>{Math.round(bar.low/1000)}-{Math.round(bar.high/1000)}k</span><div className="barTrack"><div style={{ width: `${Math.max(bar.pct,3)}%` }} /></div><b>{bar.pct}%</b></div>)}</div>
+              <div className={`signal ${priceSignal.tone}`}><strong>{priceSignal.badge}</strong><p>{priceSignal.label}</p></div>
+              <p className="sourceNote">Base démo. À connecter ensuite à une base benchmark mensuelle réelle.</p>
             </div>
-            <div className="marketStats"><div><small>Min</small><strong>{formatDh(Math.min(...MARKET_PRICES))}</strong></div><div><small>Moy.</small><strong>{formatDh(average)}</strong></div><div><small>Médiane</small><strong>{formatDh(median(MARKET_PRICES))}</strong></div><div><small>Max</small><strong>{formatDh(Math.max(...MARKET_PRICES))}</strong></div></div>
-            <div className="chart">{buildHistogram(MARKET_PRICES).map((bar, i) => <div className="barRow" key={i}><span>{Math.round(bar.low/1000)}-{Math.round(bar.high/1000)}k</span><div className="barTrack"><div style={{ width: `${Math.max(bar.pct,3)}%` }} /></div><b>{bar.pct}%</b></div>)}</div>
-            <div className={`signal ${priceSignal.tone}`}><strong>{priceSignal.badge}</strong><p>{priceSignal.label}</p></div>
-            <p className="sourceNote">Base démo. À connecter ensuite à une base benchmark mensuelle réelle.</p>
           </div>
         </aside>
       </section>
@@ -1372,7 +1405,9 @@ export default function MandatPage() {
         .photoQualityPanel{display:flex;justify-content:space-between;gap:16px;background:linear-gradient(135deg,#fff8ec,#fff);border:1.5px solid #ead3a5;border-radius:24px;padding:16px 18px;margin-bottom:18px}.photoQualityPanel p{margin:4px 0 0;color:#7a5720}.photoQualityPanel span{background:#111827;color:#d9ad62;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:950}.photoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:20px}.upload{border-radius:26px;background:rgba(255,255,255,.72);border:1.5px dashed #ccd6e2;padding:22px;display:flex;flex-direction:column;gap:8px;box-shadow:0 18px 44px rgba(22,28,36,.06)}.upload:hover{transform:translateY(-3px);border-color:#d9b56d}.photoGuideImage{width:100%;height:130px;object-fit:contain;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:12px}.uploadDefects{border-color:#f2aaa2;background:#fff7f6}.uploadDefects em{display:inline-flex;width:max-content;background:#fff2f0;color:#b42318;border-radius:999px;padding:5px 9px;font-size:11px;font-style:normal;font-weight:950}
         .check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:17px;font-weight:900}.check input{width:auto;min-height:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:22px;padding:22px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{border-radius:26px;background:linear-gradient(145deg,#fff,#f8fafc);border:1.5px solid #dce4ee;box-shadow:0 18px 44px rgba(22,28,36,.06);padding:22px;line-height:1.75}.final{margin-top:34px;border-radius:30px;background:linear-gradient(135deg,#111827,#1f2937);box-shadow:0 28px 80px rgba(17,24,39,.22);color:white;padding:24px;display:flex;justify-content:space-between;gap:22px;align-items:center}.final p{color:rgba(255,255,255,.62)}.final button{background:linear-gradient(135deg,#b8924a,#d9b56d);color:white;border:0;border-radius:18px;padding:15px 22px;font-weight:950}
         .marketCard{border-radius:32px;background:rgba(255,255,255,.80);border:1px solid #e2e8f0;box-shadow:0 30px 90px rgba(22,28,36,.10);padding:20px}.marketHeader{display:flex;justify-content:space-between;gap:10px}.marketHeader span{font-size:24px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;color:#b8924a;background:#fff6e8;border-radius:999px;padding:7px 9px}.marketIdentity{background:linear-gradient(135deg,#111827,#27313c);border-radius:24px;color:white;padding:15px;margin:15px 0}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px minmax(0,1fr) 34px;gap:8px;align-items:center;font-size:11px}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal p{margin:4px 0 0}.signal.green{background:#edf7f2;color:#2d8653}.signal.red{background:#fff2f0;color:#b42318}.signal.black{background:#f3f0ec;color:#111827}.signal.neutral{background:#f8fafc;color:#728196}.sourceNote{font-size:11px;color:#8090a3}
-        @media(max-width:1280px){.workspace{grid-template-columns:220px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.pricingGrid{grid-template-columns:1fr}.priceBoxMain{transform:none}}@media(max-width:900px){.topbar{padding:0 18px}.hero,.workspace{grid-template-columns:1fr;padding-left:18px;padding-right:18px}.leftNav,.rightRail{position:static}.brandShowcaseWide{grid-template-columns:1fr}.photoQualityPanel,.final{flex-direction:column;align-items:flex-start}.panel{padding:24px;border-radius:28px}h1{font-size:clamp(42px,12vw,64px)}}
+        .workspace{max-width:1480px;margin:auto;padding:24px 34px 100px;display:grid;grid-template-columns:230px minmax(0,1fr) 350px;gap:22px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.rightRail{display:grid;gap:14px}.infoRailHeader{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:16px 18px;border-radius:24px;background:#f7f8fa;border:1px solid #e5e7eb;box-shadow:0 14px 34px rgba(15,23,32,.05)}.infoRailHeader strong{display:block;font-size:18px;line-height:1.15;letter-spacing:-.02em}.infoRailHeader p{margin:4px 0 0;color:#6b7280;font-size:12px;line-height:1.45}.infoRailEyebrow{display:inline-flex;margin-bottom:6px;padding:5px 9px;border-radius:999px;background:#eef2f7;color:#5f6b7a;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.toggleInsightsBtn{display:none;border:1px solid #d1d5db;background:#fff;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:800;color:#111827}.infoRailHint{padding:12px 14px;border-radius:18px;background:#fff8e8;border:1px solid #f0dfaf;color:#7a5a14;font-size:12px;line-height:1.45}.infoCardsWrap{display:grid;gap:14px}.cardReadOnlyTag{display:inline-flex;align-self:flex-start;margin-bottom:10px;padding:4px 8px;border-radius:999px;background:#eef5ff;color:#0b63ce;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.livePreviewCard,.qualityCard,.marketCard{position:relative}.rightRail .livePreviewCard,.rightRail .qualityCard,.rightRail .marketCard{background:#f9fafb;border:1px solid #e5e7eb;box-shadow:0 14px 30px rgba(15,23,32,.05)}
+        @media(max-width:1380px){.workspace{grid-template-columns:220px minmax(0,1fr)}.rightRail{position:static;grid-column:2;margin-top:8px}.toggleInsightsBtn{display:inline-flex;align-items:center;justify-content:center}.infoCardsWrap{display:none}.rightRail.expandedInsights .infoCardsWrap{display:grid}.pricingGrid{grid-template-columns:1fr}.priceBoxMain{transform:none}}
+        @media(max-width:900px){.topbar{padding:0 18px}.hero,.workspace{grid-template-columns:1fr;padding-left:18px;padding-right:18px}.leftNav,.rightRail{position:static}.brandShowcaseWide{grid-template-columns:1fr}.photoQualityPanel,.final{flex-direction:column;align-items:flex-start}.panel{padding:24px;border-radius:28px}h1{font-size:clamp(42px,12vw,64px)}.rightRail{grid-column:auto}}
 
         /* V14 Apple-inspired minimal DA + subtle 3D scroll */
         :root{
@@ -2720,6 +2755,166 @@ export default function MandatPage() {
         .scoreRecommendations{display:grid;gap:6px;margin-top:10px}
         .scoreRecommendations small{background:#fff8e8;color:#6e4a00;border-radius:10px;padding:7px 8px;line-height:1.35}
         @media(max-width:900px){.publicationModeBox{grid-template-columns:1fr}}
+
+
+        /* V41 - Stronger separation between input area and read-only help panels */
+        .workspace.withoutInsights{
+          grid-template-columns:230px minmax(0,1fr)!important;
+        }
+
+        .workspace.withoutInsights .rightRail{
+          display:none!important;
+        }
+
+        .formColumn{
+          min-width:0;
+        }
+
+        .formZoneBanner{
+          position:relative;
+          margin-bottom:18px;
+          padding:18px 20px 18px 24px;
+          border-radius:26px;
+          background:#ffffff;
+          border:1px solid rgba(0,113,227,.16);
+          box-shadow:0 14px 38px rgba(0,113,227,.08);
+          overflow:hidden;
+        }
+
+        .formZoneBanner:before{
+          content:"";
+          position:absolute;
+          left:0;
+          top:0;
+          bottom:0;
+          width:7px;
+          background:#0071e3;
+        }
+
+        .formZoneBanner span{
+          display:inline-flex;
+          width:max-content;
+          margin-bottom:7px;
+          padding:5px 9px;
+          border-radius:999px;
+          background:#f0f7ff;
+          color:#0071e3;
+          font-size:10px;
+          font-weight:900;
+          text-transform:uppercase;
+          letter-spacing:.08em;
+        }
+
+        .formZoneBanner strong{
+          display:block;
+          color:#1d1d1f;
+          font-size:18px;
+          line-height:1.25;
+          letter-spacing:-.02em;
+        }
+
+        .formZoneBanner p{
+          margin:5px 0 0;
+          color:#6e6e73;
+          font-size:13px;
+          line-height:1.45;
+        }
+
+        .rightRail{
+          padding:14px!important;
+          border-radius:32px!important;
+          background:linear-gradient(180deg,#f3f6fa 0%,#e9eef5 100%)!important;
+          border:1px solid #dde4ee!important;
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 18px 50px rgba(15,23,42,.07)!important;
+        }
+
+        .rightRail:before{
+          content:"Panneaux d’aide";
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          margin-bottom:12px;
+          min-height:34px;
+          border-radius:999px;
+          background:#111827;
+          color:#fff;
+          font-size:11px;
+          font-weight:900;
+          text-transform:uppercase;
+          letter-spacing:.10em;
+        }
+
+        .railActions{
+          display:flex;
+          gap:8px;
+          align-items:center;
+          flex-wrap:wrap;
+          justify-content:flex-end;
+        }
+
+        .hideRailInlineBtn,
+        .toggleHelpPanelsTop{
+          border:1px solid #d1d5db;
+          background:#fff;
+          border-radius:999px;
+          padding:9px 12px;
+          font-size:12px;
+          font-weight:800;
+          color:#111827;
+          cursor:pointer;
+          white-space:nowrap;
+        }
+
+        .toggleHelpPanelsTop{
+          background:#f5f5f7;
+        }
+
+        .toggleHelpPanelsTop:hover,
+        .hideRailInlineBtn:hover{
+          border-color:#0071e3;
+          color:#0071e3;
+        }
+
+        .rightRail .livePreviewCard,
+        .rightRail .qualityCard,
+        .rightRail .marketCard{
+          opacity:.96;
+        }
+
+        .rightRail .livePreviewCard:hover,
+        .rightRail .qualityCard:hover,
+        .rightRail .marketCard:hover{
+          opacity:1;
+          transform:translateY(-1px);
+        }
+
+        @media(max-width:1380px){
+          .workspace.withoutInsights{
+            grid-template-columns:220px minmax(0,1fr)!important;
+          }
+          .formColumn{
+            grid-column:2;
+          }
+          .workspace.withoutInsights .formColumn{
+            grid-column:2;
+          }
+        }
+
+        @media(max-width:900px){
+          .formColumn,
+          .workspace.withoutInsights .formColumn{
+            grid-column:auto;
+          }
+
+          .topRight{
+            flex-wrap:wrap;
+            justify-content:flex-end;
+          }
+
+          .toggleHelpPanelsTop{
+            padding:8px 10px;
+          }
+        }
 
       `}</style>
     </main>
