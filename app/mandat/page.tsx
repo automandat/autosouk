@@ -1046,6 +1046,76 @@ export default function MandatPage() {
         @keyframes instantCheckTravel{0%{opacity:0;transform:translate(-50%,-50%) scale(.18)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}100%{opacity:1;transform:translate(calc(-50% + 128px),calc(-50% - 108px)) scale(.38)}}
         @media(max-width:1280px){.pricingGridExact{grid-template-columns:1fr!important}.priceBoxMinimum,.priceBoxDesired{transform:none!important}}
 
+
+        /* V19 - Pricing section: 3 horizontal square cards */
+        .pricingGridExact{
+          display:grid!important;
+          grid-template-columns:repeat(3,minmax(0,1fr))!important;
+          gap:20px!important;
+          align-items:stretch!important;
+          width:100%!important;
+        }
+
+        .pricingGridExact .priceBox{
+          aspect-ratio:1 / 1!important;
+          min-height:270px!important;
+          height:auto!important;
+          display:flex!important;
+          flex-direction:column!important;
+          justify-content:space-between!important;
+          padding:22px!important;
+        }
+
+        .pricingGridExact .priceBoxMinimum{
+          transform:none!important;
+        }
+
+        .pricingGridExact .priceBoxDesired{
+          transform:none!important;
+          scale:1.035;
+          z-index:2;
+        }
+
+        .pricingGridExact .priceBoxInstantExact{
+          transform:none!important;
+        }
+
+        .pricingGridExact .moneyInput{
+          min-height:58px!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput{
+          min-height:70px!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput input{
+          font-size:30px!important;
+        }
+
+        @media(max-width:1280px){
+          .pricingGridExact{
+            grid-template-columns:repeat(3,minmax(0,1fr))!important;
+          }
+          .pricingGridExact .priceBoxMinimum,
+          .pricingGridExact .priceBoxDesired,
+          .pricingGridExact .priceBoxInstantExact{
+            transform:none!important;
+          }
+        }
+
+        @media(max-width:760px){
+          .pricingGridExact{
+            grid-template-columns:1fr!important;
+          }
+          .pricingGridExact .priceBox{
+            aspect-ratio:auto!important;
+            min-height:auto!important;
+          }
+          .pricingGridExact .priceBoxDesired{
+            scale:1!important;
+          }
+        }
+
       `}</style>
     </main>
   );
