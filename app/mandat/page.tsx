@@ -273,6 +273,7 @@ export default function MandatPage() {
   const [uploadedPhotos, setUploadedPhotos] = useState<Record<string, number>>({});
   const [previewPhoto, setPreviewPhoto] = useState("");
   const [activeStep, setActiveStep] = useState(0);
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const displayModel = model === "Autre" ? otherModel : model;
@@ -513,7 +514,17 @@ export default function MandatPage() {
 
   const handleNextStep = () => {
     if (!currentStepValid) return;
-    goNext();
+    const nextStep = Math.min(activeStep + 1, journeySteps.length - 1);
+    setMaxUnlockedStep(prev => Math.max(prev, nextStep));
+    setActiveStep(nextStep);
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+  };
+
+  const handleStepNavClick = (index: number) => {
+    if (index <= maxUnlockedStep) {
+      setActiveStep(index);
+      window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+    }
   };
 
   return (
@@ -546,11 +557,13 @@ export default function MandatPage() {
             <button
               type="button"
               key={step.title}
-              className={activeStep === i ? "activeStepNav" : ""}
-              onClick={() => setActiveStep(i)}
+              className={`${activeStep === i ? "activeStepNav" : ""} ${i > maxUnlockedStep ? "lockedStepNav" : ""}`}
+              onClick={() => handleStepNavClick(i)}
+              disabled={i > maxUnlockedStep}
+              title={i > maxUnlockedStep ? "Complétez l’étape en cours pour débloquer cette rubrique" : ""}
             >
               <small>{String(i + 1).padStart(2, "0")}</small>
-              <span>{step.title}</span>
+              <span>{step.title}</span>{i > maxUnlockedStep && <em>🔒</em>}
             </button>
           ))}
         </aside>
@@ -2080,6 +2093,27 @@ export default function MandatPage() {
             max-width:none;
             text-align:left;
           }
+        }
+
+
+        /* V29 - Locked left navigation */
+        .leftNav button.lockedStepNav{
+          opacity:.42;
+          cursor:not-allowed;
+          pointer-events:auto;
+        }
+
+        .leftNav button.lockedStepNav:hover{
+          background:transparent!important;
+          color:#6e6e73!important;
+          transform:none!important;
+        }
+
+        .leftNav button em{
+          margin-left:auto;
+          font-style:normal;
+          font-size:11px;
+          opacity:.72;
         }
 
       `}</style>
