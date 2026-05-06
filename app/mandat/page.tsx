@@ -300,7 +300,7 @@ const PHOTOS: PhotoItem[] = [
   { label: "Défauts constatés", image: "/photo-guides/defauts.png", instruction: "Toutes les photos nécessaires des défauts", multiple: true }
 ];
 
-const STEPS = ["Vendeur","Véhicule","Technique","Design & options","Prix","Photos","Confiance","Aperçu"];
+const STEPS = ["Ma voiture","Son état","Son prix","Photos & publication"];
 const MARKET_PRICES = [104000,108000,109000,112000,115000,117000,118000,121000,123000,125000,128000,131000,135000,139000,142000,148000,152000,158000];
 
 const BRAND_LOGO_OVERRIDES: Record<string, string> = {
@@ -373,11 +373,11 @@ export default function MandatPage() {
   const [uploadedPhotos, setUploadedPhotos] = useState<Record<string, number>>({});
   const [previewPhoto, setPreviewPhoto] = useState("");
   const [activeStep, setActiveStep] = useState(0);
-  const [maxUnlockedStep, setMaxUnlockedStep] = useState(7);
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(3);
   const [isRecipeMode, setIsRecipeMode] = useState(true);
   const [draftSavedAt, setDraftSavedAt] = useState("");
   const [showInsights, setShowInsights] = useState(false);
-  const [hideHelpPanels, setHideHelpPanels] = useState(false);
+  const [hideHelpPanels, setHideHelpPanels] = useState(true);
   const [descriptionStyle, setDescriptionStyle] = useState("Premium");
   const [publicationMode, setPublicationMode] = useState("Premium");
   const [validationAttempted, setValidationAttempted] = useState(false);
@@ -532,7 +532,7 @@ export default function MandatPage() {
 
 
   useEffect(() => {
-    setMaxUnlockedStep(isRecipeMode ? 7 : activeStep);
+    setMaxUnlockedStep(isRecipeMode ? 3 : activeStep);
   }, [isRecipeMode]);
 
   useEffect(() => {
@@ -685,14 +685,10 @@ export default function MandatPage() {
     }
   };
   const journeySteps = [
-    { title: "Vendeur", section: "s1" },
-    { title: "Véhicule", section: "s2" },
-    { title: "Technique", section: "s3" },
-    { title: "Design & options", section: "s4" },
-    { title: "Prix", section: "s7" },
-    { title: "Photos", section: "s8" },
-    { title: "Confiance", section: "s9" },
-    { title: "Aperçu", section: "s10" }
+    { title: "Ma voiture", section: "s1" },
+    { title: "Son état", section: "s4" },
+    { title: "Son prix", section: "s7" },
+    { title: "Photos & publication", section: "s8" }
   ];
 
   const stepProgress = Math.round(((activeStep + 1) / journeySteps.length) * 100);
@@ -707,26 +703,24 @@ export default function MandatPage() {
   };
 
   const stepRequiredOk = [
-    Boolean(form.first && form.last && form.phone && form.phone.replace(/\D/g, "").length === 10 && form.city),
     Boolean(
+      form.first &&
+      form.last &&
+      form.phone &&
+      form.phone.replace(/\D/g, "").length === 10 &&
+      form.city &&
       brand &&
       displayModel &&
       displayEngine &&
       trim &&
       form.year &&
       form.mileage &&
-      form.registrationCountry &&
-      (
-        (form.registrationCountry === "Maroc" && form.registrationCity) ||
-        (form.registrationCountry === "Étranger" && form.foreignRegistrationCountry && form.customsCleared)
-      )
+      form.fuel &&
+      form.gearbox
     ),
-    Boolean(form.fuel && form.gearbox),
-    true,
+    Boolean(form.condition && form.accidented && form.smoker),
     Boolean(priceMin && priceDesired && Number(priceMin) < Number(priceDesired) && (!instantEnabled || !priceInstant || Number(priceInstant) > Number(priceMin))),
-    uploadedRequiredPhotos === requiredPhotoLabels.length,
-    true,
-    true
+    uploadedRequiredPhotos === requiredPhotoLabels.length
   ];
 
   const invalidFieldsByStep = [
@@ -734,41 +728,48 @@ export default function MandatPage() {
       !form.first ? "first" : "",
       !form.last ? "last" : "",
       !form.phone || form.phone.replace(/\D/g, "").length !== 10 ? "phone" : "",
-      !form.city ? "city" : ""
-    ].filter(Boolean),
-    [
+      !form.city ? "city" : "",
       !brand ? "brand" : "",
       !displayModel ? "model" : "",
       !displayEngine ? "engine" : "",
       !trim ? "trim" : "",
       !form.year ? "year" : "",
-      !form.mileage ? "mileage" : ""
-    ].filter(Boolean),
-    [
+      !form.mileage ? "mileage" : "",
       !form.fuel ? "fuel" : "",
       !form.gearbox ? "gearbox" : ""
     ].filter(Boolean),
-    [],
+    [
+      !form.condition ? "condition" : "",
+      !form.accidented ? "accidented" : "",
+      !form.smoker ? "smoker" : ""
+    ].filter(Boolean),
     [
       !priceMin ? "priceMin" : "",
       !priceDesired ? "priceDesired" : ""
     ].filter(Boolean),
-    uploadedRequiredPhotos < requiredPhotoLabels.length ? ["photos"] : [],
-    [],
-    []
+    uploadedRequiredPhotos < requiredPhotoLabels.length ? ["photos"] : []
   ];
 
   const currentStepValid = stepRequiredOk[activeStep];
 
   const stepCompletion = [
-    { done: [form.first, form.last, form.phone?.replace(/\D/g, "").length === 10, form.city].filter(Boolean).length, total: 4 },
-    { done: [brand, displayModel, displayEngine, trim, form.year, form.mileage].filter(Boolean).length, total: 6 },
-    { done: [form.fuel, form.gearbox].filter(Boolean).length, total: 2 },
-    { done: [exteriorColor, form.interiorColor, form.interiorMaterial, selectedOptions.length > 0].filter(Boolean).length, total: 4 },
+    { done: [
+      form.first,
+      form.last,
+      form.phone?.replace(/\D/g, "").length === 10,
+      form.city,
+      brand,
+      displayModel,
+      displayEngine,
+      trim,
+      form.year,
+      form.mileage,
+      form.fuel,
+      form.gearbox
+    ].filter(Boolean).length, total: 12 },
+    { done: [form.condition, form.accidented, form.smoker, docs, confidence.serviceBook, confidence.invoices].filter(Boolean).length, total: 6 },
     { done: [priceMin, priceDesired, instantEnabled ? priceInstant : "optional"].filter(Boolean).length, total: 3 },
-    { done: uploadedRequiredPhotos, total: requiredPhotoLabels.length },
-    { done: [docs, confidence.firstOwner, confidence.spareKeys, confidence.serviceBook, confidence.invoices, confidence.technicalInspection, confidence.warranty, confidence.financing, confidence.pledge].filter(Boolean).length, total: 9 },
-    { done: missingItems.length === 0 ? 1 : 0, total: 1 }
+    { done: uploadedRequiredPhotos, total: requiredPhotoLabels.length }
   ];
 
   const stepStatuses = stepCompletion.map((item, index) => {
@@ -779,11 +780,10 @@ export default function MandatPage() {
 
 
   const detailedScores = [
-    { label: "Identité", value: Math.round((stepCompletion[0].done / stepCompletion[0].total) * 100) },
-    { label: "Véhicule", value: Math.round((stepCompletion[1].done / stepCompletion[1].total) * 100) },
-    { label: "Prix", value: Math.round((stepCompletion[4].done / stepCompletion[4].total) * 100) },
-    { label: "Photos", value: Math.round((stepCompletion[5].done / stepCompletion[5].total) * 100) },
-    { label: "Confiance", value: Math.round((stepCompletion[6].done / stepCompletion[6].total) * 100) }
+    { label: "Ma voiture", value: Math.round((stepCompletion[0].done / stepCompletion[0].total) * 100) },
+    { label: "Son état", value: Math.round((stepCompletion[1].done / stepCompletion[1].total) * 100) },
+    { label: "Prix", value: Math.round((stepCompletion[2].done / stepCompletion[2].total) * 100) },
+    { label: "Photos", value: Math.round((stepCompletion[3].done / stepCompletion[3].total) * 100) }
   ];
 
   const scoreRecommendations = [
@@ -848,7 +848,7 @@ export default function MandatPage() {
         <Link href="/" className="logo">Auto<span>Souk</span></Link>
         <div className="topRight">
           <span className="draft">Brouillon sauvegardé{draftSavedAt ? ` · ${draftSavedAt}` : ""}</span>
-          <button type="button" className="toggleHelpPanelsTop" onClick={() => setHideHelpPanels(prev => !prev)}>{hideHelpPanels ? "Afficher les aides" : "Masquer les aides"}</button><Link href="/" className="back">Retour au site</Link>
+          <button type="button" className="toggleHelpPanelsTop" onClick={() => setHideHelpPanels(prev => !prev)}>{hideHelpPanels ? "Voir l’aperçu" : "Masquer l’aperçu"}</button><Link href="/" className="back">Retour au site</Link>
         </div>
       </nav>
 
@@ -901,7 +901,7 @@ export default function MandatPage() {
             <div>
               <span>Étape {activeStep + 1} sur {journeySteps.length}</span>
               <h2>{journeySteps[activeStep].title}</h2>
-              <p>Complétez cette étape, puis avancez vers la suivante. Votre annonce se construit progressivement.</p>
+              <p>Répondez simplement aux questions essentielles. Les options avancées restent disponibles plus bas.</p>
             </div>
             <div className="stepPercent">{stepProgress}%</div>
           </div>
@@ -913,11 +913,11 @@ export default function MandatPage() {
             <button type="button" className={publicationMode === "Rapide" ? "selected" : ""} onClick={() => setPublicationMode("Rapide")}>Publication rapide · 3 min</button>
             <button type="button" className={publicationMode === "Premium" ? "selected" : ""} onClick={() => setPublicationMode("Premium")}>Publication premium · dossier complet</button>
           </div>
-          <div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
+          <div className="calmJourneyIntro"><strong>On vous guide étape par étape.</strong><span>Les champs affichés ici sont les seuls à compléter pour avancer.</span></div><div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
           {smartAlerts.length > 0 && (
             <div className="smartAlertsBox">
               <strong>Alertes intelligentes</strong>
-              {[...smartAlerts, ...coherenceAlerts].slice(0, 4).map(alert => <span key={alert}>{alert}</span>)}
+              {[...smartAlerts, ...coherenceAlerts].slice(0, 2).map(alert => <span key={alert}>{alert}</span>)}
             </div>
           )}
           <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
@@ -953,7 +953,7 @@ export default function MandatPage() {
 
           </div>
 
-          <div className={`journeyPane ${activeStep === 1 ? "active" : ""}`}>
+          <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
           <Section id="s2" title="Identification du véhicule" subtitle="Commencez par les informations clés. Le reste s’ajuste progressivement autour de votre véhicule." />
           <div className="brandShowcaseWide">
             <div className="brandLogoSlot">
@@ -1063,7 +1063,7 @@ export default function MandatPage() {
 
           </div>
 
-          <div className={`journeyPane ${activeStep === 2 ? "active" : ""}`}>
+          <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
           <Section id="s3" title="Carburant & caractéristiques techniques" subtitle="Le carburant est séparé de la motorisation constructeur pour éviter les doublons et fiabiliser l’annonce." />
           <div className="grid">
             <Field label="Carburant" required><select defaultValue="" onChange={e => setValue("fuel", e.target.value)}><option value="" disabled>Sélectionner</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Hybride rechargeable</option><option>Électrique</option><option>GPL</option><option>Hydrogène</option><option>Bioéthanol</option><option>Gaz naturel CNG</option><option>Autre</option></select></Field>
@@ -1099,7 +1099,7 @@ export default function MandatPage() {
 
           </div>
 
-          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
+          <div className={`journeyPane ${activeStep === 1 ? "active" : ""}`}>
           <Section id="s4" title="Design extérieur & intérieur" subtitle="Couleurs, matériaux et premiers éléments visuels." />
           <Field label="Couleur extérieure"><ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={v => { const next = exteriorColor === v ? "" : v; setExteriorColor(next); }} /></Field>
           <div className="grid">
@@ -1124,7 +1124,7 @@ export default function MandatPage() {
 
           </div>
 
-          <div className={`journeyPane ${activeStep === 4 ? "active" : ""}`}>
+          <div className={`journeyPane ${activeStep === 2 ? "active" : ""}`}>
           <Section id="s7" title="Stratégie de prix" subtitle="Trois niveaux de décision : minimum accepté, prix souhaité et prix immédiat." />
           <div className="critical">🔒 <strong>Le prix minimum accepté reste confidentiel.</strong> Il n’est jamais montré aux acheteurs.</div>
           <div className="pricingGrid pricingGridExact">
@@ -1218,7 +1218,7 @@ export default function MandatPage() {
 
           </div>
 
-          <div className={`journeyPane ${activeStep === 5 ? "active" : ""}`}>
+          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
           <Section id="s8" title="Guide photo" subtitle="12 photos principales avec une limite de 1 photo par section, plus un espace illimité pour les défauts." />
           <div className="photoQualityPanel"><div><strong>Checklist qualité photo</strong><p>Photos nettes, lumière naturelle, véhicule propre, plaque masquée si nécessaire.</p></div><span>12 photos + défauts illimités</span></div>
           <div className="photoGrid">
@@ -1237,7 +1237,7 @@ export default function MandatPage() {
 
           </div>
 
-          <div className={`journeyPane ${activeStep === 6 ? "active" : ""}`}>
+          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
           <Section id="s9" title="Documents & confiance" subtitle="Documents publics facultatifs. Les informations sensibles doivent être floutées." />
           <label className="check"><input type="checkbox" checked={docs} onChange={e => setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
           <div className="structuredDocsGrid">
@@ -1286,7 +1286,7 @@ export default function MandatPage() {
 
           </div>
 
-          <div className={`journeyPane ${activeStep === 7 ? "active" : ""}`}>
+          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
           <Section id="s10" title="Preview de l’annonce" subtitle="Résumé public généré automatiquement." />
           <div className="descriptionAssistant">
             <h3>Description assistée</h3>
@@ -1337,7 +1337,7 @@ export default function MandatPage() {
                 {showInsights ? "Masquer" : "Afficher"}
               </button>
               <button type="button" className="hideRailInlineBtn" onClick={() => setHideHelpPanels(true)}>
-                Fermer les aides
+                Masquer
               </button>
             </div>
           </div>
@@ -1377,7 +1377,7 @@ export default function MandatPage() {
               <div className="cardReadOnlyTag">Indicateur</div>
               <div className="marketHeader"><span>Argus AutoSouk</span><b>Benchmark mensuel</b></div>
               <div className="marketIdentity"><strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong><small>{trim || "Finition"} · {form.year || "Année"} · {form.mileage || "Kilométrage"}</small></div>
-              <div className="pricePercentileBox"><strong>{priceDesired ? `${Math.min(99, Math.max(1, Math.round((MARKET_PRICES.filter(p => p <= Number(priceDesired)).length / MARKET_PRICES.length) * 100)))}e percentile` : "Position à calculer"}</strong><span>{priceDesired ? `Écart médiane : ${Math.round(((Number(priceDesired) - median(MARKET_PRICES)) / median(MARKET_PRICES)) * 100)}%` : "Renseignez un prix souhaité"}</span></div><div className="recommendedBox">
+              <div className="calmPriceHelp"><strong>Repère marché</strong><span>Prix généralement observé : {formatDh(recommendedLow)} – {formatDh(recommendedHigh)}. Ce repère reste indicatif et peut être ajusté selon l’état du véhicule.</span></div><div className="pricePercentileBox"><strong>{priceDesired ? `${Math.min(99, Math.max(1, Math.round((MARKET_PRICES.filter(p => p <= Number(priceDesired)).length / MARKET_PRICES.length) * 100)))}e percentile` : "Position à calculer"}</strong><span>{priceDesired ? `Écart médiane : ${Math.round(((Number(priceDesired) - median(MARKET_PRICES)) / median(MARKET_PRICES)) * 100)}%` : "Renseignez un prix souhaité"}</span></div><div className="recommendedBox">
                 <small>Fourchette recommandée</small>
                 <strong>{formatDh(recommendedLow)} – {formatDh(recommendedHigh)}</strong>
                 <span>Délai estimé : {estimatedDelay}</span>
@@ -2913,6 +2913,223 @@ export default function MandatPage() {
 
           .toggleHelpPanelsTop{
             padding:8px 10px;
+          }
+        }
+
+
+        /* V42 - Simplified, calming user journey */
+        .workspace{
+          grid-template-columns:220px minmax(0,860px) minmax(280px,330px)!important;
+          justify-content:center;
+          gap:24px!important;
+        }
+
+        .workspace.withoutInsights{
+          grid-template-columns:220px minmax(0,900px)!important;
+        }
+
+        .panel.stepPanel{
+          background:#fff!important;
+          box-shadow:0 24px 70px rgba(15,23,42,.07)!important;
+          border:1px solid rgba(0,0,0,.06)!important;
+        }
+
+        .stepHeader{
+          border-bottom:0!important;
+          margin-bottom:12px!important;
+        }
+
+        .stepHeader h2{
+          font-size:38px!important;
+          letter-spacing:-.055em!important;
+        }
+
+        .stepHeader p{
+          font-size:15px!important;
+          color:#6e6e73!important;
+          max-width:560px!important;
+        }
+
+        .calmJourneyIntro{
+          margin:12px 0 18px;
+          padding:15px 18px;
+          border-radius:22px;
+          background:#f5f7fb;
+          border:1px solid #e8edf5;
+          display:grid;
+          gap:3px;
+        }
+
+        .calmJourneyIntro strong{
+          color:#1d1d1f;
+          font-size:15px;
+          letter-spacing:-.02em;
+        }
+
+        .calmJourneyIntro span{
+          color:#6e6e73;
+          font-size:13px;
+          line-height:1.45;
+        }
+
+        .leftNav{
+          background:#fff!important;
+          border:1px solid rgba(0,0,0,.06)!important;
+          box-shadow:0 16px 48px rgba(15,23,42,.06)!important;
+        }
+
+        .leftNav button{
+          min-height:54px;
+          border-radius:18px!important;
+        }
+
+        .leftNav button b{
+          display:none!important;
+        }
+
+        .leftNav button em{
+          font-size:13px!important;
+        }
+
+        .formZoneBanner{
+          background:#fff!important;
+          box-shadow:0 12px 34px rgba(0,113,227,.06)!important;
+        }
+
+        .formZoneBanner p{
+          display:none;
+        }
+
+        .smartAlertsBox{
+          background:#fff8ed!important;
+          border-color:#f1dfbe!important;
+          box-shadow:none!important;
+        }
+
+        .smartAlertsBox strong{
+          font-size:12px!important;
+        }
+
+        .smartAlertsBox span{
+          font-size:12px!important;
+        }
+
+        .rightRail{
+          background:#f7f8fa!important;
+          box-shadow:none!important;
+          border:1px solid #e5e7eb!important;
+        }
+
+        .rightRail:before{
+          content:"Aperçu";
+          background:#f0f2f5!important;
+          color:#6e6e73!important;
+        }
+
+        .infoRailHint{
+          background:#fff!important;
+          border-color:#e5e7eb!important;
+          color:#6e6e73!important;
+        }
+
+        .rightRail .qualityCard,
+        .rightRail .marketCard{
+          display:none!important;
+        }
+
+        .rightRail.expandedInsights .qualityCard,
+        .rightRail.expandedInsights .marketCard{
+          display:block!important;
+        }
+
+        .calmPriceHelp{
+          background:#f5f7fb;
+          border:1px solid #e6ebf2;
+          border-radius:18px;
+          padding:13px;
+          display:grid;
+          gap:4px;
+          margin-bottom:12px;
+        }
+
+        .calmPriceHelp strong{
+          font-size:14px;
+          color:#1d1d1f;
+        }
+
+        .calmPriceHelp span{
+          font-size:12px;
+          color:#6e6e73;
+          line-height:1.45;
+        }
+
+        .marketCard .chart,
+        .marketCard .marketStats,
+        .marketCard .pricePercentileBox{
+          display:none!important;
+        }
+
+        .sectionTitle{
+          margin-top:32px!important;
+        }
+
+        .sectionTitle h2{
+          font-size:26px!important;
+        }
+
+        .field label{
+          font-size:12px!important;
+          color:#1d1d1f!important;
+        }
+
+        input,select,textarea{
+          border-radius:16px!important;
+          background:#fafafa!important;
+          border-color:#e5e7eb!important;
+        }
+
+        input:focus,select:focus,textarea:focus{
+          border-color:#0071e3!important;
+          box-shadow:0 0 0 4px rgba(0,113,227,.12)!important;
+        }
+
+        .publicationModeBox,
+        .activeStepSummary{
+          display:none!important;
+        }
+
+        .modeSwitch,
+        .resetDraftBtn{
+          display:none!important;
+        }
+
+        @media(max-width:1380px){
+          .workspace{
+            grid-template-columns:210px minmax(0,900px)!important;
+          }
+          .rightRail{
+            grid-column:2!important;
+          }
+          .infoCardsWrap{
+            display:none!important;
+          }
+          .rightRail.expandedInsights .infoCardsWrap{
+            display:grid!important;
+          }
+        }
+
+        @media(max-width:900px){
+          .workspace,
+          .workspace.withoutInsights{
+            grid-template-columns:1fr!important;
+          }
+          .formColumn,
+          .workspace.withoutInsights .formColumn,
+          .rightRail{
+            grid-column:auto!important;
+          }
+          .leftNav{
+            position:static!important;
           }
         }
 
