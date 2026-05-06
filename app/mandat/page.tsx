@@ -226,10 +226,10 @@ const PHOTOS = [
 
 const STEPS = [
   ["identity","Identité"],
-  ["main","Identification du véhicule"],
+  ["main","Données principales"],
   ["technical","Technique"],
-  ["exterior","Design extérieur"],
-  ["interior","Confort intérieur"],
+  ["exterior","Extérieur"],
+  ["interior","Intérieur"],
   ["options","Équipements"],
   ["condition","État"],
   ["pricing","Prix"],
@@ -359,7 +359,7 @@ export default function MandatPage() {
         <div className="heroGlass">
           <div className="heroMetric"><span>Annonce prête à publier</span><strong>{completion}%</strong></div>
           <div className="track"><div style={{width:`${completion}%`}} /></div>
-          <div className="heroList"><span>Identification du véhicule</span><span>Équipements détaillés</span><span>Argus benchmark mensuel</span></div>
+          <div className="heroList"><span>Données principales</span><span>Équipements détaillés</span><span>Argus benchmark mensuel</span></div>
         </div>
       </section>
 
@@ -380,7 +380,7 @@ export default function MandatPage() {
             <Field label="Ville" required><select defaultValue="" onChange={e=>set("city",e.target.value)}><option value="" disabled>Sélectionner une ville</option>{CITIES.map(x=><option key={x}>{x}</option>)}</select></Field>
           </div>
 
-          <Section id="main" title="Identification du véhicule" subtitle="Commencez par les informations clés. Le reste s’ajuste progressivement autour de votre véhicule." />
+          <Section id="main" title="Données principales" subtitle="Marque, modèle, version, type de véhicule et données administratives." />
           <div className="brandShowcaseWide">
             <div className="brandLogoSlot">
               {brand && !brandLogoMissing && getBrandLogo(brand) ? (
@@ -415,7 +415,7 @@ export default function MandatPage() {
             <Field label="Kilométrage" required><select defaultValue="" onChange={e=>set("mileage",e.target.value)}><option value="" disabled>Sélectionner</option>{MILEAGES.map(x=><option key={x}>{x}</option>)}</select></Field>
           </div>
 
-          <Section id="technical" title="Caractéristiques techniques" subtitle="Carburant, transmission, puissance, cylindrée et caractéristiques mécaniques." />
+          <Section id="technical" title="Données techniques" subtitle="Carburant, transmission, puissance, cylindrée et caractéristiques mécaniques." />
           <div className="grid">
             <Field label="Carburant" required><select defaultValue="" onChange={e=>set("fuel",e.target.value)}><option value="" disabled>Sélectionner</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Hybride rechargeable</option><option>Électrique</option><option>GPL</option><option>Hydrogène</option><option>Bioéthanol</option><option>Gaz naturel CNG</option><option>Autre</option></select></Field>
             <Field label="Transmission" required><select defaultValue="" onChange={e=>set("gearbox",e.target.value)}><option value="" disabled>Sélectionner</option><option>Boîte manuelle</option><option>Boîte automatique</option><option>Boîte semi-automatique</option></select></Field>
@@ -425,11 +425,11 @@ export default function MandatPage() {
             <Field label="Norme antipollution"><select defaultValue=""><option>Tous</option><option>Euro 4</option><option>Euro 5</option><option>Euro 6</option><option>Autre</option></select></Field>
           </div>
 
-          <Section id="exterior" title="Design extérieur" subtitle="Couleur, jantes, toit, aides de stationnement et équipements extérieurs." />
+          <Section id="exterior" title="Extérieur" subtitle="Couleur, jantes, toit, aides de stationnement et équipements extérieurs." />
           <ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={(v)=>{const next = exteriorColor === v ? "" : v; setExteriorColor(next); set("exteriorColor", next);}} />
           <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selected} toggle={toggle} customKeys={["ext_other1","ext_other2","ext_other3"]} customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
 
-          <Section id="interior" title="Confort intérieur" subtitle="Couleurs, matériaux, confort et équipements d’habitacle." />
+          <Section id="interior" title="Intérieur" subtitle="Couleurs, matériaux, confort et équipements d’habitacle." />
           <div className="grid">
             <Field label="Couleur intérieure">
               <PillGroup items={INTERIOR_COLORS} onPick={(v)=>set("interiorColor",v)} />
@@ -460,7 +460,7 @@ export default function MandatPage() {
             <Field label="Garantie"><select defaultValue=""><option>Non renseigné</option><option>Oui</option><option>Non</option></select></Field>
           </div>
 
-          <Section id="pricing" title="Stratégie de prix" subtitle="Positionnez votre véhicule avec trois niveaux de décision clairs : minimum accepté, cible souhaitée et prix de vente immédiate." />
+          <Section id="pricing" title="Prix de vente" subtitle="Positionnez votre véhicule avec trois niveaux de décision clairs : minimum accepté, cible souhaitée et prix de vente immédiate." />
           <div className="critical">🔒 <strong>Le prix minimum accepté reste confidentiel.</strong> Il n’est jamais montré aux acheteurs.</div>
 
           <div className="pricingGrid">
@@ -486,7 +486,7 @@ export default function MandatPage() {
 
           <Field label="Remarques vendeur"><textarea placeholder="Première main, carnet complet, pneus neufs, défauts éventuels..." /></Field>
 
-          <Section id="media" title="Guide photo" subtitle="Parcours type inspection : chaque photo doit montrer un angle précis du véhicule pour rassurer l’acheteur." />
+          <Section id="media" title="Photos guidées" subtitle="Parcours type inspection : chaque photo doit montrer un angle précis du véhicule pour rassurer l’acheteur." />
           <div className="photoQualityPanel">
             <div>
               <strong>Checklist qualité photo</strong>
@@ -525,11 +525,11 @@ export default function MandatPage() {
             ))}
           </div>
 
-          <Section id="documents" title="Documents & confiance" subtitle="Facultatif, mais fortement recommandé pour obtenir un badge Verified." />
+          <Section id="documents" title="Documents publics" subtitle="Facultatif, mais fortement recommandé pour obtenir un badge Verified." />
           <label className="check"><input type="checkbox" checked={docs} onChange={e=>setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
           {docs && <div className="docs"><div className="verified">Verified potentiel</div><div className="grid"><Field label="Carte grise floutée"><input type="file" accept="image/*,.pdf" /></Field><Field label="Factures / carnet"><input type="file" accept="image/*,.pdf" multiple /></Field><Field label="Contrôle technique"><input type="file" accept="image/*,.pdf" /></Field><Field label="Autres documents"><input type="file" accept="image/*,.pdf" multiple /></Field></div></div>}
 
-          <Section id="preview" title="Preview de l’annonce" subtitle="Résumé public généré automatiquement." />
+          <Section id="preview" title="Aperçu de l’annonce" subtitle="Résumé public généré automatiquement." />
           <div className="preview">{description}</div>
 
           <div className="final"><div><strong>Soumettre pour revue</strong><p>AutoSouk vérifie le dossier avant publication.</p></div><button type="button">Envoyer ma demande gratuitement</button></div>
@@ -629,45 +629,42 @@ export default function MandatPage() {
         .signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal strong{display:block;margin-bottom:4px}.signal p{margin:0;line-height:1.5;font-size:13px}.signal.green{background:#edf7f2;border-color:#c3e6d4;color:#2d8653}.signal.red{background:#fff2f0;border-color:#f2aaa2;color:#b42318}.signal.black{background:#f3f0ec;border-color:#d8c8b5;color:#17110c}.signal.neutral{background:#f8fafc;border-color:#dce3eb;color:#728196}
         @media(max-width:1280px){.workspace{grid-template-columns:210px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.grid{grid-template-columns:repeat(2,minmax(220px,1fr))}.optionsGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.topRight .draft{display:none}.hero,.workspace{grid-template-columns:1fr}.leftNav,.rightRail{position:static}.grid,.photoGrid,.optionsGrid,.colorGrid,.customOtherGrid{grid-template-columns:1fr}.panel{padding:22px}.final{flex-direction:column;align-items:flex-start}.final button{width:100%}}
       `}
-/* --- AutoSouk V11 Premium DA: Apple / Tesla / Travelwise inspired --- */
+/* AutoSouk V11.1 Premium DA - build safe */
 :root{
-  --as-bg:#f6f3ee;
-  --as-bg2:#eef3f7;
   --as-ink:#0f1720;
-  --as-muted:#6f7b8d;
-  --as-soft:#ffffffcc;
+  --as-muted:#687386;
+  --as-card:rgba(255,255,255,.82);
   --as-line:#e3e8ef;
   --as-gold:#b8924a;
   --as-gold2:#d9b56d;
   --as-shadow:0 28px 90px rgba(22,28,36,.10);
-  --as-radius:28px;
 }
 
 .page{
   background:
-    radial-gradient(circle at 12% -5%, rgba(217,181,109,.24), transparent 34%),
-    radial-gradient(circle at 88% 3%, rgba(148,163,184,.24), transparent 30%),
+    radial-gradient(circle at 10% -6%, rgba(217,181,109,.24), transparent 34%),
+    radial-gradient(circle at 90% 2%, rgba(148,163,184,.24), transparent 30%),
     linear-gradient(145deg,#fbfaf7 0%,#f3f0ea 42%,#eef4f8 100%)!important;
   color:var(--as-ink)!important;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Arial,sans-serif!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Arial,sans-serif!important;
 }
 
 .topbar{
   max-width:1480px!important;
   height:82px!important;
   padding:0 34px!important;
-  backdrop-filter:blur(18px);
 }
 
 .logo{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",Arial,sans-serif!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Inter",Arial,sans-serif!important;
   font-size:25px!important;
-  letter-spacing:-.04em;
+  letter-spacing:-.04em!important;
   font-weight:900!important;
 }
+
 .logo span{
-  background:linear-gradient(135deg,var(--as-gold),#e7c983);
-  -webkit-background-clip:text;
+  background:linear-gradient(135deg,var(--as-gold),#e7c983)!important;
+  -webkit-background-clip:text!important;
   color:transparent!important;
 }
 
@@ -675,14 +672,14 @@ export default function MandatPage() {
   background:rgba(255,255,255,.72)!important;
   border:1px solid rgba(226,232,240,.9)!important;
   color:#2f6b4f!important;
-  box-shadow:0 10px 28px rgba(22,28,36,.06);
+  box-shadow:0 10px 28px rgba(22,28,36,.06)!important;
 }
 
 .back{
   background:#111827!important;
   color:white!important;
   border:0!important;
-  box-shadow:0 12px 28px rgba(17,24,39,.14);
+  box-shadow:0 12px 28px rgba(17,24,39,.14)!important;
 }
 
 .hero{
@@ -692,28 +689,29 @@ export default function MandatPage() {
 }
 
 .eyebrow{
-  display:inline-flex;
-  background:rgba(255,255,255,.72);
-  border:1px solid rgba(226,232,240,.92);
-  border-radius:999px;
-  padding:9px 13px;
+  display:inline-flex!important;
+  background:rgba(255,255,255,.72)!important;
+  border:1px solid rgba(226,232,240,.92)!important;
+  border-radius:999px!important;
+  padding:9px 13px!important;
   color:#9c7632!important;
   letter-spacing:.14em!important;
-  box-shadow:0 12px 34px rgba(22,28,36,.06);
+  box-shadow:0 12px 34px rgba(22,28,36,.06)!important;
 }
 
 h1{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",Arial,sans-serif!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Inter",Arial,sans-serif!important;
   font-size:clamp(48px,6.4vw,92px)!important;
   line-height:.92!important;
   letter-spacing:-.075em!important;
   font-weight:950!important;
   max-width:980px!important;
 }
+
 h1 em{
   font-style:normal!important;
-  background:linear-gradient(135deg,#111827 5%,#b8924a 55%,#e2c079);
-  -webkit-background-clip:text;
+  background:linear-gradient(135deg,#111827 5%,#b8924a 55%,#e2c079)!important;
+  -webkit-background-clip:text!important;
   color:transparent!important;
 }
 
@@ -734,15 +732,17 @@ h1 em{
 
 .heroMetric strong{
   font-size:42px!important;
-  letter-spacing:-.05em;
-  background:linear-gradient(135deg,#111827,#b8924a);
-  -webkit-background-clip:text;
+  letter-spacing:-.05em!important;
+  background:linear-gradient(135deg,#111827,#b8924a)!important;
+  -webkit-background-clip:text!important;
   color:transparent!important;
 }
+
 .track{
   height:12px!important;
   background:#e9edf2!important;
 }
+
 .track div{
   background:linear-gradient(90deg,#111827,#b8924a,#e6c77e)!important;
 }
@@ -757,7 +757,6 @@ h1 em{
 .workspace{
   max-width:1480px!important;
   padding:24px 34px 100px!important;
-  grid-template-columns:230px minmax(0,1fr) 380px!important;
   gap:26px!important;
 }
 
@@ -769,25 +768,22 @@ h1 em{
   padding:16px!important;
 }
 
-.navTitle{
-  color:#93a0b2!important;
-  font-size:10px!important;
-}
-
 .leftNav a{
   border-radius:18px!important;
   color:#647083!important;
   font-weight:850!important;
-  transition:.18s ease;
+  transition:.18s ease!important;
 }
+
 .leftNav a:hover{
-  background:rgba(255,255,255,.78);
-  transform:translateX(2px);
+  background:rgba(255,255,255,.78)!important;
+  transform:translateX(2px)!important;
 }
+
 .leftNav a.active{
   background:linear-gradient(135deg,#111827,#27313c)!important;
   color:white!important;
-  box-shadow:0 14px 30px rgba(17,24,39,.18);
+  box-shadow:0 14px 30px rgba(17,24,39,.18)!important;
 }
 
 .panel{
@@ -803,31 +799,29 @@ h1 em{
   margin:46px 0 24px!important;
   padding-top:26px!important;
 }
+
 .sectionTitle:first-child{
   margin-top:0!important;
   padding-top:0!important;
 }
+
 .sectionTitle h2{
   font-size:32px!important;
   line-height:1.05!important;
   letter-spacing:-.055em!important;
   font-weight:950!important;
 }
+
 .sectionTitle p{
   color:#6d7890!important;
   font-size:15px!important;
   line-height:1.55!important;
 }
 
-.grid{
-  gap:24px 26px!important;
-}
-
 .field label{
   color:#111827!important;
   font-weight:900!important;
   font-size:12px!important;
-  letter-spacing:-.01em;
 }
 
 input,select,textarea{
@@ -838,6 +832,7 @@ input,select,textarea{
   font-size:15px!important;
   transition:.18s ease!important;
 }
+
 input:focus,select:focus,textarea:focus{
   background:white!important;
   border-color:#c9a15a!important;
@@ -851,21 +846,16 @@ input:focus,select:focus,textarea:focus{
   box-shadow:0 24px 70px rgba(22,28,36,.08)!important;
   padding:24px!important;
 }
+
 .brandLogoSlot{
   border-radius:24px!important;
   background:white!important;
-  box-shadow:inset 0 0 0 1px rgba(226,232,240,.85);
+  box-shadow:inset 0 0 0 1px rgba(226,232,240,.85)!important;
 }
+
 .brandFallback{
   border-radius:28px!important;
   background:linear-gradient(135deg,#111827,#27313c)!important;
-}
-.brandShowcaseCopy strong{
-  font-size:23px!important;
-  letter-spacing:-.04em;
-}
-.brandShowcaseCopy small{
-  color:#6d7890!important;
 }
 
 .pill,.optionItem,.colorItem{
@@ -874,11 +864,13 @@ input:focus,select:focus,textarea:focus{
   border:1.5px solid #dce4ee!important;
   transition:.16s ease!important;
 }
+
 .pill:hover,.optionItem:hover,.colorItem:hover{
-  transform:translateY(-1px);
+  transform:translateY(-1px)!important;
   border-color:#d9b56d!important;
-  box-shadow:0 12px 26px rgba(22,28,36,.06);
+  box-shadow:0 12px 26px rgba(22,28,36,.06)!important;
 }
+
 .optionItem.selected,.colorGrid.hasSelection .colorItem.selected{
   background:linear-gradient(145deg,#fff8ec,#ffffff)!important;
   border-color:#d9b56d!important;
@@ -891,23 +883,17 @@ input:focus,select:focus,textarea:focus{
   border:1.5px solid #f0b4aa!important;
 }
 
-.pricingGrid{
-  gap:22px!important;
-}
 .priceBox{
   border-radius:26px!important;
   border:1.5px solid #dce4ee!important;
   background:rgba(248,250,252,.72)!important;
-  box-shadow:0 18px 46px rgba(22,28,36,.06);
+  box-shadow:0 18px 46px rgba(22,28,36,.06)!important;
 }
+
 .priceBoxMain{
   background:linear-gradient(180deg,#fff8ea,#ffffff)!important;
   border-color:#d9b56d!important;
   box-shadow:0 26px 70px rgba(184,146,74,.20)!important;
-}
-.moneyInput{
-  border-radius:18px!important;
-  background:white!important;
 }
 
 .photoQualityPanel{
@@ -915,25 +901,25 @@ input:focus,select:focus,textarea:focus{
   background:linear-gradient(135deg,#fff8ec,#ffffff)!important;
   border:1.5px solid #ead3a5!important;
 }
-.photoGrid{
-  gap:20px!important;
-}
+
 .upload{
   border-radius:26px!important;
   background:rgba(255,255,255,.72)!important;
   border:1.5px dashed #ccd6e2!important;
   padding:22px!important;
-  box-shadow:0 18px 44px rgba(22,28,36,.06);
+  box-shadow:0 18px 44px rgba(22,28,36,.06)!important;
 }
+
 .upload:hover{
   transform:translateY(-3px)!important;
   border-color:#d9b56d!important;
   box-shadow:0 28px 70px rgba(22,28,36,.10)!important;
 }
+
 .photoGuideImage{
   border-radius:20px!important;
   background:#fff!important;
-  box-shadow:inset 0 0 0 1px #edf1f5;
+  box-shadow:inset 0 0 0 1px #edf1f5!important;
 }
 
 .marketCard{
@@ -942,40 +928,31 @@ input:focus,select:focus,textarea:focus{
   border:1px solid rgba(226,232,240,.94)!important;
   box-shadow:0 30px 90px rgba(22,28,36,.10)!important;
 }
-.marketHeader span{
-  font-size:24px!important;
-  letter-spacing:-.04em;
-}
+
 .marketIdentity{
   background:linear-gradient(135deg,#111827,#27313c)!important;
   border-radius:24px!important;
-}
-.marketStats div{
-  border-radius:18px!important;
-  background:rgba(248,250,252,.82)!important;
 }
 
 .preview{
   border-radius:26px!important;
   background:linear-gradient(145deg,#ffffff,#f8fafc)!important;
   border:1.5px solid #dce4ee!important;
-  box-shadow:0 18px 44px rgba(22,28,36,.06);
+  box-shadow:0 18px 44px rgba(22,28,36,.06)!important;
 }
 
 .final{
   border-radius:30px!important;
   background:linear-gradient(135deg,#111827,#1f2937)!important;
-  box-shadow:0 28px 80px rgba(17,24,39,.22);
+  box-shadow:0 28px 80px rgba(17,24,39,.22)!important;
 }
+
 .final button{
   background:linear-gradient(135deg,#b8924a,#d9b56d)!important;
   border-radius:18px!important;
-  box-shadow:0 16px 34px rgba(184,146,74,.28);
+  box-shadow:0 16px 34px rgba(184,146,74,.28)!important;
 }
 
-@media(max-width:1280px){
-  .workspace{grid-template-columns:220px minmax(0,1fr)!important}
-}
 @media(max-width:900px){
   .topbar{padding:0 18px!important}
   .hero{padding:44px 18px 18px!important}
