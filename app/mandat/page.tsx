@@ -1479,6 +1479,118 @@ export default function MandatPage() {
           margin:0;
         }
 
+
+        /* V24 - Ultra smooth 100-step check animation */
+        .instantFlyingCheck{
+          will-change:transform, opacity!important;
+          animation:singleCheckTravelV24 1.35s linear forwards!important;
+          transform:translate3d(-165px,135px,0) scale(.32);
+        }
+
+        @keyframes singleCheckTravelV24{
+          0%{opacity:0.000;transform:translate3d(-165.00px,135.00px,0) scale(0.320);}
+          1%{opacity:0.125;transform:translate3d(-160.10px,130.99px,0) scale(0.478);}
+          2%{opacity:0.250;transform:translate3d(-155.30px,127.06px,0) scale(0.636);}
+          3%{opacity:0.375;transform:translate3d(-150.59px,123.21px,0) scale(0.794);}
+          4%{opacity:0.500;transform:translate3d(-145.98px,119.44px,0) scale(0.953);}
+          5%{opacity:0.625;transform:translate3d(-141.47px,115.75px,0) scale(1.111);}
+          6%{opacity:0.750;transform:translate3d(-137.05px,112.13px,0) scale(1.269);}
+          7%{opacity:0.875;transform:translate3d(-132.72px,108.59px,0) scale(1.427);}
+          8%{opacity:1.000;transform:translate3d(-128.48px,105.12px,0) scale(1.585);}
+          9%{opacity:1.000;transform:translate3d(-124.34px,101.73px,0) scale(1.743);}
+          10%{opacity:1.000;transform:translate3d(-120.29px,98.42px,0) scale(1.901);}
+          11%{opacity:1.000;transform:translate3d(-116.32px,95.17px,0) scale(2.059);}
+          12%{opacity:1.000;transform:translate3d(-112.44px,92.00px,0) scale(2.218);}
+          13%{opacity:1.000;transform:translate3d(-108.65px,88.90px,0) scale(2.376);}
+          14%{opacity:1.000;transform:translate3d(-104.95px,85.87px,0) scale(2.534);}
+          15%{opacity:1.000;transform:translate3d(-101.33px,82.91px,0) scale(2.692);}
+          16%{opacity:1.000;transform:translate3d(-97.80px,80.02px,0) scale(2.850);}
+          17%{opacity:1.000;transform:translate3d(-94.34px,77.19px,0) scale(2.785);}
+          18%{opacity:1.000;transform:translate3d(-90.98px,74.43px,0) scale(2.721);}
+          19%{opacity:1.000;transform:translate3d(-87.69px,71.74px,0) scale(2.659);}
+          20%{opacity:1.000;transform:translate3d(-84.48px,69.12px,0) scale(2.598);}
+          21%{opacity:1.000;transform:translate3d(-81.35px,66.56px,0) scale(2.539);}
+          22%{opacity:1.000;transform:translate3d(-78.30px,64.06px,0) scale(2.481);}
+          23%{opacity:1.000;transform:translate3d(-75.33px,61.63px,0) scale(2.425);}
+          24%{opacity:1.000;transform:translate3d(-72.43px,59.26px,0) scale(2.370);}
+          25%{opacity:1.000;transform:translate3d(-69.61px,56.95px,0) scale(2.317);}
+          26%{opacity:1.000;transform:translate3d(-66.86px,54.71px,0) scale(2.265);}
+          27%{opacity:1.000;transform:translate3d(-64.19px,52.52px,0) scale(2.214);}
+          28%{opacity:1.000;transform:translate3d(-61.59px,50.39px,0) scale(2.165);}
+          29%{opacity:1.000;transform:translate3d(-59.06px,48.32px,0) scale(2.117);}
+          30%{opacity:1.000;transform:translate3d(-56.59px,46.30px,0) scale(2.071);}
+          31%{opacity:1.000;transform:translate3d(-54.20px,44.35px,0) scale(2.025);}
+          32%{opacity:1.000;transform:translate3d(-51.88px,42.45px,0) scale(1.981);}
+          33%{opacity:1.000;transform:translate3d(-49.63px,40.60px,0) scale(1.939);}
+          34%{opacity:1.000;transform:translate3d(-47.44px,38.81px,0) scale(1.897);}
+          35%{opacity:1.000;transform:translate3d(-45.31px,37.07px,0) scale(1.857);}
+          36%{opacity:1.000;transform:translate3d(-43.25px,35.39px,0) scale(1.818);}
+          37%{opacity:1.000;transform:translate3d(-41.26px,33.76px,0) scale(1.780);}
+          38%{opacity:1.000;transform:translate3d(-39.32px,32.17px,0) scale(1.744);}
+          39%{opacity:1.000;transform:translate3d(-37.45px,30.64px,0) scale(1.708);}
+          40%{opacity:1.000;transform:translate3d(-35.64px,29.16px,0) scale(1.674);}
+          41%{opacity:1.000;transform:translate3d(-33.89px,27.73px,0) scale(1.641);}
+          42%{opacity:1.000;transform:translate3d(-32.19px,26.34px,0) scale(1.609);}
+          43%{opacity:1.000;transform:translate3d(-30.56px,25.00px,0) scale(1.578);}
+          44%{opacity:1.000;transform:translate3d(-28.98px,23.71px,0) scale(1.548);}
+          45%{opacity:1.000;transform:translate3d(-27.45px,22.46px,0) scale(1.519);}
+          46%{opacity:1.000;transform:translate3d(-25.98px,21.26px,0) scale(1.491);}
+          47%{opacity:1.000;transform:translate3d(-24.56px,20.10px,0) scale(1.465);}
+          48%{opacity:1.000;transform:translate3d(-23.20px,18.98px,0) scale(1.439);}
+          49%{opacity:1.000;transform:translate3d(-21.89px,17.91px,0) scale(1.414);}
+          50%{opacity:1.000;transform:translate3d(-20.62px,16.88px,0) scale(1.390);}
+          51%{opacity:1.000;transform:translate3d(-19.41px,15.88px,0) scale(1.367);}
+          52%{opacity:1.000;transform:translate3d(-18.25px,14.93px,0) scale(1.345);}
+          53%{opacity:1.000;transform:translate3d(-17.13px,14.02px,0) scale(1.324);}
+          54%{opacity:1.000;transform:translate3d(-16.06px,13.14px,0) scale(1.304);}
+          55%{opacity:1.000;transform:translate3d(-15.04px,12.30px,0) scale(1.284);}
+          56%{opacity:1.000;transform:translate3d(-14.06px,11.50px,0) scale(1.266);}
+          57%{opacity:1.000;transform:translate3d(-13.12px,10.73px,0) scale(1.248);}
+          58%{opacity:1.000;transform:translate3d(-12.22px,10.00px,0) scale(1.231);}
+          59%{opacity:1.000;transform:translate3d(-11.37px,9.30px,0) scale(1.215);}
+          60%{opacity:1.000;transform:translate3d(-10.56px,8.64px,0) scale(1.200);}
+          61%{opacity:1.000;transform:translate3d(-9.79px,8.01px,0) scale(1.185);}
+          62%{opacity:1.000;transform:translate3d(-9.05px,7.41px,0) scale(1.171);}
+          63%{opacity:1.000;transform:translate3d(-8.36px,6.84px,0) scale(1.158);}
+          64%{opacity:1.000;transform:translate3d(-7.70px,6.30px,0) scale(1.146);}
+          65%{opacity:1.000;transform:translate3d(-7.07px,5.79px,0) scale(1.134);}
+          66%{opacity:1.000;transform:translate3d(-6.49px,5.31px,0) scale(1.123);}
+          67%{opacity:1.000;transform:translate3d(-5.93px,4.85px,0) scale(1.112);}
+          68%{opacity:1.000;transform:translate3d(-5.41px,4.42px,0) scale(1.102);}
+          69%{opacity:1.000;transform:translate3d(-4.92px,4.02px,0) scale(1.093);}
+          70%{opacity:1.000;transform:translate3d(-4.46px,3.65px,0) scale(1.084);}
+          71%{opacity:1.000;transform:translate3d(-4.02px,3.29px,0) scale(1.076);}
+          72%{opacity:1.000;transform:translate3d(-3.62px,2.96px,0) scale(1.069);}
+          73%{opacity:1.000;transform:translate3d(-3.25px,2.66px,0) scale(1.061);}
+          74%{opacity:1.000;transform:translate3d(-2.90px,2.37px,0) scale(1.055);}
+          75%{opacity:1.000;transform:translate3d(-2.58px,2.11px,0) scale(1.049);}
+          76%{opacity:1.000;transform:translate3d(-2.28px,1.87px,0) scale(1.043);}
+          77%{opacity:1.000;transform:translate3d(-2.01px,1.64px,0) scale(1.038);}
+          78%{opacity:1.000;transform:translate3d(-1.76px,1.44px,0) scale(1.033);}
+          79%{opacity:1.000;transform:translate3d(-1.53px,1.25px,0) scale(1.029);}
+          80%{opacity:1.000;transform:translate3d(-1.32px,1.08px,0) scale(1.025);}
+          81%{opacity:1.000;transform:translate3d(-1.13px,0.93px,0) scale(1.021);}
+          82%{opacity:1.000;transform:translate3d(-0.96px,0.79px,0) scale(1.018);}
+          83%{opacity:1.000;transform:translate3d(-0.81px,0.66px,0) scale(1.015);}
+          84%{opacity:1.000;transform:translate3d(-0.68px,0.55px,0) scale(1.013);}
+          85%{opacity:1.000;transform:translate3d(-0.56px,0.46px,0) scale(1.011);}
+          86%{opacity:1.000;transform:translate3d(-0.45px,0.37px,0) scale(1.009);}
+          87%{opacity:1.000;transform:translate3d(-0.36px,0.30px,0) scale(1.007);}
+          88%{opacity:1.000;transform:translate3d(-0.29px,0.23px,0) scale(1.005);}
+          89%{opacity:1.000;transform:translate3d(-0.22px,0.18px,0) scale(1.004);}
+          90%{opacity:1.000;transform:translate3d(-0.16px,0.13px,0) scale(1.003);}
+          91%{opacity:1.000;transform:translate3d(-0.12px,0.10px,0) scale(1.002);}
+          92%{opacity:1.000;transform:translate3d(-0.08px,0.07px,0) scale(1.002);}
+          93%{opacity:1.000;transform:translate3d(-0.06px,0.05px,0) scale(1.001);}
+          94%{opacity:1.000;transform:translate3d(-0.04px,0.03px,0) scale(1.001);}
+          95%{opacity:1.000;transform:translate3d(-0.02px,0.02px,0) scale(1.000);}
+          96%{opacity:1.000;transform:translate3d(-0.01px,0.01px,0) scale(1.000);}
+          97%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
+          98%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
+          99%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
+          100%{opacity:1.000;transform:translate3d(0.00px,0.00px,0) scale(1.000);}
+        }
+
       `}</style>
     </main>
   );
