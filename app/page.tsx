@@ -2,73 +2,76 @@
 
 import Link from "next/link";
 
-const benefits = [
+const pillars = [
   {
     title: "Annonce guidée",
-    text: "Un parcours simple pour renseigner les informations essentielles de votre véhicule."
+    text: "Un parcours clair pour renseigner les informations essentielles sans se perdre."
   },
   {
-    title: "Prix mieux positionné",
-    text: "Un repère marché vous aide à définir un prix cohérent et rassurant."
+    title: "Prix plus cohérent",
+    text: "Un repère marché aide à positionner le véhicule avec plus de justesse."
   },
   {
-    title: "Dossier plus clair",
-    text: "Photos, historique et documents utiles rendent votre annonce plus crédible."
+    title: "Dossier rassurant",
+    text: "Photos, état, historique et documents sont structurés pour inspirer confiance."
   }
 ];
 
 const steps = [
   "Décrivez votre véhicule",
-  "Ajoutez son état et son historique",
+  "Précisez son état",
   "Définissez votre prix",
-  "Préparez les photos avant publication"
+  "Ajoutez vos photos"
 ];
 
 export default function HomePage() {
   return (
     <main className="home">
-      <nav className="nav">
-        <Link href="/" className="brand">Auto<span>Souk</span></Link>
-        <div className="navRight">
-          <a href="#how">Comment ça marche</a>
-          <Link href="/mandat" className="navCta">Confier mon véhicule</Link>
+      <header className="blueBar">
+        <div className="blueInner">
+          <Link href="/" className="brand">Auto<span>Souk</span></Link>
+          <nav className="topLinks" aria-label="Navigation principale">
+            <a href="#how">Comment ça marche</a>
+            <Link href="/espace" className="accountLink">Accéder à mon espace personnel</Link>
+          </nav>
         </div>
-      </nav>
+      </header>
 
       <section className="hero">
-        <div className="copy">
+        <div className="heroCopy">
           <span className="eyebrow">Vente automobile accompagnée</span>
-          <h1>Vendez votre voiture simplement, avec plus de confiance.</h1>
+          <h1>Vendez votre voiture avec plus de sérénité.</h1>
           <p>
-            AutoSouk vous accompagne pour préparer une annonce claire, complète
-            et rassurante avant sa publication.
+            AutoSouk vous accompagne dans la préparation d’une annonce claire,
+            complète et rassurante, avant sa mise en relation avec les acheteurs.
           </p>
+
           <div className="actions">
-            <Link href="/mandat" className="primary">Confier mon véhicule</Link>
-            <a href="#how" className="secondary">Voir comment ça marche</a>
+            <Link href="/mandat" className="primaryButton">Confier mon véhicule</Link>
+            <a href="#how" className="secondaryButton">Voir comment ça marche</a>
           </div>
         </div>
 
-        <div className="card">
-          <div className="cardHeader">
+        <aside className="announcement" aria-label="Aperçu d’une annonce AutoSouk">
+          <div className="announcementHeader">
             <div>
               <small>Exemple d’annonce</small>
-              <strong>BMW Série 3 320d</strong>
-              <p>2021 · Diesel · Automatique · 74 000 km</p>
+              <strong>BMW Série 3</strong>
+              <p>320d · 2021 · 74 000 km</p>
             </div>
             <span>92</span>
           </div>
 
-          <div className="vehicle">
-            <div className="body" />
-            <div className="wheel left" />
-            <div className="wheel right" />
+          <div className="vehicleVisual">
+            <div className="carBody" />
+            <div className="wheel wheelLeft" />
+            <div className="wheel wheelRight" />
           </div>
 
-          <div className="meta">
+          <div className="announcementInfo">
             <div>
               <small>Repère marché</small>
-              <b>210 000 – 225 000 DH</b>
+              <b>210 000 - 225 000 DH</b>
             </div>
             <div>
               <small>Dossier</small>
@@ -78,21 +81,27 @@ export default function HomePage() {
 
           <div className="badges">
             <span>Prix cohérent</span>
-            <span>Photos guidées</span>
             <span>Annonce claire</span>
           </div>
-        </div>
+        </aside>
+      </section>
+
+      <section className="introStrip">
+        <p>
+          Une annonce bien préparée réduit les hésitations, clarifie les échanges
+          et aide l’acheteur à se projeter plus rapidement.
+        </p>
       </section>
 
       <section className="section">
         <div className="sectionTitle">
           <span>Pourquoi AutoSouk ?</span>
-          <h2>Une annonce mieux préparée inspire plus confiance.</h2>
+          <h2>Un accompagnement simple pour mieux présenter votre voiture.</h2>
         </div>
 
-        <div className="benefits">
-          {benefits.map((item) => (
-            <article key={item.title}>
+        <div className="pillars">
+          {pillars.map((item) => (
+            <article className="pillar" key={item.title}>
               <h3>{item.title}</h3>
               <p>{item.text}</p>
             </article>
@@ -100,102 +109,125 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section" id="how">
-        <div className="sectionTitle">
+      <section className="section how" id="how">
+        <div className="sectionTitle center">
           <span>Comment ça marche</span>
-          <h2>Un parcours simple, en quatre étapes.</h2>
+          <h2>Quatre étapes, sans complexité.</h2>
         </div>
 
         <div className="steps">
           {steps.map((step, index) => (
-            <div className="step" key={step}>
-              <strong>{String(index + 1).padStart(2, "0")}</strong>
-              <p>{step}</p>
-            </div>
+            <article className="step" key={step}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{step}</strong>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="trust">
-        <h2>Les bons éléments, présentés simplement.</h2>
-        <p>
-          AutoSouk vous aide à mettre en avant le kilométrage, l’état, le prix,
-          les photos et les documents utiles, sans complexifier le parcours.
-        </p>
-        <Link href="/mandat" className="primary">Commencer</Link>
+      <section className="trustPanel">
+        <div>
+          <span>Confiance acheteur</span>
+          <h2>Les informations importantes, présentées proprement.</h2>
+          <p>
+            AutoSouk vous aide à structurer le kilométrage, l’état, le prix,
+            les photos et les documents utiles, sans rendre le parcours lourd.
+          </p>
+        </div>
+        <Link href="/mandat" className="primaryButton">Commencer</Link>
       </section>
 
       <footer className="footer">
-        <Link href="/" className="brand">Auto<span>Souk</span></Link>
+        <Link href="/" className="footerBrand">AutoSouk</Link>
         <p>Vente automobile accompagnée au Maroc.</p>
       </footer>
 
       <style jsx>{`
-        * {
+        .home,
+        .home * {
           box-sizing: border-box;
+          font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Arial, sans-serif !important;
         }
 
         .home {
           min-height: 100vh;
           background: #f5f5f7;
           color: #1d1d1f;
-          font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Arial, sans-serif;
         }
 
-        .nav {
+        .blueBar {
+          background: #0071e3;
+          color: #fff;
+          position: sticky;
+          top: 0;
+          z-index: 40;
+          box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset;
+        }
+
+        .blueInner {
           max-width: 1180px;
-          height: 76px;
+          height: 64px;
           margin: 0 auto;
           padding: 0 28px;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 28px;
         }
 
         .brand {
-          color: #1d1d1f;
+          color: #fff;
           text-decoration: none;
-          font-size: 24px;
-          font-weight: 850;
-          letter-spacing: -0.05em;
+          font-size: 23px;
+          font-weight: 800;
+          letter-spacing: -0.045em;
         }
 
         .brand span {
-          color: #0071e3;
+          color: rgba(255, 255, 255, 0.74);
         }
 
-        .navRight {
+        .topLinks {
           display: flex;
           align-items: center;
           gap: 22px;
         }
 
-        .navRight a {
-          color: #6e6e73;
+        .topLinks a {
+          color: rgba(255, 255, 255, 0.88);
           text-decoration: none;
           font-size: 14px;
           font-weight: 650;
         }
 
-        .navCta {
-          background: #1d1d1f;
-          color: #fff !important;
+        .topLinks a:hover {
+          color: #fff;
+        }
+
+        .accountLink {
+          min-height: 38px;
+          display: inline-flex;
+          align-items: center;
+          border: 1px solid rgba(255, 255, 255, 0.42);
           border-radius: 999px;
-          padding: 11px 16px;
+          padding: 0 14px;
+          background: rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(12px);
         }
 
         .hero {
           max-width: 1180px;
           margin: 0 auto;
-          padding: 86px 28px 72px;
+          padding: 92px 28px 66px;
           display: grid;
-          grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
-          gap: 56px;
+          grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.72fr);
+          gap: 58px;
           align-items: center;
         }
 
         .eyebrow,
-        .sectionTitle span {
+        .sectionTitle span,
+        .trustPanel span {
           display: inline-flex;
           width: max-content;
           border-radius: 999px;
@@ -210,31 +242,33 @@ export default function HomePage() {
         }
 
         h1 {
-          max-width: 760px;
-          margin: 18px 0;
-          font-size: clamp(48px, 7vw, 86px);
-          line-height: 0.94;
-          letter-spacing: -0.078em;
-          font-weight: 850;
+          max-width: 780px;
+          margin: 20px 0 18px;
+          color: #1d1d1f;
+          font-size: clamp(48px, 6.2vw, 78px);
+          line-height: 0.96;
+          letter-spacing: -0.072em;
+          font-weight: 820;
         }
 
-        .copy p {
-          max-width: 620px;
+        .heroCopy p {
+          max-width: 610px;
           margin: 0;
           color: #6e6e73;
-          font-size: 20px;
+          font-size: 19px;
           line-height: 1.55;
+          letter-spacing: -0.015em;
         }
 
         .actions {
+          margin-top: 30px;
           display: flex;
           gap: 12px;
           flex-wrap: wrap;
-          margin-top: 30px;
         }
 
-        .primary,
-        .secondary {
+        .primaryButton,
+        .secondaryButton {
           min-height: 48px;
           border-radius: 999px;
           padding: 0 20px;
@@ -242,185 +276,230 @@ export default function HomePage() {
           align-items: center;
           justify-content: center;
           text-decoration: none;
-          font-weight: 750;
           font-size: 15px;
+          font-weight: 750;
+          transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
         }
 
-        .primary {
+        .primaryButton {
           background: #0071e3;
           color: #fff;
+          border: 1px solid #0071e3;
         }
 
-        .secondary {
+        .primaryButton:hover {
+          background: #0077ed;
+          transform: translateY(-1px);
+        }
+
+        .secondaryButton {
           background: #fff;
           color: #1d1d1f;
-          border: 1px solid #e5e5ea;
+          border: 1px solid #dcdce1;
         }
 
-        .card {
+        .secondaryButton:hover {
+          border-color: #bfc0c6;
+          transform: translateY(-1px);
+        }
+
+        .announcement {
+          width: min(100%, 340px);
+          justify-self: end;
           background: #fff;
           border: 1px solid #e5e5ea;
-          border-radius: 36px;
-          padding: 26px;
-          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.08);
+          border-radius: 30px;
+          padding: 20px;
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
         }
 
-        .cardHeader {
+        .announcementHeader {
           display: flex;
+          align-items: flex-start;
           justify-content: space-between;
-          gap: 20px;
+          gap: 16px;
         }
 
-        .cardHeader small {
+        .announcementHeader small {
           display: block;
+          margin-bottom: 6px;
           color: #0071e3;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 750;
-          margin-bottom: 7px;
         }
 
-        .cardHeader strong {
+        .announcementHeader strong {
           display: block;
-          font-size: 24px;
+          color: #1d1d1f;
+          font-size: 21px;
+          line-height: 1.05;
           letter-spacing: -0.05em;
         }
 
-        .cardHeader p {
+        .announcementHeader p {
           margin: 6px 0 0;
           color: #6e6e73;
-          font-size: 14px;
+          font-size: 13px;
         }
 
-        .cardHeader span {
-          width: 58px;
-          height: 58px;
+        .announcementHeader span {
+          width: 48px;
+          height: 48px;
+          flex: 0 0 auto;
           border-radius: 50%;
           background: #f0f7ff;
           color: #0071e3;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: 850;
-          font-size: 22px;
+          font-size: 19px;
+          font-weight: 820;
         }
 
-        .vehicle {
+        .vehicleVisual {
           position: relative;
-          height: 174px;
-          margin: 26px 0;
-          border-radius: 28px;
-          background: linear-gradient(180deg, #f5f7fb, #eef2f7);
+          height: 132px;
+          margin: 18px 0;
+          border-radius: 24px;
+          background: linear-gradient(180deg, #f8fafc, #edf2f7);
           overflow: hidden;
         }
 
-        .body {
+        .carBody {
           position: absolute;
           left: 50%;
-          top: 50%;
-          width: 70%;
-          height: 54px;
-          transform: translate(-50%, -35%);
-          border-radius: 70px 80px 34px 34px;
+          top: 55%;
+          width: 68%;
+          height: 40px;
+          transform: translate(-50%, -50%);
+          border-radius: 60px 70px 26px 26px;
           background: linear-gradient(135deg, #1d1d1f, #3a3a3c);
         }
 
-        .body:before {
+        .carBody:before {
           content: "";
           position: absolute;
           left: 24%;
-          top: -35px;
+          top: -26px;
           width: 38%;
-          height: 42px;
-          border-radius: 42px 42px 8px 8px;
+          height: 31px;
+          border-radius: 34px 34px 7px 7px;
           background: #3a3a3c;
           transform: skewX(-16deg);
         }
 
         .wheel {
           position: absolute;
-          bottom: 49px;
-          width: 28px;
-          height: 28px;
+          bottom: 36px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
           background: #111;
-          border: 6px solid #555;
+          border: 5px solid #555;
         }
 
-        .wheel.left {
-          left: 28%;
+        .wheelLeft {
+          left: 30%;
         }
 
-        .wheel.right {
-          right: 28%;
+        .wheelRight {
+          right: 30%;
         }
 
-        .meta {
+        .announcementInfo {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 10px;
+          gap: 8px;
         }
 
-        .meta div {
+        .announcementInfo div {
           background: #f5f5f7;
-          border-radius: 18px;
-          padding: 13px;
+          border-radius: 15px;
+          padding: 11px;
         }
 
-        .meta small {
+        .announcementInfo small {
           display: block;
-          color: #86868b;
-          font-size: 11px;
           margin-bottom: 4px;
+          color: #86868b;
+          font-size: 10px;
         }
 
-        .meta b {
-          font-size: 13px;
+        .announcementInfo b {
+          color: #1d1d1f;
+          font-size: 12px;
           letter-spacing: -0.02em;
         }
 
         .badges {
-          margin-top: 14px;
+          margin-top: 12px;
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 7px;
         }
 
         .badges span {
           background: #f0f7ff;
           color: #0071e3;
           border-radius: 999px;
-          padding: 7px 10px;
-          font-size: 12px;
+          padding: 6px 8px;
+          font-size: 11px;
           font-weight: 750;
+        }
+
+        .introStrip {
+          max-width: 1124px;
+          margin: 0 auto 16px;
+          padding: 0 28px;
+        }
+
+        .introStrip p {
+          margin: 0;
+          border-radius: 28px;
+          background: #fff;
+          border: 1px solid #e5e5ea;
+          padding: 24px 28px;
+          color: #1d1d1f;
+          font-size: clamp(20px, 2.6vw, 30px);
+          line-height: 1.22;
+          letter-spacing: -0.05em;
+          font-weight: 760;
         }
 
         .section {
           max-width: 1180px;
           margin: 0 auto;
-          padding: 56px 28px;
+          padding: 62px 28px;
         }
 
         .sectionTitle {
-          max-width: 720px;
+          max-width: 760px;
           margin-bottom: 24px;
         }
 
-        .sectionTitle h2,
-        .trust h2 {
-          margin: 14px 0 0;
-          font-size: clamp(34px, 4.5vw, 56px);
-          line-height: 1;
-          letter-spacing: -0.065em;
-          font-weight: 850;
+        .sectionTitle.center {
+          margin-left: auto;
+          margin-right: auto;
+          text-align: center;
         }
 
-        .benefits {
+        .sectionTitle h2,
+        .trustPanel h2 {
+          margin: 14px 0 0;
+          color: #1d1d1f;
+          font-size: clamp(34px, 4.8vw, 58px);
+          line-height: 1;
+          letter-spacing: -0.068em;
+          font-weight: 820;
+        }
+
+        .pillars {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
+          gap: 14px;
         }
 
-        .benefits article,
+        .pillar,
         .step {
           background: #fff;
           border: 1px solid #e5e5ea;
@@ -429,18 +508,18 @@ export default function HomePage() {
           box-shadow: 0 14px 36px rgba(0, 0, 0, 0.04);
         }
 
-        .benefits h3 {
+        .pillar h3 {
           margin: 0 0 10px;
+          color: #1d1d1f;
           font-size: 20px;
           letter-spacing: -0.04em;
         }
 
-        .benefits p,
-        .trust p {
+        .pillar p {
           margin: 0;
           color: #6e6e73;
           font-size: 15px;
-          line-height: 1.55;
+          line-height: 1.5;
         }
 
         .steps {
@@ -449,36 +528,46 @@ export default function HomePage() {
           gap: 12px;
         }
 
+        .step {
+          min-height: 132px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .step span {
+          color: #0071e3;
+          font-size: 13px;
+          font-weight: 820;
+        }
+
         .step strong {
-          display: inline-flex;
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          background: #0071e3;
-          color: #fff;
+          color: #1d1d1f;
+          font-size: 19px;
+          line-height: 1.25;
+          letter-spacing: -0.04em;
+        }
+
+        .trustPanel {
+          max-width: 1124px;
+          margin: 42px auto 70px;
+          padding: 46px;
+          border-radius: 38px;
+          background: #fff;
+          border: 1px solid #e5e5ea;
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.06);
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 28px;
           align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          margin-bottom: 18px;
         }
 
-        .step p {
-          margin: 0;
-          font-weight: 700;
-          line-height: 1.4;
-          letter-spacing: -0.02em;
-        }
-
-        .trust {
-          max-width: 980px;
-          margin: 56px auto;
-          padding: 56px 28px;
-          text-align: center;
-        }
-
-        .trust p {
+        .trustPanel p {
           max-width: 620px;
-          margin: 16px auto 24px;
+          margin: 16px 0 0;
+          color: #6e6e73;
+          font-size: 16px;
+          line-height: 1.55;
         }
 
         .footer {
@@ -492,50 +581,77 @@ export default function HomePage() {
           color: #86868b;
         }
 
+        .footerBrand {
+          color: #1d1d1f;
+          text-decoration: none;
+          font-weight: 800;
+          letter-spacing: -0.04em;
+        }
+
         .footer p {
           margin: 0;
         }
 
         @media (max-width: 980px) {
-          .navRight a:not(.navCta) {
-            display: none;
-          }
-
           .hero {
             grid-template-columns: 1fr;
-            padding-top: 54px;
+            padding-top: 58px;
           }
 
-          .benefits,
-          .steps {
+          .announcement {
+            justify-self: start;
+          }
+
+          .pillars,
+          .steps,
+          .trustPanel {
             grid-template-columns: 1fr;
           }
 
-          .card {
-            max-width: 560px;
+          .topLinks a:first-child {
+            display: none;
           }
         }
 
         @media (max-width: 640px) {
-          .nav,
+          .blueInner,
           .hero,
           .section,
-          .trust,
+          .introStrip,
           .footer {
             padding-left: 18px;
             padding-right: 18px;
           }
 
-          .navCta {
+          .blueInner {
+            height: 60px;
+          }
+
+          .accountLink {
             display: none;
           }
 
           h1 {
-            font-size: 44px;
+            font-size: 43px;
           }
 
-          .meta {
+          .heroCopy p {
+            font-size: 17px;
+          }
+
+          .announcement {
+            width: 100%;
+          }
+
+          .announcementInfo {
             grid-template-columns: 1fr;
+          }
+
+          .trustPanel {
+            margin-left: 18px;
+            margin-right: 18px;
+            padding: 28px;
+            border-radius: 28px;
           }
 
           .footer {
