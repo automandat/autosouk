@@ -1,3744 +1,548 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
 
-type PhotoItem = {
-  label: string;
-  image: string;
-  instruction: string;
-  multiple: boolean;
-};
-
-const CITIES = [
-  "Casablanca","Rabat","Marrakech","Fès","Tanger","Agadir","Meknès","Oujda","Kénitra","Tétouan","Safi","Mohammedia","El Jadida","Béni Mellal","Nador","Khouribga","Settat","Taza","Larache","Ksar El Kébir","Khemisset","Guelmim","Berrechid","Wad Zem","Fquih Ben Salah","Taourirt","Berkane","Sidi Slimane","Errachidia","Guercif","Ouarzazate","Tiznit","Taroudant","Essaouira","Al Hoceïma","Chefchaouen","Sidi Kacem","Youssoufia","Tan-Tan","Dakhla","Laâyoune","Boujdour","Ifrane","Azrou","Midelt","Zagora","Tinghir","Skhirat","Temara","Salé","Bouskoura","Nouaceur","Mediouna","Dar Bouazza","Autre"
+const benefits = [
+  {
+    title: "Annonce guidée",
+    text: "Un parcours simple pour renseigner les informations essentielles de votre véhicule."
+  },
+  {
+    title: "Prix mieux positionné",
+    text: "Un repère marché vous aide à définir un prix cohérent et rassurant."
+  },
+  {
+    title: "Dossier plus clair",
+    text: "Photos, historique et documents utiles rendent votre annonce plus crédible."
+  }
 ];
 
-const MOROCCAN_REGISTRATION_CITIES = [
-  "1 - Rabat",
-  "2 - Salé",
-  "3 - Sala Al Jadida",
-  "4 - Skhirat-Témara",
-  "5 - Khémisset",
-  "6 - Casablanca - Anfa",
-  "7 - Casablanca - Aïn Sebaâ - Hay Mohammadi",
-  "8 - Casablanca - Hay Hassani",
-  "9 - Casablanca - Ben M’Sick",
-  "10 - Casablanca - My Rachid",
-  "11 - Casablanca - Al Fida",
-  "12 - Casablanca - Mechouar",
-  "13 - Casablanca - Sidi Bernoussi",
-  "14 - Mohammédia",
-  "15 - Fès - Jdid",
-  "16 - Fès - Medina",
-  "17 - Fès - Zouagha Moulay Yacoub",
-  "18 - Sefrou",
-  "19 - Boulemane",
-  "20 - Meknès - Menzah",
-  "21 - Meknès - Ismailia",
-  "22 - El Hajeb",
-  "23 - Ifrane",
-  "24 - Khénifra",
-  "25 - Errachidia",
-  "26 - Marrakech - Menara",
-  "27 - Marrakech - Medina",
-  "28 - Marrakech - Sidi Youssef Ben Ali",
-  "29 - Marrakech - El Haouz",
-  "30 - Chichaoua",
-  "31 - Kelâat Es-Sraghna",
-  "32 - Essaouira",
-  "33 - Agadir - Ida Ouatanane",
-  "34 - Inezgane - Aït Melloul",
-  "35 - Chtouka - Aït Baha",
-  "36 - Taroudant",
-  "37 - Tiznit",
-  "38 - Ouarzazate",
-  "39 - Zagora",
-  "40 - Tanger - Asilah",
-  "41 - Tanger - Fahs Anjra",
-  "42 - Larache - Ksar El Kébir",
-  "43 - Chefchaouen",
-  "44 - Tétouan",
-  "45 - El Hoceima",
-  "46 - Taza",
-  "47 - Taounate",
-  "48 - Oujda-Angad",
-  "49 - Berkane",
-  "50 - Nador",
-  "51 - Taourirt",
-  "52 - Jerada",
-  "53 - Figuig",
-  "54 - Safi",
-  "55 - El Jadida",
-  "56 - Settat",
-  "57 - Khouribga",
-  "58 - Bouznika - Benslimane",
-  "59 - Kénitra",
-  "60 - Sidi Kacem",
-  "61 - Beni Mellal",
-  "62 - Azilal",
-  "63 - Smara",
-  "64 - Guelmim",
-  "65 - Tan-Tan",
-  "66 - Tata",
-  "67 - Assa-Zag",
-  "68 - Laâyoune",
-  "69 - Boujdour",
-  "70 - Oued Ed-Dahab",
-  "71 - Aousserd",
-  "72 - Casablanca - Aïn Chock",
-  "73 - Nouaceur",
-  "74 - Médiouna",
-  "75 - M’diq, Fnideq",
-  "76 - Driouch",
-  "77 - Guercif",
-  "78 - Ouezzane",
-  "79 - Sidi Slimane",
-  "80 - Midelt",
-  "81 - Berrechid",
-  "82 - Sidi Bennour",
-  "83 - Benguerir",
-  "84 - Fquih Ben Salah",
-  "85 - Youssoufia",
-  "86 - Tinghir",
-  "87 - Sidi Ifni",
-  "88 - Tarfaya",
-  "89 - Lagouira",
-  "Autre"
+const steps = [
+  "Décrivez votre véhicule",
+  "Ajoutez son état et son historique",
+  "Définissez votre prix",
+  "Préparez les photos avant publication"
 ];
 
-const COUNTRIES = [
-  "France","Espagne","Belgique","Allemagne","Italie","Pays-Bas","Portugal","Suisse","Royaume-Uni","Luxembourg",
-  "États-Unis","Canada","Émirats Arabes Unis","Arabie Saoudite","Qatar","Turquie","Chine","Japon","Corée du Sud",
-  "Algérie","Tunisie","Égypte","Sénégal","Côte d’Ivoire","Mauritanie","Autre"
-];
-
-const MODELS: Record<string, string[]> = {
-  "Abarth":["500","595","695","124 Spider","Autre"],
-  "Alfa Romeo":["Giulia","Giulietta","MiTo","Stelvio","Tonale","Autre"],
-  "Audi":["A1","A3","A4","A5","A6","A7","A8","Q2","Q3","Q5","Q7","Q8","TT","e-tron","Autre"],
-  "BAIC":["X35","X55","X7","BJ40","BJ60","EU5","Autre"],
-  "BMW":["Série 1","Série 2","Série 3","Série 4","Série 5","Série 7","X1","X2","X3","X4","X5","X6","X7","i3","i4","iX","Autre"],
-  "BYD":["Atto 3","Dolphin","Seal","Seal U","Tang","Han","Song Plus","Qin Plus","Autre"],
-  "Changan":["Alsvin","Eado","CS35 Plus","CS55 Plus","CS75 Plus","UNI-K","UNI-T","Deepal S07","Autre"],
-  "Chery":["Tiggo 2 Pro","Tiggo 4 Pro","Tiggo 7 Pro","Tiggo 8 Pro","Arrizo 5","Arrizo 6","Autre"],
-  "Citroën":["C1","C3","C3 Aircross","C4","C5 Aircross","Berlingo","Autre"],
-  "Cupra":["Born","Formentor","Leon","Ateca","Tavascan","Terramar","Autre"],
-  "Dacia":["Dokker","Duster","Jogger","Lodgy","Logan","Sandero","Sandero Stepway","Spring","Autre"],
-  "DFSK":["K01","K05","K07","C31","C32","Glory 500","Glory 580","Fengon 500","Fengon 580","Autre"],
-  "Dongfeng":["Aeolus Shine","Aeolus AX7","Forthing T5 Evo","Forthing U-Tour","M-Hero 917","Autre"],
-  "DS Automobiles":["DS 3","DS 4","DS 7","DS 9","Autre"],
-  "Fiat":["500","500X","Doblo","Fiorino","Panda","Punto","Tipo","Autre"],
-  "Ford":["EcoSport","Fiesta","Focus","Kuga","Mondeo","Mustang","Puma","Ranger","Transit","Autre"],
-  "Geely":["Coolray","Azkarra","Atlas","Emgrand","Geometry C","Starray","Okavango","Autre"],
-  "GWM":["Haval H6","Haval Jolion","Tank 300","Tank 500","Ora 03","Poer","Autre"],
-  "Honda":["Accord","Civic","CR-V","HR-V","Jazz","Autre"],
-  "Hyundai":["Accent","Atos","Creta","Elantra","i10","i20","i30","Kona","Santa Fe","Tucson","Venue","Autre"],
-  "JAC":["JS2","JS3","JS4","JS6","S2","S3","T8","T9","E10X","Autre"],
-  "Jaecoo":["J7","J8","Autre"],
-  "Jaguar":["XE","XF","F-Pace","E-Pace","I-Pace","F-Type","Autre"],
-  "Jeep":["Compass","Grand Cherokee","Renegade","Wrangler","Cherokee","Autre"],
-  "Jetour":["X70","X70 Plus","X90 Plus","Dashing","T2","Autre"],
-  "KGM":["Tivoli","Korando","Torres","Rexton","Musso","Autre"],
-  "Kia":["Ceed","Cerato","Picanto","Rio","Seltos","Sorento","Sportage","Stonic","Autre"],
-  "Land Rover":["Defender","Discovery","Discovery Sport","Range Rover","Range Rover Evoque","Range Rover Sport","Velar","Autre"],
-  "Leapmotor":["T03","C10","C11","C01","Autre"],
-  "Lexus":["CT","IS","ES","GS","LS","UX","NX","RX","LX","LC","Autre"],
-  "Lynk & Co":["01","02","03","05","06","07","08","09","Autre"],
-  "Mahindra":["KUV100","XUV300","XUV500","XUV700","Scorpio","Thar","Pick Up","Autre"],
-  "Maserati":["Ghibli","Quattroporte","Levante","Grecale","GranTurismo","MC20","Autre"],
-  "Mazda":["2","3","6","CX-3","CX-30","CX-5","MX-5","Autre"],
-  "Mercedes-Benz":["Classe A","Classe B","Classe C","Classe CLA","Classe E","Classe GLA","Classe GLB","Classe GLC","Classe GLE","Classe GLS","Classe S","Classe V","Vito","Autre"],
-  "MG":["MG3","MG4","MG5","ZS","HS","EHS","Marvel R","Cyberster","Autre"],
-  "Mini":["Cooper","Countryman","Clubman","Autre"],
-  "Mitsubishi":["Space Star","ASX","Eclipse Cross","Outlander","L200","Pajero Sport","Autre"],
-  "Nissan":["Juke","Micra","Navara","Qashqai","X-Trail","Note","Autre"],
-  "Omoda":["C5","E5","Autre"],
-  "Opel":["Astra","Corsa","Crossland","Grandland","Mokka","Insignia","Autre"],
-  "Peugeot":["108","2008","208","3008","301","308","5008","508","Partner","Rifter","Autre"],
-  "Porsche":["911","Cayenne","Macan","Panamera","Taycan","Boxster","Cayman","Autre"],
-  "Renault":["Arkana","Captur","Clio","Kadjar","Kangoo","Koleos","Megane","Scenic","Symbol","Talisman","Twingo","Trafic","Autre"],
-  "Seat":["Arona","Ateca","Ibiza","Leon","Tarraco","Autre"],
-  "Seres":["3","5","7","Autre"],
-  "Skoda":["Fabia","Kamiq","Karoq","Kodiaq","Octavia","Rapid","Scala","Superb","Autre"],
-  "Smart":["Fortwo","Forfour","#1","#3","Autre"],
-  "Suzuki":["Alto","Baleno","Celerio","Jimny","S-Cross","Swift","Vitara","Autre"],
-  "Tesla":["Model 3","Model S","Model X","Model Y","Autre"],
-  "Toyota":["Auris","Avensis","C-HR","Camry","Corolla","Hilux","Land Cruiser","Prado","RAV4","Yaris","Yaris Cross","Autre"],
-  "Volkswagen":["Arteon","Caddy","Golf","Golf VII","Golf VIII","Jetta","Passat","Polo","T-Cross","T-Roc","Tiguan","Touareg","Touran","Autre"],
-  "Volvo":["S60","S90","V40","V60","XC40","XC60","XC90","Autre"],
-  "Xpeng":["G6","G9","P7","P7i","Autre"],
-  "Zeekr":["001","007","X","7X","009","Autre"],
-  "Autre":["Autre"]
-};
-
-const ENGINES: Record<string, string[]> = {
-  "Mercedes-Benz|Classe C":["C180","C200","C220d","C250","C300","C300e","C350e","C43 AMG","C63 AMG","Autre"],
-  "Mercedes-Benz|Classe E":["E200","E220d","E300","E300e","E350e","E400d","E450","E53 AMG","E63 AMG","Autre"],
-  "Mercedes-Benz|Classe GLC":["GLC200","GLC220d","GLC300","GLC300e","GLC350e","GLC43 AMG","GLC63 AMG","Autre"],
-  "BMW|Série 3":["316i","316d","318i","318d","320i","320d","325d","328i","330i","330d","330e","335i","335d","M340i","M3","Autre"],
-  "BMW|Série 5":["518d","520i","520d","523i","525i","525d","528i","530i","530d","530e","535i","535d","540i","545e","M550d","M550i","M5","Autre"],
-  "Audi|A3":["30 TFSI","35 TFSI","35 TDI","40 TFSI","40 TDI","45 TFSI e","S3","RS3","Autre"],
-  "Audi|A4":["35 TFSI","35 TDI","40 TFSI","40 TDI","45 TFSI","S4","RS4","Autre"],
-  "Dacia|Logan":["1.0 SCe","1.0 TCe","1.2 16V","1.5 dCi","1.6 MPI","ECO-G","Autre"],
-  "Dacia|Duster":["1.0 TCe","1.2 TCe","1.3 TCe","1.5 dCi","1.6 SCe","ECO-G","Autre"],
-  "Peugeot|208":["1.2 PureTech","1.5 BlueHDi","e-208","GTi","Autre"],
-  "Peugeot|3008":["1.2 PureTech","1.6 PureTech","1.5 BlueHDi","2.0 BlueHDi","Hybrid 225","Hybrid4 300","Autre"],
-  "Volkswagen|Golf":["1.0 TSI","1.2 TSI","1.4 TSI","1.5 TSI","1.6 TDI","2.0 TDI","GTE","GTI","GTD","R","Autre"],
-  "Renault|Clio":["0.9 TCe","1.0 SCe","1.0 TCe","1.2 16V","1.3 TCe","1.5 dCi","E-Tech Hybrid","RS","Autre"],
-  "Toyota|Yaris":["1.0 VVT-i","1.3 VVT-i","1.5 VVT-i","Hybrid","GR Yaris","Autre"],
-  "Hyundai|Tucson":["1.6 GDi","1.6 T-GDi","1.6 CRDi","2.0 CRDi","Hybrid","Plug-in Hybrid","Autre"],
-  "Kia|Sportage":["1.6 GDi","1.6 T-GDi","1.6 CRDi","2.0 CRDi","Hybrid","Plug-in Hybrid","Autre"],
-  "Lynk & Co|01":["1.5 PHEV","2.0 T","Hybrid","Autre"],
-  "Lynk & Co|02":["1.5 T","2.0 T","Autre"],
-  "Lynk & Co|03":["1.5 T","2.0 T","03+","Autre"],
-  "Lynk & Co|05":["2.0 T","Autre"],
-  "Lynk & Co|06":["1.5 T","Hybrid","Autre"],
-  "Lynk & Co|08":["EM-P","Autre"],
-  "BMW|Série 1":["116i","118i","120i","125i","M135i","M140i","116d","118d","120d","123d","125d","Autre"],
-  "BMW|Série 2":["218i","220i","225i","230i","M235i","M240i","216d","218d","220d","225d","225e","Autre"],
-  "BMW|Série 4":["420i","430i","440i","M440i","420d","430d","435d","M4","Autre"],
-  "BMW|Série 7":["730d","740d","740i","745e","750i","760i","i7 eDrive50","i7 xDrive60","i7 M70","Autre"],
-  "BMW|X1":["16d","18i","18d","20i","20d","23i","23d","25e","30e","M35i","iX1 eDrive20","iX1 xDrive30","Autre"],
-  "BMW|X3":["20i","20d","30i","30d","30e","40i","M40d","M40i","X3 M","Autre"],
-  "BMW|X5":["30d","40d","40i","45e","50e","M50d","M50i","X5 M","Autre"],
-  "Audi|A1":["25 TFSI","30 TFSI","35 TFSI","40 TFSI","Autre"],
-  "Audi|A5":["35 TFSI","40 TFSI","45 TFSI","35 TDI","40 TDI","S5","RS5","Autre"],
-  "Audi|A6":["40 TDI","45 TDI","50 TDI","55 TFSI","50 TFSI e","55 TFSI e","S6","RS6","Autre"],
-  "Audi|Q2":["30 TFSI","35 TFSI","30 TDI","35 TDI","SQ2","Autre"],
-  "Audi|Q3":["35 TFSI","40 TFSI","45 TFSI","35 TDI","40 TDI","45 TFSI e","RS Q3","Autre"],
-  "Audi|Q5":["40 TDI","45 TFSI","50 TDI","50 TFSI e","55 TFSI e","SQ5","Autre"],
-  "Audi|Q7":["45 TDI","50 TDI","55 TFSI","55 TFSI e","60 TFSI e","SQ7","Autre"],
-  "Audi|Q8":["45 TDI","50 TDI","55 TFSI","55 TFSI e","60 TFSI e","SQ8","RS Q8","Autre"],
-  "Mercedes-Benz|Classe A":["A160","A180","A200","A220","A250","A250e","A180d","A200d","A220d","A35 AMG","A45 AMG","Autre"],
-  "Mercedes-Benz|Classe B":["B160","B180","B200","B220","B250","B250e","B180d","B200d","B220d","Autre"],
-  "Mercedes-Benz|Classe CLA":["CLA180","CLA200","CLA220","CLA250","CLA250e","CLA180d","CLA200d","CLA220d","CLA35 AMG","CLA45 AMG","Autre"],
-  "Mercedes-Benz|Classe GLA":["GLA180","GLA200","GLA220","GLA250","GLA250e","GLA180d","GLA200d","GLA220d","GLA35 AMG","GLA45 AMG","Autre"],
-  "Mercedes-Benz|Classe GLB":["GLB180","GLB200","GLB220","GLB250","GLB180d","GLB200d","GLB220d","GLB35 AMG","Autre"],
-  "Mercedes-Benz|Classe GLE":["GLE300d","GLE350d","GLE350de","GLE400d","GLE450","GLE450e","GLE53 AMG","GLE63 AMG","Autre"],
-  "Volkswagen|Polo":["1.0 MPI","1.0 TSI","1.2 TSI","1.4 TSI","1.6 MPI","1.4 TDI","1.6 TDI","GTI","Autre"],
-  "Volkswagen|Passat":["1.4 TSI","1.5 TSI","1.8 TSI","2.0 TSI","1.6 TDI","2.0 TDI","GTE","Alltrack 2.0 TDI","Autre"],
-  "Volkswagen|Tiguan":["1.4 TSI","1.5 TSI","2.0 TSI","2.0 TDI","eHybrid","R","Autre"],
-  "Volkswagen|T-Roc":["1.0 TSI","1.5 TSI","2.0 TSI","1.6 TDI","2.0 TDI","R","Autre"],
-  "Volkswagen|Touareg":["3.0 V6 TDI","3.0 V6 TSI","eHybrid","R eHybrid","Autre"],
-  "Peugeot|2008":["1.2 PureTech 100","1.2 PureTech 130","1.2 PureTech 155","1.5 BlueHDi 100","1.5 BlueHDi 130","e-2008","Autre"],
-  "Peugeot|308":["1.2 PureTech 110","1.2 PureTech 130","1.5 BlueHDi 130","Hybrid 180","Hybrid 225","e-308","Autre"],
-  "Peugeot|5008":["1.2 PureTech 130","1.6 PureTech 180","1.5 BlueHDi 130","2.0 BlueHDi 180","Hybrid 136","Autre"],
-  "Peugeot|508":["1.2 PureTech 130","1.6 PureTech 180","1.6 PureTech 225","1.5 BlueHDi 130","2.0 BlueHDi 160","2.0 BlueHDi 180","Hybrid 225","PSE 360","Autre"],
-  "Renault|Captur":["0.9 TCe","1.0 TCe","1.2 TCe","1.3 TCe","1.5 dCi","E-Tech Hybrid","E-Tech Plug-in Hybrid","Autre"],
-  "Renault|Megane":["1.2 TCe","1.3 TCe","1.5 dCi","1.6 dCi","2.0 dCi","E-Tech Plug-in Hybrid","R.S.","Autre"],
-  "Renault|Kadjar":["1.2 TCe","1.3 TCe","1.5 dCi","1.6 dCi","Autre"],
-  "Renault|Koleos":["1.6 dCi","2.0 dCi","2.5 SCe","Autre"],
-  "Dacia|Sandero":["1.0 SCe","1.0 TCe","1.2 16V","1.5 dCi","ECO-G","Stepway TCe","Autre"],
-  "Dacia|Sandero Stepway":["1.0 TCe","1.0 ECO-G","1.5 dCi","Autre"],
-  "Dacia|Jogger":["1.0 TCe","1.0 ECO-G","Hybrid 140","Autre"],
-  "Toyota|Corolla":["1.2 Turbo","1.6 VVT-i","1.8 Hybrid","2.0 Hybrid","Autre"],
-  "Toyota|C-HR":["1.2 Turbo","1.8 Hybrid","2.0 Hybrid","2.0 Plug-in Hybrid","Autre"],
-  "Toyota|RAV4":["2.0 VVT-i","2.5 Hybrid","2.5 Plug-in Hybrid","Autre"],
-  "Toyota|Land Cruiser":["2.8 D-4D","3.0 D-4D","4.0 V6","Autre"],
-  "Hyundai|i10":["1.0 MPI","1.2 MPI","Autre"],
-  "Hyundai|i20":["1.0 T-GDi","1.2 MPI","1.4 MPI","1.4 CRDi","Autre"],
-  "Hyundai|Kona":["1.0 T-GDi","1.6 T-GDi","1.6 CRDi","Hybrid","Electric 39 kWh","Electric 64 kWh","Autre"],
-  "Kia|Picanto":["1.0 MPI","1.2 MPI","Autre"],
-  "Kia|Rio":["1.0 T-GDi","1.2 MPI","1.4 MPI","1.4 CRDi","Autre"],
-  "Kia|Stonic":["1.0 T-GDi","1.2 MPI","1.4 MPI","1.6 CRDi","Autre"],
-  "Ford|Fiesta":["1.0 EcoBoost","1.1 Ti-VCT","1.5 TDCi","ST 1.5 EcoBoost","Autre"],
-  "Ford|Focus":["1.0 EcoBoost","1.5 EcoBoost","2.0 EcoBlue","1.5 EcoBlue","ST 2.3 EcoBoost","Autre"],
-  "Ford|Kuga":["1.5 EcoBoost","1.5 EcoBlue","2.0 EcoBlue","Hybrid","Plug-in Hybrid","Autre"],
-  "Nissan|Qashqai":["1.2 DIG-T","1.3 DIG-T","1.5 dCi","1.6 dCi","e-Power","Autre"],
-  "Nissan|Juke":["1.0 DIG-T","1.2 DIG-T","1.5 dCi","Hybrid","Autre"],
-  "Citroën|C3":["1.2 PureTech","1.5 BlueHDi","Autre"],
-  "Citroën|C4":["1.2 PureTech","1.5 BlueHDi","Hybrid 136","ë-C4","Autre"],
-  "Citroën|C5 Aircross":["1.2 PureTech","1.5 BlueHDi","Hybrid 180","Hybrid 225","Autre"],
-  "Opel|Corsa":["1.2","1.2 Turbo","1.5 Diesel","Corsa-e","Autre"],
-  "Opel|Mokka":["1.2 Turbo","1.5 Diesel","Mokka-e","Autre"],
-  "Skoda|Octavia":["1.0 TSI","1.4 TSI","1.5 TSI","2.0 TSI","1.6 TDI","2.0 TDI","iV","RS","Autre"],
-  "Seat|Leon":["1.0 TSI","1.4 TSI","1.5 TSI","2.0 TSI","1.6 TDI","2.0 TDI","eHybrid","FR","Cupra","Autre"],
-  "Cupra|Formentor":["1.5 TSI","2.0 TSI","2.0 TSI VZ","1.4 e-Hybrid","VZ5","Autre"],
-  "Volvo|XC40":["T2","T3","T4","T5","B3","B4","B5","Recharge T4","Recharge Twin","Autre"],
-  "Volvo|XC60":["D4","D5","B4","B5","B6","T5","T6","T8 Recharge","Autre"],
-  "Porsche|Cayenne":["Cayenne","Cayenne S","Cayenne E-Hybrid","Cayenne Turbo","Cayenne Turbo S E-Hybrid","Autre"],
-  "Porsche|Macan":["Macan","Macan S","Macan GTS","Macan Turbo","Autre"],
-  "Tesla|Model 3":["Propulsion","Grande Autonomie","Performance","Autre"],
-  "Tesla|Model Y":["Propulsion","Grande Autonomie","Performance","Autre"],
-  "BYD|Atto 3":["Comfort","Design","Autre"],
-  "BYD|Dolphin":["Active","Boost","Comfort","Design","Autre"],
-  "BYD|Seal":["Design","Excellence AWD","Autre"],
-  "MG|ZS":["1.5 VTi-tech","1.0 T-GDI","ZS EV","Autre"],
-  "MG|HS":["1.5 T-GDI","EHS Plug-in Hybrid","Autre"],
-  "MG|MG4":["Standard","Comfort","Luxury","XPower","Autre"]
-};
-
-const DEFAULT_ENGINES = ["Autre"];
-const BRANDS = Object.keys(MODELS).sort();
-const YEARS = Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => String(new Date().getFullYear() - i));
-const MILEAGES = ["< 1 000 km", ...Array.from({ length: 199 }, (_, i) => `> ${(i + 1) * 1000} km`), "> 200 000 km"];
-const VEHICLE_TYPES = ["Cabriolet/Roadster","SUV / Tout-terrain / Pickup","Citadine","Break","Berline","Sport / Coupé","Monospace / Minibus","Utilitaire","Autre"];
-const BODY_COLORS = ["Beige","Bleu","Brun","Jaune","Or","Vert","Gris","Orange","Rouge","Noir","Argent","Violet","Blanc","Mat","Métallique"];
-const INTERIOR_COLORS = ["Beige","Noir","Bleu","Brun","Gris","Rouge","Blanc","Crème","Bordeaux","Cognac","Autres"];
-const INTERIOR_COLOR_PALETTE = ["Beige","Noir","Bleu","Brun","Gris","Rouge","Blanc","Crème","Bordeaux","Cognac","Autres"];
-const INTERIOR_MATERIALS = ["Alcantara","Tissu","Imitation cuir","Cuir partiel","Tout cuir","Velours","Autres"];
-
-const EXTERIOR_OPTIONS = [
-  "Jantes alliage","Jantes forgées","Pack sport","Pack chrome","Pack carbone","Phares LED","Phares Matrix LED","Phares laser","Phares xénon",
-  "Feux de jour LED","Phares antibrouillard","Toit ouvrant","Toit panoramique","Toit panoramique ouvrant","Attelage fixe","Attelage amovible",
-  "Attelage pivotant","Barres de toit","Rails de toit","Vitres arrière surteintées","Vitres teintées","Rétroviseurs rabattables électriquement",
-  "Rétroviseurs électrochromes","Hayon électrique","Portes coulissantes électriques","Peinture métallisée","Peinture mate","Pack off-road",
-  "Marchepieds","Becquet arrière","Étriers de frein sport","Suspension pneumatique","Suspension sport"
-];
-const COMFORT_OPTIONS = [
-  "Climatisation manuelle","Climatisation automatique","Climatisation bi-zone","Climatisation tri-zone","Climatisation quadrizone",
-  "Sièges chauffants","Sièges ventilés","Sièges massants","Sièges électriques","Mémoire de siège","Sièges sport","Sièges confort",
-  "Support lombaire","Volant chauffant","Volant multifonction","Palettes au volant","Accès sans clé","Démarrage sans clé",
-  "Fermeture soft-close","Hayon électrique","Rideaux pare-soleil","Vitres électriques","Vitres teintées","Toit ouvrant",
-  "Toit panoramique","Toit panoramique ouvrant","Suspension adaptative","Régulateur de vitesse","Régulateur adaptatif",
-  "Mode de conduite","Frein de parking électrique","Start & Stop","Chargeur 12V","Prise 230V"
-];
-const INFOTAINMENT_OPTIONS = [
-  "Apple CarPlay","Apple CarPlay sans fil","Android Auto","Android Auto sans fil","Navigation GPS","Écran tactile","Double écran",
-  "Cockpit numérique","Compteur digital","Affichage tête haute","Bluetooth","Commande vocale","Chargeur induction","USB avant",
-  "USB arrière","USB-C","Système audio premium","Burmester","Harman Kardon","Bose","Bang & Olufsen","Meridian","JBL",
-  "TV","WLAN / Wi-Fi","Hotspot Wi-Fi","Radio DAB","Caméra embarquée","Mise à jour OTA","Application mobile constructeur"
-];
-const SAFETY_OPTIONS = [
-  "ABS","ESP","Airbags frontaux","Airbags latéraux","Airbags rideaux","Airbag genoux","Freinage d’urgence","Détecteur angle mort",
-  "Aide maintien de voie","Alerte franchissement ligne","Assistant feux de route","Contrôle pression pneus","Reconnaissance panneaux",
-  "Appel d’urgence","Caméra 360°","Caméra de recul","Radars avant","Radars arrière","Park Assist","Aide au stationnement automatique",
-  "Régulateur adaptatif","Assistant embouteillage","Assistant conduite semi-autonome","Détection fatigue","Détection piétons",
-  "Détection cyclistes","Alerte trafic arrière","Freinage post-collision","Isofix","Contrôle descente","Aide démarrage en côte",
-  "Vision nocturne"
-];
-
-const PHOTOS: PhotoItem[] = [
-  { label: "Arrière", image: "/photo-guides/arriere.png", instruction: "Arrière complet du véhicule", multiple: false },
-  { label: "Avant", image: "/photo-guides/avant.png", instruction: "Avant complet du véhicule", multiple: false },
-  { label: "Coffre", image: "/photo-guides/coffre.png", instruction: "Coffre ouvert, volume visible", multiple: false },
-  { label: "Compteur kilométrique", image: "/photo-guides/compteur-kilometrique.png", instruction: "Kilométrage net et lisible", multiple: false },
-  { label: "Jantes", image: "/photo-guides/jantes.png", instruction: "Jante et état du pneu visibles", multiple: false },
-  { label: "Moteur", image: "/photo-guides/moteur.png", instruction: "Capot ouvert, moteur visible", multiple: false },
-  { label: "Profil droit", image: "/photo-guides/profil-droit.png", instruction: "Côté droit complet, roues incluses", multiple: false },
-  { label: "Profil gauche", image: "/photo-guides/profil-gauche.png", instruction: "Côté gauche complet, roues incluses", multiple: false },
-  { label: "Siège conducteur", image: "/photo-guides/siege-conducteur.png", instruction: "Siège conducteur et commandes visibles", multiple: false },
-  { label: "Siège passager", image: "/photo-guides/siege-passager.png", instruction: "Siège passager visible", multiple: false },
-  { label: "Sièges arrières", image: "/photo-guides/sieges-arrieres.png", instruction: "Banquette arrière entière visible", multiple: false },
-  { label: "Tableau de bord", image: "/photo-guides/tableau-de-bord.png", instruction: "Volant, écran et console visibles", multiple: false },
-  { label: "Défauts constatés", image: "/photo-guides/defauts.png", instruction: "Toutes les photos nécessaires des défauts", multiple: true }
-];
-
-const STEPS = ["Ma voiture","Son état","Son prix","Photos & publication"];
-const MARKET_PRICES = [104000,108000,109000,112000,115000,117000,118000,121000,123000,125000,128000,131000,135000,139000,142000,148000,152000,158000];
-
-const BRAND_LOGO_OVERRIDES: Record<string, string> = {
-  "Lynk & Co": "/brands/lynk-&-co.png",
-  "DS Automobiles": "/brands/ds-automobiles.png",
-  "Mercedes-Benz": "/brands/mercedes-benz.png",
-  "Land Rover": "/brands/land-rover.png",
-  "Alfa Romeo": "/brands/alfa-romeo.png"
-};
-
-function getBrandLogo(brand: string) {
-  if (!brand) return null;
-  if (BRAND_LOGO_OVERRIDES[brand]) return BRAND_LOGO_OVERRIDES[brand];
-  const normalized = brand
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return `/brands/${normalized}.png`;
-}
-
-function formatDh(value: number) {
-  return `${value.toLocaleString("fr-FR")} DH`;
-}
-
-function median(values: number[]) {
-  const sorted = [...values].sort((a,b) => a-b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
-}
-
-function buildHistogram(values: number[], buckets = 7) {
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const step = Math.ceil((max - min) / buckets);
-  return Array.from({ length: buckets }, (_, i) => {
-    const low = min + i * step;
-    const high = i === buckets - 1 ? max : low + step;
-    const count = values.filter(v => i === buckets - 1 ? v >= low && v <= high : v >= low && v < high).length;
-    return { low, high, pct: Math.round((count / values.length) * 100) };
-  });
-}
-
-export default function MandatPage() {
-  const [brand, setBrand] = useState("");
-  const [model, setModel] = useState("");
-  const [otherModel, setOtherModel] = useState("");
-  const [engine, setEngine] = useState("");
-  const [otherEngine, setOtherEngine] = useState("");
-  const [trim, setTrim] = useState("");
-  const [exteriorColor, setExteriorColor] = useState("");
-  const [mileageRange, setMileageRange] = useState("0");
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [customFields, setCustomFields] = useState<Record<string, { checked: boolean; value: string }>>({});
-  const [docs, setDocs] = useState(false);
-  const [confidence, setConfidence] = useState<Record<string, string>>({});
-  const [brandLogoMissing, setBrandLogoMissing] = useState(false);
-  const [form, setForm] = useState<Record<string, string>>({});
-  const [priceMin, setPriceMin] = useState("");
-  const [priceDesired, setPriceDesired] = useState("");
-  const [priceInstant, setPriceInstant] = useState("");
-  const [priceMinError, setPriceMinError] = useState("");
-  const [priceInstantError, setPriceInstantError] = useState("");
-  const [instantEnabled, setInstantEnabled] = useState(false);
-  const [instantCommitChecked, setInstantCommitChecked] = useState(false);
-  const [instantLocked, setInstantLocked] = useState(false);
-  const [instantCheckAnimation, setInstantCheckAnimation] = useState(false);
-  const [uploadedPhotos, setUploadedPhotos] = useState<Record<string, number>>({});
-  const [previewPhoto, setPreviewPhoto] = useState("");
-  const [activeStep, setActiveStep] = useState(0);
-  const [maxUnlockedStep, setMaxUnlockedStep] = useState(3);
-  const [isRecipeMode, setIsRecipeMode] = useState(true);
-  const [draftSavedAt, setDraftSavedAt] = useState("");
-  const [showInsights, setShowInsights] = useState(false);
-  const [hideHelpPanels, setHideHelpPanels] = useState(true);
-  const [descriptionStyle, setDescriptionStyle] = useState("Premium");
-  const [publicationMode, setPublicationMode] = useState("Premium");
-  const [validationAttempted, setValidationAttempted] = useState(false);
-  const [firstInvalidKey, setFirstInvalidKey] = useState("");
-  const [expandedOptionBlocks, setExpandedOptionBlocks] = useState<Record<string, boolean>>({});
-  const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({
-    vehicleIdentity: true,
-    registration: true,
-    mileage: true,
-    tech: true,
-    design: true,
-    options: true,
-    history: true,
-    documents: true
-  });
-  const [history, setHistory] = useState<Record<string, string>>({});
-  const [structuredDocs, setStructuredDocs] = useState<Record<string, number>>({});
-  const [fuelDetails, setFuelDetails] = useState<Record<string, string>>({});
-
-  const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
-  const displayModel = model === "Autre" ? otherModel : model;
-  const engineOptions = useMemo(() => {
-    const key = `${brand}|${model}`;
-    return brand && model ? ENGINES[key] || DEFAULT_ENGINES : [];
-  }, [brand, model]);
-
-  const displayEngine = engine === "Autre" ? otherEngine : engine;
-  const desired = Number(priceDesired || form.desired || 0);
-  const average = Math.round(MARKET_PRICES.reduce((a,b) => a + b, 0) / MARKET_PRICES.length);
-  const completionBase = [form.first, form.last, form.phone, form.city, brand, displayModel, displayEngine, trim, form.year, form.mileage, form.fuel, form.gearbox, form.condition, form.desired, form.floor, form.instantPrice];
-  const completion = Math.round((completionBase.filter(Boolean).length / completionBase.length) * 100);
-
-  const priceSignal = useMemo(() => {
-    if (!desired) return { tone: "neutral", badge: "En attente", label: "Renseignez un prix souhaité pour obtenir un signal marché." };
-    const diff = (desired - average) / average;
-    if (diff < -0.05) return { tone: "green", badge: "Sous marché", label: "Prix plus bas que le marché. Votre annonce devrait générer plus de demandes." };
-    if (diff > 0.05) return { tone: "red", badge: "Au-dessus marché", label: "Prix plus haut que le marché. Le délai de vente peut être plus long." };
-    return { tone: "black", badge: "Prix du marché ✓", label: "Positionnement cohérent avec les comparables collectés." };
-  }, [desired, average]);
-
-  const setValue = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
-
-  const rejectMinPrice = () => {
-    setPriceMin("");
-    setValue("floor", "");
-    setPriceMinError("Prix minimum supérieur au prix souhaité");
-  };
-
-  const rejectInstantPrice = () => {
-    setPriceInstant("");
-    setValue("instantPrice", "");
-    setInstantCommitChecked(false);
-    setInstantLocked(false);
-    setPriceInstantError("Prix minimum supérieur au prix de vente immédiat");
-  };
-
-  const handleDesiredPriceChange = (value: string) => {
-    if (Number(value) < 0) value = "";
-    setPriceDesired(value);
-    setValue("desired", value);
-    setPriceMinError("");
-    if (priceMin && value && Number(priceMin) >= Number(value)) {
-      setTimeout(rejectMinPrice, 0);
-    }
-    if (priceInstant && priceMin && Number(priceInstant) <= Number(priceMin)) {
-      setTimeout(rejectInstantPrice, 0);
-    }
-  };
-
-  const handleMinPriceChange = (value: string) => {
-    if (Number(value) < 0) value = "";
-    setPriceMin(value);
-    setValue("floor", value);
-    setPriceMinError("");
-    if (priceInstant && value && Number(priceInstant) <= Number(value)) {
-      setInstantCommitChecked(false);
-      setInstantLocked(false);
-      setPriceInstantError("");
-    }
-  };
-
-  const validateMinPrice = () => {
-    if (priceMin && priceDesired && Number(priceMin) >= Number(priceDesired)) {
-      rejectMinPrice();
-      return false;
-    }
-    setPriceMinError("");
-    return true;
-  };
-
-  const handleInstantEnable = (checked: boolean) => {
-    setInstantEnabled(checked);
-    setPriceInstantError("");
-    setInstantCommitChecked(false);
-    setInstantLocked(false);
-    setInstantCheckAnimation(false);
-    if (!checked) {
-      setPriceInstant("");
-      setValue("instantPrice", "");
-    }
-  };
-
-  const handleInstantPriceChange = (value: string) => {
-    if (instantLocked) return;
-    if (Number(value) < 0) value = "";
-    setPriceInstant(value);
-    setValue("instantPrice", value);
-    setPriceInstantError("");
-    setInstantCommitChecked(false);
-    setInstantLocked(false);
-  };
-
-  const validateInstantPrice = () => {
-    if (!instantEnabled || !priceInstant) return false;
-    if (priceMin && Number(priceInstant) <= Number(priceMin)) {
-      rejectInstantPrice();
-      return false;
-    }
-    setPriceInstantError("");
-    return true;
-  };
-
-  const handleInstantCommit = (checked: boolean) => {
-    if (!checked) {
-      setInstantCommitChecked(false);
-      setInstantLocked(false);
-      setInstantCheckAnimation(false);
-      return;
-    }
-
-    const valid = validateInstantPrice();
-    if (!valid) return;
-
-    setInstantCommitChecked(true);
-    setInstantLocked(true);
-    setInstantCheckAnimation(false);
-    window.setTimeout(() => setInstantCheckAnimation(true), 20);
-  };
-
-  const showInstantCommit = instantEnabled && priceInstant && !priceInstantError && (!priceMin || Number(priceInstant) > Number(priceMin));
-  const toggleOption = (value: string) => setSelectedOptions(prev => prev.includes(value) ? prev.filter(x => x !== value) : [...prev, value]);
-
-  const toggleCustom = (key: string) => {
-    setCustomFields(prev => {
-      const checked = !prev[key]?.checked;
-      return { ...prev, [key]: { checked, value: checked ? prev[key]?.value || "" : "" } };
-    });
-  };
-
-  const setCustomValue = (key: string, value: string) => {
-    setCustomFields(prev => ({ ...prev, [key]: { checked: true, value } }));
-  };
-
-
-  useEffect(() => {
-    setMaxUnlockedStep(isRecipeMode ? 3 : activeStep);
-  }, [isRecipeMode]);
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("autosoukDraftV37");
-      if (!saved) return;
-      const p = JSON.parse(saved);
-      if (p.form) setForm(p.form);
-      if (p.brand) setBrand(p.brand);
-      if (p.model) setModel(p.model);
-      if (p.otherModel) setOtherModel(p.otherModel);
-      if (p.engine) setEngine(p.engine);
-      if (p.otherEngine) setOtherEngine(p.otherEngine);
-      if (p.trim) setTrim(p.trim);
-      if (p.exteriorColor) setExteriorColor(p.exteriorColor);
-      if (p.selectedOptions) setSelectedOptions(p.selectedOptions);
-      if (p.customFields) setCustomFields(p.customFields);
-      if (p.docs) setDocs(p.docs);
-      if (p.confidence) setConfidence(p.confidence);
-      if (p.priceMin) setPriceMin(p.priceMin);
-      if (p.priceDesired) setPriceDesired(p.priceDesired);
-      if (p.priceInstant) setPriceInstant(p.priceInstant);
-      if (p.instantEnabled) setInstantEnabled(p.instantEnabled);
-      if (p.mileageRange) setMileageRange(p.mileageRange);
-      if (p.descriptionStyle) setDescriptionStyle(p.descriptionStyle);
-      if (p.publicationMode) setPublicationMode(p.publicationMode);
-      if (p.openBlocks) setOpenBlocks(p.openBlocks);
-      if (p.history) setHistory(p.history);
-      if (p.structuredDocs) setStructuredDocs(p.structuredDocs);
-      if (p.fuelDetails) setFuelDetails(p.fuelDetails);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    try {
-      const payload = { form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange, descriptionStyle, publicationMode, openBlocks, history, structuredDocs, fuelDetails };
-      localStorage.setItem("autosoukDraftV37", JSON.stringify(payload));
-      setDraftSavedAt(new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }));
-    } catch {}
-  }, [form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange, descriptionStyle, publicationMode, openBlocks, history, structuredDocs, fuelDetails]);
-
-  const resetDraft = () => {
-    try { localStorage.removeItem("autosoukDraftV37"); } catch {}
-    window.location.reload();
-  };
-
-  const customOptions = (Object.values(customFields) as Array<{ checked: boolean; value: string }>).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
-  const allOptions = [...selectedOptions, ...customOptions];
-
-  const registrationSummary =
-    form.registrationCountry === "Maroc"
-      ? `Immatriculation : Maroc${form.registrationCity ? ` (${form.registrationCity})` : ""}.`
-      : form.registrationCountry === "Étranger"
-        ? `Immatriculation : ${form.foreignRegistrationCountry || "Étranger"}${form.customsCleared ? `, dédouanée : ${form.customsCleared.toLowerCase()}` : ""}.`
-        : "";
-  const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${registrationSummary ? ` ${registrationSummary}` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
-
-  const descriptionVariants: Record<string, string> = {
-    Sobre: description,
-    Premium: `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""} ${form.year || ""}, présenté avec ${form.mileage || "kilométrage renseigné"}${form.city ? ` à ${form.city}` : ""}. ${form.condition ? `État déclaré : ${form.condition.toLowerCase()}.` : ""}${allOptions.length ? ` Options principales : ${allOptions.slice(0, 8).join(", ")}.` : ""}${priceDesired ? ` Prix souhaité : ${formatDh(Number(priceDesired))}.` : ""}`.replace(/\s+/g, " ").trim(),
-    Commercial: `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""} ${form.year || ""} à vendre${form.city ? ` à ${form.city}` : ""}. Configuration ${trim || "soignée"}, ${form.mileage || "kilométrage renseigné"} au compteur${allOptions.length ? `, avec ${allOptions.slice(0, 6).join(", ")}` : ""}. ${priceDesired ? `Disponible au prix de ${formatDh(Number(priceDesired))}.` : ""}`.replace(/\s+/g, " ").trim()
-  };
-
-  const generatedDescription = descriptionVariants[descriptionStyle] || description;
-
-
-
-  const requiredPhotoLabels = PHOTOS.filter(photo => !photo.multiple).map(photo => photo.label);
-  const uploadedRequiredPhotos = requiredPhotoLabels.filter(label => (uploadedPhotos[label] || 0) > 0).length;
-  const hasDefectPhotos = (uploadedPhotos["Défauts constatés"] || 0) > 0;
-  const photoCompletion = Math.round((uploadedRequiredPhotos / requiredPhotoLabels.length) * 100);
-
-  const priceWithinMarket = !!priceDesired && Math.abs((Number(priceDesired) - average) / average) <= 0.05;
-
-  const dynamicBadges = [
-    docs ? "Verified potentiel" : "",
-    priceWithinMarket ? "Prix marché" : "",
-    confidence.firstOwner === "Oui" ? "Première main" : "",
-    confidence.serviceBook === "Oui" ? "Carnet complet" : "",
-    Number((form.mileage || "").replace(/\D/g, "")) > 0 && Number((form.mileage || "").replace(/\D/g, "")) < 50000 ? "Faible kilométrage" : "",
-    form.customsCleared === "Oui" ? "Dédouané" : "",
-    form.accidented === "Non" ? "Non accidenté" : "",
-    uploadedRequiredPhotos === requiredPhotoLabels.length ? "12 photos" : ""
-  ].filter(Boolean);
-
-  const coherenceAlerts = [
-    displayEngine && form.fuel === "Diesel" && /(e|hybrid|phev|plug-in|electric)/i.test(displayEngine) ? "Motorisation et carburant potentiellement incohérents." : "",
-    form.fuel === "Électrique" && fuelDetails.engineDisplacement ? "Électrique + cylindrée renseignée : vérifiez la cohérence." : "",
-    form.year && Number(form.year) > new Date().getFullYear() ? "Année future non autorisée." : "",
-    priceInstant && priceDesired && Number(priceInstant) > Number(priceDesired) ? "Prix immédiat supérieur au prix souhaité : logique commerciale à vérifier." : "",
-    form.mileage && Number((form.mileage || "").replace(/\D/g, "")) === 0 && form.condition !== "Neuf" ? "Kilométrage 0 avec véhicule non neuf : à vérifier." : ""
-  ].filter(Boolean);
-  const trustSignals = [
-    docs,
-    form.condition,
-    form.accidented,
-    form.smoker,
-    form.mileageEvolving,
-    form.fuel,
-    form.gearbox,
-    uploadedRequiredPhotos === requiredPhotoLabels.length,
-    priceWithinMarket
-  ];
-
-  const qualityScore = Math.min(
-    100,
-    Math.round(
-      completion * 0.42 +
-      photoCompletion * 0.30 +
-      (trustSignals.filter(Boolean).length / trustSignals.length) * 28
-    )
-  );
-
-  const qualityLabel =
-    qualityScore >= 90 ? "Excellent" :
-    qualityScore >= 75 ? "Très bon" :
-    qualityScore >= 55 ? "À renforcer" :
-    "Incomplet";
-
-  const missingItems = [
-    !brand || !displayModel ? "Identifier précisément le véhicule" : "",
-    !displayEngine ? "Renseigner la motorisation constructeur" : "",
-    !form.fuel ? "Sélectionner le carburant" : "",
-    !form.mileage ? "Renseigner le kilométrage" : "",
-    !form.condition ? "Préciser l’état général" : "",
-    !form.registrationCountry ? "Préciser le pays d’immatriculation" : "",
-    form.registrationCountry === "Maroc" && !form.registrationCity ? "Sélectionner la ville d’immatriculation" : "",
-    form.registrationCountry === "Étranger" && !form.foreignRegistrationCountry ? "Sélectionner le pays d’immatriculation étranger" : "",
-    form.registrationCountry === "Étranger" && !form.customsCleared ? "Indiquer si la voiture est dédouanée" : "",
-    !priceDesired ? "Ajouter un prix souhaité" : "",
-    uploadedRequiredPhotos < requiredPhotoLabels.length ? `Ajouter les photos obligatoires manquantes (${uploadedRequiredPhotos}/${requiredPhotoLabels.length})` : "",
-    !docs ? "Ajouter des documents publics pour renforcer la confiance" : ""
-  ].filter(Boolean);
-
-  const recommendedLow = Math.round(average * 0.96 / 1000) * 1000;
-  const recommendedHigh = Math.round(average * 1.05 / 1000) * 1000;
-  const estimatedDelay =
-    !priceDesired ? "—" :
-    Number(priceDesired) <= recommendedHigh && Number(priceDesired) >= recommendedLow ? "12 à 18 jours" :
-    Number(priceDesired) < recommendedLow ? "7 à 12 jours" :
-    "20 jours et +";
-
-  const handlePhotoUpload = (label: string, files: FileList | null) => {
-    const count = files?.length || 0;
-    setUploadedPhotos(prev => ({ ...prev, [label]: count }));
-
-    if (count > 0 && !previewPhoto && files && files[0]) {
-      const url = URL.createObjectURL(files[0]);
-      setPreviewPhoto(url);
-    }
-  };
-  const journeySteps = [
-    { title: "Ma voiture", section: "s1" },
-    { title: "Son état", section: "s4" },
-    { title: "Son prix", section: "s7" },
-    { title: "Photos & publication", section: "s8" }
-  ];
-
-  const stepProgress = Math.round(((activeStep + 1) / journeySteps.length) * 100);
-  const isLastStep = activeStep === journeySteps.length - 1;
-
-  const goNext = () => {
-    setActiveStep(prev => Math.min(prev + 1, journeySteps.length - 1));
-  };
-
-  const goPrev = () => {
-    setActiveStep(prev => Math.max(prev - 1, 0));
-  };
-
-  const stepRequiredOk = [
-    Boolean(
-      form.first &&
-      form.last &&
-      form.phone &&
-      form.phone.replace(/\D/g, "").length === 10 &&
-      form.city &&
-      brand &&
-      displayModel &&
-      displayEngine &&
-      trim &&
-      form.year &&
-      form.mileage &&
-      form.fuel &&
-      form.gearbox
-    ),
-    Boolean(form.condition && form.accidented && form.smoker),
-    Boolean(priceMin && priceDesired && Number(priceMin) < Number(priceDesired) && (!instantEnabled || !priceInstant || Number(priceInstant) > Number(priceMin))),
-    uploadedRequiredPhotos === requiredPhotoLabels.length
-  ];
-
-  const invalidFieldsByStep = [
-    [
-      !form.first ? "first" : "",
-      !form.last ? "last" : "",
-      !form.phone || form.phone.replace(/\D/g, "").length !== 10 ? "phone" : "",
-      !form.city ? "city" : "",
-      !brand ? "brand" : "",
-      !displayModel ? "model" : "",
-      !displayEngine ? "engine" : "",
-      !trim ? "trim" : "",
-      !form.year ? "year" : "",
-      !form.mileage ? "mileage" : "",
-      !form.fuel ? "fuel" : "",
-      !form.gearbox ? "gearbox" : ""
-    ].filter(Boolean),
-    [
-      !form.condition ? "condition" : "",
-      !form.accidented ? "accidented" : "",
-      !form.smoker ? "smoker" : ""
-    ].filter(Boolean),
-    [
-      !priceMin ? "priceMin" : "",
-      !priceDesired ? "priceDesired" : ""
-    ].filter(Boolean),
-    uploadedRequiredPhotos < requiredPhotoLabels.length ? ["photos"] : []
-  ];
-
-  const currentStepValid = stepRequiredOk[activeStep];
-
-  const stepCompletion = [
-    { done: [
-      form.first,
-      form.last,
-      form.phone?.replace(/\D/g, "").length === 10,
-      form.city,
-      brand,
-      displayModel,
-      displayEngine,
-      trim,
-      form.year,
-      form.mileage,
-      form.fuel,
-      form.gearbox
-    ].filter(Boolean).length, total: 12 },
-    { done: [form.condition, form.accidented, form.smoker, docs, confidence.serviceBook, confidence.invoices].filter(Boolean).length, total: 6 },
-    { done: [priceMin, priceDesired, instantEnabled ? priceInstant : "optional"].filter(Boolean).length, total: 3 },
-    { done: uploadedRequiredPhotos, total: requiredPhotoLabels.length }
-  ];
-
-  const stepStatuses = stepCompletion.map((item, index) => {
-    if (item.done >= item.total) return "complete";
-    if (index === activeStep || item.done > 0) return "current";
-    return "empty";
-  });
-
-
-  const detailedScores = [
-    { label: "Ma voiture", value: Math.round((stepCompletion[0].done / stepCompletion[0].total) * 100) },
-    { label: "Son état", value: Math.round((stepCompletion[1].done / stepCompletion[1].total) * 100) },
-    { label: "Prix", value: Math.round((stepCompletion[2].done / stepCompletion[2].total) * 100) },
-    { label: "Photos", value: Math.round((stepCompletion[3].done / stepCompletion[3].total) * 100) }
-  ];
-
-  const scoreRecommendations = [
-    uploadedRequiredPhotos < requiredPhotoLabels.length ? `Ajoutez ${requiredPhotoLabels.length - uploadedRequiredPhotos} photo(s) obligatoire(s) pour améliorer le score.` : "",
-    !docs ? "Ajoutez les documents publics pour renforcer le badge Verified." : "",
-    confidence.invoices !== "Oui" ? "Ajoutez les factures d’entretien pour rassurer l’acheteur." : "",
-    !priceWithinMarket && priceDesired ? "Ajustez le prix pour vous rapprocher de la fourchette recommandée." : ""
-  ].filter(Boolean);
-
-  const smartAlerts = [
-    Number((form.mileage || "").replace(/\D/g, "")) > 200000 ? "Kilométrage élevé : ajoutez l’historique d’entretien et des factures." : "",
-    form.accidented === "Oui" ? "Véhicule accidenté : ajoutez les photos des réparations ou justificatifs disponibles." : "",
-    !docs ? "Documents absents : le badge Verified ne pourra pas être obtenu." : "",
-    priceDesired && Number(priceDesired) > recommendedHigh ? "Prix souhaité supérieur au marché : délai de vente probablement plus long." : ""
-  ].filter(Boolean);
-
-  const setConfidenceValue = (key: string, value: string) => {
-    setConfidence(prev => ({ ...prev, [key]: value }));
-  };
-
-  const setHistoryValue = (key: string, value: string) => {
-    setHistory(prev => ({ ...prev, [key]: value }));
-  };
-
-  const setFuelValue = (key: string, value: string) => {
-    setFuelDetails(prev => ({ ...prev, [key]: value }));
-  };
-
-  const toggleBlock = (key: string) => {
-    setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const toggleOptionBlockExpansion = (key: string) => {
-    setExpandedOptionBlocks(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleStructuredDocUpload = (key: string, files: FileList | null) => {
-    setStructuredDocs(prev => ({ ...prev, [key]: files?.length || 0 }));
-  };
-
-  const handleNextStep = () => {
-    setValidationAttempted(true);
-    const firstInvalid = invalidFieldsByStep[activeStep]?.[0] || "";
-    setFirstInvalidKey(firstInvalid);
-    if (!isRecipeMode && !currentStepValid) {
-      window.setTimeout(() => {
-        const el = document.querySelector(`[data-field-key="${firstInvalid}"]`) as HTMLElement | null;
-        el?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 50);
-      return;
-    }
-    setValidationAttempted(false);
-    setFirstInvalidKey("");
-    const nextStep = Math.min(activeStep + 1, journeySteps.length - 1);
-    setMaxUnlockedStep(prev => Math.max(prev, nextStep));
-    setActiveStep(nextStep);
-  };
-
-  const handleStepNavClick = (index: number) => {
-    if (isRecipeMode || index <= maxUnlockedStep) setActiveStep(index);
-  };
-
+export default function HomePage() {
   return (
-    <main className="page">
-      <nav className="topbar">
-        <Link href="/" className="logo">Auto<span>Souk</span></Link>
-        <div className="topRight">
-          <span className="draft">Brouillon sauvegardé{draftSavedAt ? ` · ${draftSavedAt}` : ""}</span>
-          <Link href="/" className="back">Retour au site</Link>
+    <main className="home">
+      <nav className="nav">
+        <Link href="/" className="brand">Auto<span>Souk</span></Link>
+        <div className="navRight">
+          <a href="#how">Comment ça marche</a>
+          <Link href="/mandat" className="navCta">Confier mon véhicule</Link>
         </div>
       </nav>
 
       <section className="hero">
-        <div>
-          <div className="eyebrow">AutoSouk</div>
-          <h1>Vendez votre voiture avec une expérience <em>fluide</em>, claire et premium.</h1>
-          <p>Un parcours minimaliste, visuel et guidé — pensé pour créer une annonce fiable sans effort.</p>
+        <div className="copy">
+          <span className="eyebrow">Vente automobile accompagnée</span>
+          <h1>Vendez votre voiture simplement, avec plus de confiance.</h1>
+          <p>
+            AutoSouk vous accompagne pour préparer une annonce claire, complète
+            et rassurante avant sa publication.
+          </p>
+          <div className="actions">
+            <Link href="/mandat" className="primary">Confier mon véhicule</Link>
+            <a href="#how" className="secondary">Voir comment ça marche</a>
+          </div>
         </div>
-        <div className="heroGlass">
-          <div className="heroMetric"><span>Annonce prête à publier</span><strong>{completion}%</strong></div>
-          <div className="track"><div style={{ width: `${completion}%` }} /></div>
-          <div className="heroList"><span>Identification guidée</span><span>Argus mensuel</span><span>Dossier photo structuré</span></div>
+
+        <div className="card">
+          <div className="cardHeader">
+            <div>
+              <small>Exemple d’annonce</small>
+              <strong>BMW Série 3 320d</strong>
+              <p>2021 · Diesel · Automatique · 74 000 km</p>
+            </div>
+            <span>92</span>
+          </div>
+
+          <div className="vehicle">
+            <div className="body" />
+            <div className="wheel left" />
+            <div className="wheel right" />
+          </div>
+
+          <div className="meta">
+            <div>
+              <small>Repère marché</small>
+              <b>210 000 – 225 000 DH</b>
+            </div>
+            <div>
+              <small>Dossier</small>
+              <b>Photos + historique</b>
+            </div>
+          </div>
+
+          <div className="badges">
+            <span>Prix cohérent</span>
+            <span>Photos guidées</span>
+            <span>Annonce claire</span>
+          </div>
         </div>
       </section>
 
-      <section className="workspace cleanWorkspace">
-        <form className="panel stepPanel cleanPanel">
-          <div className="cleanStepIndicator">
-            {journeySteps.map((step, index) => (
-              <button
-                key={step.title}
-                type="button"
-                className={`${activeStep === index ? "active" : ""} ${stepStatuses[index] === "complete" ? "done" : ""}`}
-                onClick={() => handleStepNavClick(index)}
-              >
-                <span>{index + 1}</span>
-                <b>{step.title}</b>
-              </button>
-            ))}
-          </div>
-          <div className="stepHeader">
-            <div>
-              <span>Étape {activeStep + 1} sur {journeySteps.length}</span>
-              <h2>{journeySteps[activeStep].title}</h2>
-              <p>Quelques informations essentielles suffisent. Vous pourrez finaliser votre annonce en quelques minutes.</p>
-            </div>
-            <div className="stepPercent">{stepProgress}%</div>
-          </div>
-          <div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
-          
-          <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
-          <Section id="s1" title="Identité vendeur" subtitle="Ces informations restent privées et ne sont jamais publiées." />
-          <div className="grid">
-            <Field label="Prénom" required><input data-field-key="first" className={validationAttempted && firstInvalidKey === "first" ? "invalidInput" : ""} placeholder="Mohammed" onChange={e => setValue("first", e.target.value)} />{validationAttempted && !form.first && <small className="inlineError">Champ requis</small>}</Field>
-            <Field label="Nom" required><input data-field-key="last" className={validationAttempted && firstInvalidKey === "last" ? "invalidInput" : ""} placeholder="El Fassi" onChange={e => setValue("last", e.target.value)} />{validationAttempted && !form.last && <small className="inlineError">Champ requis</small>}</Field>
-            <Field label="Téléphone" required>
-              <input
-                data-field-key="phone"
-                className={validationAttempted && firstInvalidKey === "phone" ? "invalidInput" : ""}
-                type="tel"
-                inputMode="numeric"
-                pattern="[0-9 ]*"
-                placeholder="06 XX XX XX XX"
-                value={form.phone || ""}
-                onKeyDown={e => {
-                  const allowed = ["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Home","End"," "];
-                  if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) e.preventDefault();
-                }}
-                onChange={e => {
-                  const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
-                  const grouped = digits.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
-                  setValue("phone", grouped);
-                }}
-              />
-              <small className={form.phone && form.phone.replace(/\D/g, "").length !== 10 ? "fieldHint fieldHintError" : "fieldHint"}>
-                {form.phone && form.phone.replace(/\D/g, "").length === 10 ? "✓ Numéro valide" : "10 chiffres obligatoires."}
-              </small>
-            </Field>
-            <Field label="Ville" required><select data-field-key="city" className={validationAttempted && firstInvalidKey === "city" ? "invalidInput" : ""} defaultValue="" onChange={e => setValue("city", e.target.value)}><option value="" disabled>Sélectionner</option>{CITIES.map(x => <option key={x}>{x}</option>)}</select>{validationAttempted && !form.city && <small className="inlineError">Champ requis</small>}</Field>
-          </div>
-
-          </div>
-
-          <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
-          <Section id="s2" title="Identification du véhicule" subtitle="Commencez par les informations clés. Le reste s’ajuste progressivement autour de votre véhicule." />
-          <div className="brandShowcaseWide">
-            <div className="brandLogoSlot">
-              {brand && !brandLogoMissing && getBrandLogo(brand) ? <img src={getBrandLogo(brand) || ""} alt={brand} className="brandPngLogo" onError={() => setBrandLogoMissing(true)} /> : <div className="brandFallback"><span>{brand ? brand.slice(0, 2).toUpperCase() : "AS"}</span></div>}
-            </div>
-            <div className="brandShowcaseCopy">
-              <strong>{brand || "Sélectionnez une marque"}</strong>
-              <small>{brand ? "Logo constructeur affiché automatiquement si disponible dans /public/brands." : "Le logo apparaîtra ici après sélection."}</small>
-            </div>
-          </div>
-          <div className="grid">
-            <Field label="Marque" required><select value={brand} onChange={e => { setBrand(e.target.value); setModel(""); setEngine(""); setBrandLogoMissing(false); }}><option value="">Sélectionner</option>{BRANDS.map(x => <option key={x}>{x}</option>)}</select></Field>
-            <Field label="Modèle" required><select value={model} disabled={!brand} onChange={e => { setModel(e.target.value); setEngine(""); }}><option value="">{brand ? "Sélectionner" : "Choisissez une marque"}</option>{models.map(x => <option key={x}>{x}</option>)}</select></Field>
-            {model === "Autre" && <Field label="Autre modèle"><input value={otherModel} onChange={e => setOtherModel(e.target.value)} placeholder="Préciser le modèle" /></Field>}
-            <Field label="Motorisation constructeur" required><select value={engine} disabled={!brand || !model} onChange={e => setEngine(e.target.value)}><option value="">{brand && model ? "Sélectionner" : "Choisissez marque et modèle"}</option>{engineOptions.map(x => <option key={x}>{x}</option>)}</select><small className="fieldHint">Variante constructeur du modèle : ex. 320d, C300, 2.0 TDI, 1.2 PureTech.</small></Field>
-            {engine === "Autre" && <Field label="Autre motorisation"><input value={otherEngine} onChange={e => setOtherEngine(e.target.value)} placeholder="Ex. 300e, 520d..." /></Field>}
-            <Field label="Finition (Pack M, AMG Line, R Line...)" required><input value={trim} onChange={e => setTrim(e.target.value)} placeholder="Ex. Pack M, AMG Line..." /></Field>
-            <Field label="Type de véhicule"><select defaultValue="" onChange={e => setValue("type", e.target.value)}><option value="" disabled>Sélectionner</option>{VEHICLE_TYPES.map(x => <option key={x}>{x}</option>)}</select></Field>
-            <Field label="Année" required><select defaultValue="" onChange={e => setValue("year", e.target.value)}><option value="" disabled>Sélectionner</option>{YEARS.map(x => <option key={x}>{x}</option>)}</select></Field>
-            <Field label="Kilométrage" required>
-              <div className="mileageGaugeBox">
-                <div className="mileageGaugeTop">
-                  <span>0 km</span>
-                  <strong>{mileageRange === "200000" ? "+200 000 km" : `${Number(mileageRange).toLocaleString("fr-FR")} km`}</strong>
-                  <span>+200 000 km</span>
-                </div>
-                <input
-                  className="mileageRange"
-                  type="range"
-                  min="0"
-                  max="200000"
-                  step="1000"
-                  value={mileageRange}
-                  onChange={e => {
-                    setMileageRange(e.target.value);
-                    setValue("mileage", e.target.value === "200000" ? "+200 000 km" : `${Number(e.target.value).toLocaleString("fr-FR")} km`);
-                  }}
-                />
-                <input
-                  className="mileagePrecise"
-                  type="number"
-                  placeholder="Corriger manuellement, ex. 18 350"
-                  onChange={e => {
-                    setValue("mileage", e.target.value ? `${Number(e.target.value).toLocaleString("fr-FR")} km` : "");
-                  }}
-                />
-              </div>
-            </Field>
-            <Field label="Kilométrage évolutif ?">
-              <select defaultValue="" onChange={e => setValue("mileageEvolving", e.target.value)}>
-                <option value="" disabled>Sélectionner</option>
-                <option>Oui, j’utilise encore la voiture au quotidien</option>
-                <option>Non, le véhicule ne roule presque plus</option>
-              </select>
-            </Field>
-          </div>
-
-          <div className="subSectionBox">
-            <h3>Immatriculation</h3>
-            <p>Pays et lieu d’immatriculation du véhicule.</p>
-            <div className="grid">
-              <Field label="Pays d’immatriculation" required>
-                <select
-                  value={form.registrationCountry || ""}
-                  onChange={e => {
-                    setValue("registrationCountry", e.target.value);
-                    setValue("registrationCity", "");
-                    setValue("foreignRegistrationCountry", "");
-                    setValue("customsCleared", "");
-                  }}
-                >
-                  <option value="" disabled>Sélectionner</option>
-                  <option value="Maroc">Maroc</option>
-                  <option value="Étranger">Étranger</option>
-                </select>
-              </Field>
-
-              {form.registrationCountry === "Maroc" && (
-                <Field label="Ville / préfecture d’immatriculation" required>
-                  <select value={form.registrationCity || ""} onChange={e => setValue("registrationCity", e.target.value)}>
-                    <option value="" disabled>Sélectionner</option>
-                    {MOROCCAN_REGISTRATION_CITIES.map(city => <option key={city}>{city}</option>)}
-                  </select>
-                </Field>
-              )}
-
-              {form.registrationCountry === "Étranger" && (
-                <>
-                  <Field label="Pays d’immatriculation étranger" required>
-                    <select value={form.foreignRegistrationCountry || ""} onChange={e => setValue("foreignRegistrationCountry", e.target.value)}>
-                      <option value="" disabled>Sélectionner le pays</option>
-                      {COUNTRIES.map(country => <option key={country}>{country}</option>)}
-                    </select>
-                  </Field>
-
-                  <Field label="Voiture dédouanée ?" required>
-                    <select value={form.customsCleared || ""} onChange={e => setValue("customsCleared", e.target.value)}>
-                      <option value="" disabled>Sélectionner</option>
-                      <option value="Oui">Oui</option>
-                      <option value="Non">Non</option>
-                    </select>
-                  </Field>
-                </>
-              )}
-            </div>
-          </div>
-
-          </div>
-
-          <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
-          <Section id="s3" title="Carburant & caractéristiques techniques" subtitle="Le carburant est séparé de la motorisation constructeur pour éviter les doublons et fiabiliser l’annonce." />
-          <div className="grid">
-            <Field label="Carburant" required><select defaultValue="" onChange={e => setValue("fuel", e.target.value)}><option value="" disabled>Sélectionner</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Hybride rechargeable</option><option>Électrique</option><option>GPL</option><option>Hydrogène</option><option>Bioéthanol</option><option>Gaz naturel CNG</option><option>Autre</option></select></Field>
-            <Field label="Transmission" required><select defaultValue="" onChange={e => setValue("gearbox", e.target.value)}><option value="" disabled>Sélectionner</option><option>Boîte manuelle</option><option>Boîte automatique</option><option>Boîte semi-automatique</option></select></Field>
-            <Field label="Motricité"><select defaultValue=""><option>Tous</option><option>Traction avant</option><option>Propulsion</option><option>4x4</option></select></Field>
-            <Field label="Puissance"><input placeholder="Ex. 204 ch DIN" /></Field>
-            <Field label="Cylindrée"><input value={fuelDetails.engineDisplacement || ""} onChange={e => setFuelValue("engineDisplacement", e.target.value)} placeholder="Ex. 1998 ccm" /></Field>
-            <Field label="Nombre de portes"><select defaultValue=""><option>Tous</option><option>2 portes</option><option>3 portes</option><option>4 portes</option><option>5 portes</option></select></Field>
-          </div>
-
-          <div className="fuelConditionalBox">
-            <h3>Champs adaptés au carburant</h3>
-            {form.fuel === "Électrique" && (
-              <div className="grid">
-                <Field label="Capacité batterie"><input value={fuelDetails.battery || ""} onChange={e => setFuelValue("battery", e.target.value)} placeholder="Ex. 75 kWh" /></Field>
-                <Field label="Autonomie WLTP"><input value={fuelDetails.range || ""} onChange={e => setFuelValue("range", e.target.value)} placeholder="Ex. 520 km" /></Field>
-                <Field label="Type de recharge"><select value={fuelDetails.charging || ""} onChange={e => setFuelValue("charging", e.target.value)}><option value="" disabled>Sélectionner</option><option>AC</option><option>DC rapide</option><option>AC + DC</option></select></Field>
-              </div>
-            )}
-            {form.fuel === "Hybride rechargeable" && (
-              <div className="grid">
-                <Field label="Autonomie électrique"><input value={fuelDetails.evRange || ""} onChange={e => setFuelValue("evRange", e.target.value)} placeholder="Ex. 80 km" /></Field>
-                <Field label="Capacité batterie"><input value={fuelDetails.battery || ""} onChange={e => setFuelValue("battery", e.target.value)} placeholder="Ex. 25 kWh" /></Field>
-              </div>
-            )}
-            {form.fuel && !["Électrique","Hybride rechargeable"].includes(form.fuel) && (
-              <div className="grid">
-                <Field label="Puissance fiscale"><input value={fuelDetails.fiscalPower || ""} onChange={e => setFuelValue("fiscalPower", e.target.value)} placeholder="Ex. 8 CV" /></Field>
-                <Field label="Norme antipollution"><select value={fuelDetails.emission || ""} onChange={e => setFuelValue("emission", e.target.value)}><option value="" disabled>Sélectionner</option><option>Euro 4</option><option>Euro 5</option><option>Euro 6</option><option>Non renseigné</option></select></Field>
-              </div>
-            )}
-          </div>
-
-          </div>
-
-          <div className={`journeyPane ${activeStep === 1 ? "active" : ""}`}>
-          <Section id="s4" title="Design extérieur & intérieur" subtitle="Couleurs, matériaux et premiers éléments visuels." />
-          <Field label="Couleur extérieure"><ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={v => { const next = exteriorColor === v ? "" : v; setExteriorColor(next); }} /></Field>
-          <div className="grid">
-            <Field label="Couleur intérieure">
-              <ColorGrid
-                items={INTERIOR_COLOR_PALETTE}
-                selectedColor={form.interiorColor || ""}
-                onPick={v => {
-                  const next = form.interiorColor === v ? "" : v;
-                  setValue("interiorColor", next);
-                  if (next !== "Autres") setValue("interiorColorOther", "");
-                }}
-              />
-              {form.interiorColor === "Autres" && <input placeholder="Préciser la couleur intérieure" onChange={e => setValue("interiorColorOther", e.target.value)} />}
-            </Field>
-            <Field label="Matériau intérieur"><PillGroup items={INTERIOR_MATERIALS} onPick={v => setValue("interiorMaterial", v)} />{form.interiorMaterial === "Autres" && <input placeholder="Préciser le matériau" onChange={e => setValue("interiorMaterialOther", e.target.value)} />}</Field>
-          </div>
-
-          <Section id="s5" title="Équipements" subtitle="Sélectionnez les options présentes. Les champs Autre se vident automatiquement si décochés." />
-          <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="ext" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.ext} onToggleExpanded={() => toggleOptionBlockExpansion("ext")} />
-          <OptionBlock title="Confort & intérieur" items={COMFORT_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="comfort" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.comfort} onToggleExpanded={() => toggleOptionBlockExpansion("comfort")} />
-          <OptionBlock title="Infotainment" items={INFOTAINMENT_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="info" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.info} onToggleExpanded={() => toggleOptionBlockExpansion("info")} />
-          <OptionBlock title="Sécurité & aides à la conduite" items={SAFETY_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="safety" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.safety} onToggleExpanded={() => toggleOptionBlockExpansion("safety")} />
-
-          <Section id="s6" title="État, vendeur & historique" subtitle="Ces informations renforcent la confiance et réduisent les questions inutiles." />
-          <div className="grid">
-            <Field label="État général" required><select defaultValue="" onChange={e => setValue("condition", e.target.value)}><option value="" disabled>Sélectionner</option><option>Neuf</option><option>Excellent état</option><option>Très bon état</option><option>Bon état</option><option>État correct</option><option>Petits frais à prévoir</option></select></Field>
-            <Field label="Vendeur"><select defaultValue=""><option>Particulier</option><option>Concessionnaire</option><option>Voiture de société</option></select></Field>
-            <Field label="Entretien"><select defaultValue=""><option>Non renseigné</option><option>Carnet complet</option><option>Factures disponibles</option><option>Historique partiel</option><option>Non disponible</option></select></Field>
-            <Field label="Véhicule fumeur ?"><select defaultValue="" onChange={e => setValue("smoker", e.target.value)}><option value="" disabled>Sélectionner</option><option>Oui</option><option>Non</option></select></Field>
-            <Field label="Véhicule accidenté ?"><select defaultValue="" onChange={e => setValue("accidented", e.target.value)}><option value="" disabled>Sélectionner</option><option>Oui</option><option>Non</option></select></Field>
-          </div>
-
-          </div>
-
-          <div className={`journeyPane ${activeStep === 2 ? "active" : ""}`}>
-          <Section id="s7" title="Stratégie de prix" subtitle="Trois niveaux de décision : minimum accepté, prix souhaité et prix immédiat." />
-          <div className="critical">🔒 <strong>Le prix minimum accepté reste confidentiel.</strong> Il n’est jamais montré aux acheteurs.</div>
-          <div className="pricingGrid pricingGridExact">
-            <div className="priceBox priceBoxMinimum">
-              <div className="priceLabel">Prix minimum accepté <span>*</span></div>
-              <div className={`moneyInput ${priceMinError ? "priceInvalid shakeField" : ""}`}>
-                <input
-                  type="number"
-                  min="0"
-                  inputMode="numeric"
-                  onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }}
-                  value={priceMin}
-                  placeholder={priceMinError || "Ex. 145000"}
-                  onChange={e => handleMinPriceChange(e.target.value)}
-                  onBlur={validateMinPrice}
-                />
-                <span>Dirhams</span>
-              </div>
-              {priceMinError && <div className="priceError">{priceMinError}</div>}
-              <p>Confidentiel. Il doit impérativement être inférieur au prix souhaité.</p>
-            </div>
-
-            <div className="priceBox priceBoxMain priceBoxDesired">
-              <div className="priceBadge">Prix affiché</div>
-              <div className="priceLabel">Prix souhaité <span>*</span></div>
-              <div className="moneyInput moneyInputDesired">
-                <input
-                  type="number"
-                  min="0"
-                  inputMode="numeric"
-                  onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }}
-                  value={priceDesired}
-                  placeholder="Ex. 160000"
-                  onChange={e => handleDesiredPriceChange(e.target.value)}
-                />
-                <span>Dirhams</span>
-              </div>
-              <p>Montant central de l’annonce, utilisé comme base de discussion.</p>
-            </div>
-
-            <div className={`priceBox priceBoxInstantExact ${instantEnabled ? "instantEnabled" : ""} ${instantLocked ? "instantLocked" : ""}`}>
-              <div className="instantHeader">
-                <div>
-                  <div className="priceLabel">Prix de vente immédiat</div>
-                  <small>Optionnel</small>
-                </div>
-                
-              </div>
-
-              <div className={`moneyInput ${priceInstantError ? "priceInvalid shakeField" : ""}`}>
-                <input
-                  type="number"
-                  min="0"
-                  inputMode="numeric"
-                  onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }}
-                  value={priceInstant}
-                  placeholder={priceInstantError || "Ex. 155000"}
-                  disabled={!instantEnabled || instantLocked}
-                  onChange={e => handleInstantPriceChange(e.target.value)}
-                  onBlur={validateInstantPrice}
-                />
-                <span>Dirhams</span>
-              </div>
-              {priceInstantError && <div className="priceError">{priceInstantError}</div>}
-
-              <label className="instantEnableLine">
-                <input
-                  type="checkbox"
-                  checked={instantEnabled}
-                  onChange={e => handleInstantEnable(e.target.checked)}
-                />
-                <span>Je souhaite renseigner un prix de vente immédiat</span>
-              </label>
-
-              {showInstantCommit && (
-                <label className={`instantCommitLine ${instantLocked ? "locked" : ""}`}>
-                  <input
-                    type="checkbox"
-                    checked={instantCommitChecked}
-                    disabled={instantLocked}
-                    onChange={e => handleInstantCommit(e.target.checked)}
-                  />
-                  <span>Je m’engage à céder mon véhicule si une offre atteint au minimum ce prix-là.</span>
-                </label>
-              )}
-
-              {instantCheckAnimation && <div className="instantFlyingCheck">✓</div>}
-            </div>
-          </div>
-          <Field label="Remarques vendeur"><textarea placeholder="Première main, carnet complet, pneus neufs, défauts éventuels..." /></Field>
-
-          </div>
-
-          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
-          <Section id="s8" title="Guide photo" subtitle="12 photos principales avec une limite de 1 photo par section, plus un espace illimité pour les défauts." />
-          <div className="photoQualityPanel"><div><strong>Checklist qualité photo</strong><p>Photos nettes, lumière naturelle, véhicule propre, plaque masquée si nécessaire.</p></div><span>12 photos + défauts illimités</span></div>
-          <div className="photoGrid">
-            {PHOTOS.map((photo, i) => (
-              <label className={`upload ${photo.multiple ? "uploadDefects" : ""}`} key={photo.label}>
-                <b>{String(i + 1).padStart(2, "0")}</b><i className="photoRequirement">{photo.multiple ? "Facultatif" : "Obligatoire"}</i>
-                <img src={photo.image} alt={photo.label} className="photoGuideImage" onError={e => { e.currentTarget.style.display = "none"; }} />
-                <span>{photo.label}</span>
-                <small>{photo.instruction}</small>
-                <input type="file" accept="image/*" multiple={photo.multiple} onChange={e => handlePhotoUpload(photo.label, e.target.files)} />
-                {(uploadedPhotos[photo.label] || 0) > 0 && <em className="photoAdded">✓ Photo ajoutée{photo.multiple && uploadedPhotos[photo.label] > 1 ? `s (${uploadedPhotos[photo.label]})` : ""} · Remplacer</em>}
-                {photo.multiple && <em>Upload multiple autorisé</em>}
-              </label>
-            ))}
-          </div>
-
-          </div>
-
-          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
-          <Section id="s9" title="Documents & confiance" subtitle="Documents publics facultatifs. Les informations sensibles doivent être floutées." />
-          <label className="check"><input type="checkbox" checked={docs} onChange={e => setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
-          <div className="structuredDocsGrid">
-            {[
-              ["registration","Carte grise floutée","Obligatoire pour Verified"],
-              ["inspection","Contrôle technique","Recommandé"],
-              ["invoices","Factures d’entretien","Recommandé"],
-              ["serviceBook","Carnet d’entretien","Facultatif"],
-              ["customs","Certificat de dédouanement","Si import"],
-              ["expertise","Rapport d’expertise","Facultatif"]
-            ].map(([key,label,tag]) => (
-              <label key={key} className={`structuredDoc ${structuredDocs[key] ? "added" : ""}`}>
-                <strong>{label}</strong>
-                <span>{structuredDocs[key] ? "Ajouté" : tag}</span>
-                <input type="file" accept="image/*,.pdf" onChange={e => handleStructuredDocUpload(key, e.target.files)} />
-              </label>
-            ))}
-          </div>
-          {docs && <div className="docs"><div className="verified">Verified potentiel</div><div className="grid"><Field label="Carte grise floutée"><input type="file" accept="image/*,.pdf" /></Field><Field label="Factures / carnet"><input type="file" accept="image/*,.pdf" multiple /></Field><Field label="Contrôle technique"><input type="file" accept="image/*,.pdf" /></Field><Field label="Autres documents"><input type="file" accept="image/*,.pdf" multiple /></Field></div></div>}
-
-          <div className="trustBox">
-            <h3>Confiance acheteur</h3>
-            <p>Ces éléments augmentent la crédibilité de l’annonce et réduisent les questions inutiles.</p>
-            <div className="grid">
-              {[
-                ["firstOwner","Première main ?"],
-                ["spareKeys","Double des clés disponible ?"],
-                ["serviceBook","Carnet d’entretien disponible ?"],
-                ["invoices","Factures disponibles ?"],
-                ["technicalInspection","Contrôle technique valide ?"],
-                ["warranty","Garantie restante ?"],
-                ["financing","Crédit / leasing en cours ?"],
-                ["pledge","Opposition / gage ?"]
-              ].map(([key,label]) => (
-                <Field key={key} label={label}>
-                  <select value={confidence[key] || ""} onChange={e => setConfidenceValue(key, e.target.value)}>
-                    <option value="" disabled>Sélectionner</option>
-                    <option>Oui</option>
-                    <option>Non</option>
-                    <option>Non applicable</option>
-                  </select>
-                </Field>
-              ))}
-            </div>
-          </div>
-
-          </div>
-
-          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
-          <Section id="s10" title="Aperçu final" subtitle="Relisez votre annonce avant de l’envoyer en revue." />
-          <div className="descriptionAssistant">
-            <h3>Description assistée</h3>
-            <div className="descriptionStyles">
-              {["Sobre","Premium","Commercial"].map(style => (
-                <button type="button" key={style} className={descriptionStyle === style ? "selected" : ""} onClick={() => setDescriptionStyle(style)}>{style}</button>
-              ))}
-            </div>
-          </div>
-          <div className="preview">{generatedDescription}</div>
-          <div className="finalReview">
-            <div>
-              <div className="finalScorePill">Score qualité : {qualityScore}/100 · {qualityLabel}</div><strong>{missingItems.length ? "Derniers points avant publication" : "Votre annonce est prête"}</strong>
-              <p>{missingItems.length ? "Complétez les éléments ci-dessous pour maximiser la confiance acheteur." : "Le dossier est suffisamment complet pour être envoyé en revue."}</p>
-              <div className="finalChecklist">
-                {journeySteps.map((step, index) => (
-                  <span key={step.title} className={stepStatuses[index] === "complete" ? "ok" : ""}>
-                    {stepStatuses[index] === "complete" ? "✓" : "•"} {step.title} · {stepCompletion[index].done}/{stepCompletion[index].total}
-                  </span>
-                ))}
-              </div>
-              {missingItems.length > 0 && <ul>{missingItems.slice(0, 5).map(item => <li key={item}>{item}</li>)}</ul>}
-            </div>
-            <button type="button">{missingItems.length ? "Continuer à compléter" : "Finaliser mon annonce"}</button>
-          </div>
+      <section className="section">
+        <div className="sectionTitle">
+          <span>Pourquoi AutoSouk ?</span>
+          <h2>Une annonce mieux préparée inspire plus confiance.</h2>
         </div>
-          <div className="stepActions persistentStepActions">
-            <button type="button" className="secondaryStep" onClick={goPrev} disabled={activeStep === 0}>Retour</button>
-            <div className="stepActionRight">
-              {!currentStepValid && !isRecipeMode && <span className="stepValidationHint">Complétez les champs obligatoires (*) pour continuer.</span>}{!currentStepValid && isRecipeMode && <span className="stepValidationHint recipeHint">Mode recette : validation non bloquante.</span>}
-              <button type="button" className="primaryStep" onClick={handleNextStep} disabled={!isRecipeMode && !currentStepValid}>
-                {isLastStep ? "Envoyer mon annonce" : "Continuer"}
-              </button>
-            </div>
-          </div>
-        </form>
 
-        
+        <div className="benefits">
+          {benefits.map((item) => (
+            <article key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
-      <style>{`
-        *{box-sizing:border-box} html{scroll-behavior:smooth}
-        .page{min-height:100vh;background:radial-gradient(circle at 10% -6%,rgba(217,181,109,.24),transparent 34%),radial-gradient(circle at 90% 2%,rgba(148,163,184,.24),transparent 30%),linear-gradient(145deg,#fbfaf7 0%,#f3f0ea 42%,#eef4f8 100%);color:#0f1720;font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Arial,sans-serif}
-        .topbar{height:82px;display:flex;justify-content:space-between;align-items:center;max-width:1480px;margin:auto;padding:0 34px}.logo{text-decoration:none;color:#111827;font-size:25px;font-weight:950;letter-spacing:-.04em}.logo span{background:linear-gradient(135deg,#b8924a,#e7c983);-webkit-background-clip:text;color:transparent}.topRight{display:flex;gap:12px;align-items:center}.draft{background:rgba(255,255,255,.72);border:1px solid #e2e8f0;color:#2f6b4f;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:850}.back{background:#111827;color:white;text-decoration:none;border-radius:999px;padding:10px 16px;font-weight:850}
-        .hero{max-width:1480px;margin:auto;padding:70px 34px 36px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.75fr);gap:34px;align-items:end}.eyebrow{display:inline-flex;background:rgba(255,255,255,.72);border:1px solid #e2e8f0;border-radius:999px;padding:9px 13px;color:#9c7632;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:950}h1{font-size:clamp(48px,6.4vw,92px);line-height:.92;letter-spacing:-.075em;font-weight:950;margin:18px 0;max-width:980px}h1 em{font-style:normal;background:linear-gradient(135deg,#111827 5%,#b8924a 55%,#e2c079);-webkit-background-clip:text;color:transparent}.hero p{font-size:20px;line-height:1.65;color:#687386;max-width:760px}.heroGlass{border-radius:34px;background:linear-gradient(160deg,rgba(255,255,255,.9),rgba(255,255,255,.58));border:1px solid #fff;box-shadow:0 28px 90px rgba(22,28,36,.10);padding:28px}.heroMetric{display:flex;justify-content:space-between;align-items:center}.heroMetric strong{font-size:42px;background:linear-gradient(135deg,#111827,#b8924a);-webkit-background-clip:text;color:transparent}.track{height:12px;background:#e9edf2;border-radius:999px;overflow:hidden;margin:14px 0 18px}.track div{height:100%;background:linear-gradient(90deg,#111827,#b8924a,#e6c77e)}.heroList{display:grid;gap:10px}.heroList span{background:rgba(255,255,255,.72);border:1px solid #e2e8f0;border-radius:18px;padding:13px 14px;font-weight:850}
-        .workspace{max-width:1480px;margin:auto;padding:24px 34px 100px;display:grid;grid-template-columns:230px minmax(0,1fr) 380px;gap:26px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.leftNav{border-radius:28px;background:rgba(255,255,255,.72);border:1px solid #e2e8f0;box-shadow:0 24px 70px rgba(22,28,36,.08);padding:16px}.navTitle{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#93a0b2;font-weight:950;margin:4px 8px 12px}.leftNav a{display:flex;gap:10px;padding:10px 11px;border-radius:18px;text-decoration:none;color:#647083;font-size:13px;font-weight:850}.leftNav a:hover{background:rgba(255,255,255,.78);transform:translateX(2px)}.leftNav small{color:#b8924a}
-        .panel{border-radius:36px;background:rgba(255,255,255,.84);border:1px solid #e2e8f0;box-shadow:0 34px 100px rgba(22,28,36,.10);padding:38px;min-width:0}.sectionTitle{scroll-margin-top:30px;border-top:1px solid #e2e8f0;margin:46px 0 24px;padding-top:26px}.sectionTitle:first-child{margin-top:0;padding-top:0;border-top:0}.sectionTitle h2{font-size:32px;line-height:1.05;letter-spacing:-.055em;font-weight:950;margin:0}.sectionTitle p{color:#6d7890;font-size:15px;line-height:1.55;margin:5px 0 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:24px 26px;align-items:start}.field{display:grid;gap:8px;min-width:0}.field label{font-weight:900;font-size:12px;color:#111827}.req{color:#b8924a}input,select,textarea{width:100%;min-height:56px;border-radius:18px;border:1.5px solid #dce4ee;background:rgba(248,250,252,.82);padding:14px 15px;font-size:15px;outline:none}textarea{min-height:118px}input:focus,select:focus,textarea:focus{background:white;border-color:#c9a15a;box-shadow:0 0 0 5px rgba(184,146,74,.13)}
-        .brandShowcaseWide{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:center;border-radius:30px;background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(248,250,252,.70));border:1px solid #e2e8f0;box-shadow:0 24px 70px rgba(22,28,36,.08);padding:24px;margin-bottom:24px}.brandLogoSlot{height:118px;display:flex;align-items:center;justify-content:center;background:white;border-radius:24px;box-shadow:inset 0 0 0 1px #e2e8f0}.brandPngLogo{max-width:175px;max-height:86px;object-fit:contain}.brandFallback{width:86px;height:86px;border-radius:28px;background:linear-gradient(135deg,#111827,#27313c);color:#d9ad62;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:950}.brandShowcaseCopy strong{font-size:23px}.brandShowcaseCopy small{display:block;color:#6d7890;margin-top:5px}
-        .pillGroup,.optionsGrid,.colorGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px}.pill,.optionItem,.colorItem{display:flex;gap:8px;align-items:center;border-radius:16px;background:rgba(248,250,252,.84);border:1.5px solid #dce4ee;padding:10px;font-size:12px;font-weight:850;color:#111827}.pill input,.optionItem input{width:auto;min-height:auto}.optionItem.selected,.colorGrid.hasSelection .colorItem.selected{background:linear-gradient(145deg,#fff8ec,#fff);border-color:#d9b56d;box-shadow:0 14px 34px rgba(184,146,74,.16)}.colorItem{cursor:pointer;position:relative}.colorGrid.hasSelection .colorItem{opacity:.35;filter:grayscale(.85)}.colorGrid.hasSelection .colorItem.selected{opacity:1;filter:none}.colorItem.selected:after{content:"✓";position:absolute;right:8px;top:8px;background:#111827;color:#d9ad62;width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center}.swatch{width:16px;height:16px;border-radius:5px;border:1px solid #9aa6b4}
-        .optionBlock{margin-top:18px}.optionBlock h3{font-size:15px}.customOtherGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-top:12px}.customOtherBox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;background:white;border:1.5px solid #dce4ee;border-radius:16px;padding:10px 12px}.customOtherBox.active{background:#fff8ec;border-color:#d9b56d}.customOtherCheck{display:flex;gap:8px;font-size:12px;font-weight:900}.customOtherCheck input{width:auto;min-height:auto}.customOtherInput{min-height:38px!important;border-radius:10px!important;font-size:13px!important}.customOtherInput:disabled{background:#eef2f6!important;color:#9aa6b4!important}
-        .critical{border-radius:20px;background:#fff7f5;border:1.5px solid #f0b4aa;color:#b42318;padding:16px 18px;font-weight:900}.pricingGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.22fr) minmax(0,1fr);gap:22px;margin:20px 0 24px}.priceBox{border-radius:26px;border:1.5px solid #dce4ee;background:rgba(248,250,252,.72);box-shadow:0 18px 46px rgba(22,28,36,.06);padding:18px;display:grid;gap:10px}.priceBoxMain{background:linear-gradient(180deg,#fff8ea,#fff);border-color:#d9b56d;box-shadow:0 26px 70px rgba(184,146,74,.20);transform:translateY(-6px)}.priceBadge{display:inline-flex;background:#111827;color:#d9ad62;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:950;width:max-content}.priceLabel{font-weight:950}.moneyInput{display:grid;grid-template-columns:minmax(0,1fr) auto;background:white;border:1.5px solid #cfd8e3;border-radius:18px;overflow:hidden}.moneyInput input{border:0!important;box-shadow:none!important;background:white!important;font-size:20px!important;font-weight:900!important}.moneyInput span{display:flex;align-items:center;padding:0 14px;background:#eef2f6;border-left:1px solid #dce3eb;font-size:12px;font-weight:950;color:#5f6f82;text-transform:uppercase}
-        .photoQualityPanel{display:flex;justify-content:space-between;gap:16px;background:linear-gradient(135deg,#fff8ec,#fff);border:1.5px solid #ead3a5;border-radius:24px;padding:16px 18px;margin-bottom:18px}.photoQualityPanel p{margin:4px 0 0;color:#7a5720}.photoQualityPanel span{background:#111827;color:#d9ad62;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:950}.photoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:20px}.upload{border-radius:26px;background:rgba(255,255,255,.72);border:1.5px dashed #ccd6e2;padding:22px;display:flex;flex-direction:column;gap:8px;box-shadow:0 18px 44px rgba(22,28,36,.06)}.upload:hover{transform:translateY(-3px);border-color:#d9b56d}.photoGuideImage{width:100%;height:130px;object-fit:contain;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:12px}.uploadDefects{border-color:#f2aaa2;background:#fff7f6}.uploadDefects em{display:inline-flex;width:max-content;background:#fff2f0;color:#b42318;border-radius:999px;padding:5px 9px;font-size:11px;font-style:normal;font-weight:950}
-        .check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:17px;font-weight:900}.check input{width:auto;min-height:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:22px;padding:22px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{border-radius:26px;background:linear-gradient(145deg,#fff,#f8fafc);border:1.5px solid #dce4ee;box-shadow:0 18px 44px rgba(22,28,36,.06);padding:22px;line-height:1.75}.final{margin-top:34px;border-radius:30px;background:linear-gradient(135deg,#111827,#1f2937);box-shadow:0 28px 80px rgba(17,24,39,.22);color:white;padding:24px;display:flex;justify-content:space-between;gap:22px;align-items:center}.final p{color:rgba(255,255,255,.62)}.final button{background:linear-gradient(135deg,#b8924a,#d9b56d);color:white;border:0;border-radius:18px;padding:15px 22px;font-weight:950}
-        .marketCard{border-radius:32px;background:rgba(255,255,255,.80);border:1px solid #e2e8f0;box-shadow:0 30px 90px rgba(22,28,36,.10);padding:20px}.marketHeader{display:flex;justify-content:space-between;gap:10px}.marketHeader span{font-size:24px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;color:#b8924a;background:#fff6e8;border-radius:999px;padding:7px 9px}.marketIdentity{background:linear-gradient(135deg,#111827,#27313c);border-radius:24px;color:white;padding:15px;margin:15px 0}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px minmax(0,1fr) 34px;gap:8px;align-items:center;font-size:11px}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal p{margin:4px 0 0}.signal.green{background:#edf7f2;color:#2d8653}.signal.red{background:#fff2f0;color:#b42318}.signal.black{background:#f3f0ec;color:#111827}.signal.neutral{background:#f8fafc;color:#728196}.sourceNote{font-size:11px;color:#8090a3}
-        .workspace{max-width:1480px;margin:auto;padding:24px 34px 100px;display:grid;grid-template-columns:230px minmax(0,1fr) 350px;gap:22px;align-items:start}.leftNav,.rightRail{position:sticky;top:22px}.rightRail{display:grid;gap:14px}.infoRailHeader{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:16px 18px;border-radius:24px;background:#f7f8fa;border:1px solid #e5e7eb;box-shadow:0 14px 34px rgba(15,23,32,.05)}.infoRailHeader strong{display:block;font-size:18px;line-height:1.15;letter-spacing:-.02em}.infoRailHeader p{margin:4px 0 0;color:#6b7280;font-size:12px;line-height:1.45}.infoRailEyebrow{display:inline-flex;margin-bottom:6px;padding:5px 9px;border-radius:999px;background:#eef2f7;color:#5f6b7a;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.toggleInsightsBtn{display:none;border:1px solid #d1d5db;background:#fff;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:800;color:#111827}.infoRailHint{padding:12px 14px;border-radius:18px;background:#fff8e8;border:1px solid #f0dfaf;color:#7a5a14;font-size:12px;line-height:1.45}.infoCardsWrap{display:grid;gap:14px}.cardReadOnlyTag{display:inline-flex;align-self:flex-start;margin-bottom:10px;padding:4px 8px;border-radius:999px;background:#eef5ff;color:#0b63ce;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.livePreviewCard,.qualityCard,.marketCard{position:relative}.rightRail .livePreviewCard,.rightRail .qualityCard,.rightRail .marketCard{background:#f9fafb;border:1px solid #e5e7eb;box-shadow:0 14px 30px rgba(15,23,32,.05)}
-        @media(max-width:1380px){.workspace{grid-template-columns:220px minmax(0,1fr)}.rightRail{position:static;grid-column:2;margin-top:8px}.toggleInsightsBtn{display:inline-flex;align-items:center;justify-content:center}.infoCardsWrap{display:none}.rightRail.expandedInsights .infoCardsWrap{display:grid}.pricingGrid{grid-template-columns:1fr}.priceBoxMain{transform:none}}
-        @media(max-width:900px){.topbar{padding:0 18px}.hero,.workspace{grid-template-columns:1fr;padding-left:18px;padding-right:18px}.leftNav,.rightRail{position:static}.brandShowcaseWide{grid-template-columns:1fr}.photoQualityPanel,.final{flex-direction:column;align-items:flex-start}.panel{padding:24px;border-radius:28px}h1{font-size:clamp(42px,12vw,64px)}.rightRail{grid-column:auto}}
+      <section className="section" id="how">
+        <div className="sectionTitle">
+          <span>Comment ça marche</span>
+          <h2>Un parcours simple, en quatre étapes.</h2>
+        </div>
 
-        /* V14 Apple-inspired minimal DA + subtle 3D scroll */
-        :root{
-          --apple-bg:#f5f5f7;
-          --apple-white:#ffffff;
-          --apple-ink:#1d1d1f;
-          --apple-muted:#6e6e73;
-          --apple-line:rgba(0,0,0,.075);
-          --apple-blue:#0071e3;
-          --apple-blue-soft:#f0f7ff;
-          --apple-shadow:0 18px 60px rgba(0,0,0,.055);
-          --apple-shadow-strong:0 28px 90px rgba(0,0,0,.09);
+        <div className="steps">
+          {steps.map((step, index) => (
+            <div className="step" key={step}>
+              <strong>{String(index + 1).padStart(2, "0")}</strong>
+              <p>{step}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="trust">
+        <h2>Les bons éléments, présentés simplement.</h2>
+        <p>
+          AutoSouk vous aide à mettre en avant le kilométrage, l’état, le prix,
+          les photos et les documents utiles, sans complexifier le parcours.
+        </p>
+        <Link href="/mandat" className="primary">Commencer</Link>
+      </section>
+
+      <footer className="footer">
+        <Link href="/" className="brand">Auto<span>Souk</span></Link>
+        <p>Vente automobile accompagnée au Maroc.</p>
+      </footer>
+
+      <style jsx>{`
+        * {
+          box-sizing: border-box;
         }
 
-        .page{
-          background:linear-gradient(180deg,#f5f5f7 0%,#ffffff 46%,#f5f5f7 100%)!important;
-          color:var(--apple-ink)!important;
-          font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Arial,sans-serif!important;
-          overflow-x:hidden!important;
+        .home {
+          min-height: 100vh;
+          background: #f5f5f7;
+          color: #1d1d1f;
+          font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Arial, sans-serif;
         }
 
-        .topbar{
-          height:74px!important;
-          background:rgba(245,245,247,.74)!important;
-          backdrop-filter:blur(28px)!important;
-          border-bottom:1px solid rgba(0,0,0,.045)!important;
-          position:sticky!important;
-          top:0!important;
-          z-index:50!important;
+        .nav {
+          max-width: 1180px;
+          height: 76px;
+          margin: 0 auto;
+          padding: 0 28px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
 
-        .logo{
-          color:var(--apple-ink)!important;
-          font-weight:760!important;
-          letter-spacing:-.045em!important;
+        .brand {
+          color: #1d1d1f;
+          text-decoration: none;
+          font-size: 24px;
+          font-weight: 850;
+          letter-spacing: -0.05em;
         }
 
-        .logo span{
-          color:var(--apple-ink)!important;
-          background:none!important;
-          -webkit-background-clip:initial!important;
+        .brand span {
+          color: #0071e3;
         }
 
-        .draft{
-          background:rgba(255,255,255,.72)!important;
-          border:1px solid rgba(0,0,0,.06)!important;
-          color:var(--apple-muted)!important;
-          box-shadow:none!important;
+        .navRight {
+          display: flex;
+          align-items: center;
+          gap: 22px;
         }
 
-        .back{
-          background:var(--apple-ink)!important;
-          color:white!important;
-          box-shadow:0 12px 30px rgba(0,0,0,.14)!important;
+        .navRight a {
+          color: #6e6e73;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 650;
         }
 
-        .hero{
-          padding-top:96px!important;
-          padding-bottom:58px!important;
-          perspective:1200px!important;
+        .navCta {
+          background: #1d1d1f;
+          color: #fff !important;
+          border-radius: 999px;
+          padding: 11px 16px;
         }
 
-        .eyebrow{
-          color:var(--apple-muted)!important;
-          background:transparent!important;
-          border:0!important;
-          box-shadow:none!important;
-          text-transform:none!important;
-          letter-spacing:0!important;
-          font-size:14px!important;
-          padding:0!important;
+        .hero {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 86px 28px 72px;
+          display: grid;
+          grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+          gap: 56px;
+          align-items: center;
         }
 
-        .eyebrow:before{
-          display:none!important;
+        .eyebrow,
+        .sectionTitle span {
+          display: inline-flex;
+          width: max-content;
+          border-radius: 999px;
+          background: #fff;
+          border: 1px solid #e5e5ea;
+          color: #0071e3;
+          padding: 7px 11px;
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.09em;
         }
 
-        h1{
-          font-weight:760!important;
-          letter-spacing:-.075em!important;
-          color:var(--apple-ink)!important;
-          font-size:clamp(56px,7vw,108px)!important;
-          line-height:.94!important;
+        h1 {
+          max-width: 760px;
+          margin: 18px 0;
+          font-size: clamp(48px, 7vw, 86px);
+          line-height: 0.94;
+          letter-spacing: -0.078em;
+          font-weight: 850;
         }
 
-        h1 em{
-          color:var(--apple-blue)!important;
-          background:none!important;
-          -webkit-background-clip:initial!important;
-          font-style:normal!important;
+        .copy p {
+          max-width: 620px;
+          margin: 0;
+          color: #6e6e73;
+          font-size: 20px;
+          line-height: 1.55;
         }
 
-        .hero p{
-          color:var(--apple-muted)!important;
-          font-size:22px!important;
-          line-height:1.45!important;
+        .actions {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-top: 30px;
         }
 
-        .heroGlass,.panel,.leftNav,.marketCard{
-          background:rgba(255,255,255,.84)!important;
-          border:1px solid var(--apple-line)!important;
-          box-shadow:var(--apple-shadow)!important;
-          backdrop-filter:blur(26px)!important;
+        .primary,
+        .secondary {
+          min-height: 48px;
+          border-radius: 999px;
+          padding: 0 20px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          font-weight: 750;
+          font-size: 15px;
         }
 
-        .heroGlass{
-          animation:appleFloatIn .9s ease both!important;
-          transform-style:preserve-3d!important;
+        .primary {
+          background: #0071e3;
+          color: #fff;
         }
 
-        .heroMetric strong{
-          color:var(--apple-ink)!important;
-          background:none!important;
-          -webkit-background-clip:initial!important;
-          font-weight:760!important;
+        .secondary {
+          background: #fff;
+          color: #1d1d1f;
+          border: 1px solid #e5e5ea;
         }
 
-        .track div{
-          background:var(--apple-blue)!important;
+        .card {
+          background: #fff;
+          border: 1px solid #e5e5ea;
+          border-radius: 36px;
+          padding: 26px;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.08);
         }
 
-        .heroList span{
-          background:#f5f5f7!important;
-          border:1px solid rgba(0,0,0,.055)!important;
-          color:#333336!important;
+        .cardHeader {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
         }
 
-        .workspace{
-          perspective:1200px!important;
+        .cardHeader small {
+          display: block;
+          color: #0071e3;
+          font-size: 12px;
+          font-weight: 750;
+          margin-bottom: 7px;
         }
 
-        .leftNav{
-          top:94px!important;
+        .cardHeader strong {
+          display: block;
+          font-size: 24px;
+          letter-spacing: -0.05em;
         }
 
-        .leftNav a{
-          color:var(--apple-muted)!important;
-          transition:transform .18s ease, background .18s ease, color .18s ease!important;
+        .cardHeader p {
+          margin: 6px 0 0;
+          color: #6e6e73;
+          font-size: 14px;
         }
 
-        .leftNav a:hover{
-          background:#f5f5f7!important;
-          color:var(--apple-ink)!important;
-          transform:translateX(3px) translateZ(8px)!important;
+        .cardHeader span {
+          width: 58px;
+          height: 58px;
+          border-radius: 50%;
+          background: #f0f7ff;
+          color: #0071e3;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 850;
+          font-size: 22px;
         }
 
-        .leftNav small,.req,.upload b{
-          color:var(--apple-blue)!important;
+        .vehicle {
+          position: relative;
+          height: 174px;
+          margin: 26px 0;
+          border-radius: 28px;
+          background: linear-gradient(180deg, #f5f7fb, #eef2f7);
+          overflow: hidden;
         }
 
-        .sectionTitle{
-          animation:sectionReveal linear both!important;
-          animation-timeline:view()!important;
-          animation-range:entry 0% cover 28%!important;
+        .body {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 70%;
+          height: 54px;
+          transform: translate(-50%, -35%);
+          border-radius: 70px 80px 34px 34px;
+          background: linear-gradient(135deg, #1d1d1f, #3a3a3c);
         }
 
-        .sectionTitle h2{
-          color:var(--apple-ink)!important;
-          font-weight:760!important;
-          letter-spacing:-.055em!important;
+        .body:before {
+          content: "";
+          position: absolute;
+          left: 24%;
+          top: -35px;
+          width: 38%;
+          height: 42px;
+          border-radius: 42px 42px 8px 8px;
+          background: #3a3a3c;
+          transform: skewX(-16deg);
         }
 
-        .sectionTitle p{
-          color:var(--apple-muted)!important;
+        .wheel {
+          position: absolute;
+          bottom: 49px;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: #111;
+          border: 6px solid #555;
         }
 
-        input,select,textarea{
-          background:#f5f5f7!important;
-          border:1px solid rgba(0,0,0,.08)!important;
-          border-radius:16px!important;
-          color:var(--apple-ink)!important;
-          transition:border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease!important;
+        .wheel.left {
+          left: 28%;
         }
 
-        input:hover,select:hover,textarea:hover{
-          background:#fff!important;
-          border-color:rgba(0,113,227,.32)!important;
+        .wheel.right {
+          right: 28%;
         }
 
-        input:focus,select:focus,textarea:focus{
-          background:#fff!important;
-          border-color:var(--apple-blue)!important;
-          box-shadow:0 0 0 4px rgba(0,113,227,.16)!important;
-          transform:translateY(-1px)!important;
+        .meta {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
         }
 
-        .brandShowcaseWide,.priceBox,.upload,.optionBlock,.field{
-          animation:cardReveal linear both!important;
-          animation-timeline:view()!important;
-          animation-range:entry 0% cover 22%!important;
+        .meta div {
+          background: #f5f5f7;
+          border-radius: 18px;
+          padding: 13px;
         }
 
-        .brandShowcaseWide{
-          background:linear-gradient(180deg,#fff,#f5f5f7)!important;
-          border:1px solid var(--apple-line)!important;
-          box-shadow:var(--apple-shadow)!important;
-          transform-style:preserve-3d!important;
+        .meta small {
+          display: block;
+          color: #86868b;
+          font-size: 11px;
+          margin-bottom: 4px;
         }
 
-        .brandLogoSlot{
-          background:#fff!important;
-          box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 12px 32px rgba(0,0,0,.045)!important;
-          transform:translateZ(18px)!important;
+        .meta b {
+          font-size: 13px;
+          letter-spacing: -0.02em;
         }
 
-        .brandFallback{
-          background:var(--apple-ink)!important;
-          color:#fff!important;
+        .badges {
+          margin-top: 14px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
         }
 
-        .brandPngLogo{
-          transition:transform .22s ease!important;
+        .badges span {
+          background: #f0f7ff;
+          color: #0071e3;
+          border-radius: 999px;
+          padding: 7px 10px;
+          font-size: 12px;
+          font-weight: 750;
         }
 
-        .brandPngLogo:hover{
-          transform:scale(1.04) rotateX(3deg)!important;
+        .section {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 56px 28px;
         }
 
-        .pill,.optionItem,.colorItem,.priceBox,.upload,.preview,.check{
-          background:#fff!important;
-          border:1px solid rgba(0,0,0,.08)!important;
-          box-shadow:0 8px 30px rgba(0,0,0,.035)!important;
-          transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease!important;
-          transform-style:preserve-3d!important;
+        .sectionTitle {
+          max-width: 720px;
+          margin-bottom: 24px;
         }
 
-        .pill:hover,.optionItem:hover,.colorItem:hover,.upload:hover{
-          transform:translateY(-3px) rotateX(2deg)!important;
-          border-color:rgba(0,113,227,.30)!important;
-          box-shadow:0 18px 54px rgba(0,0,0,.075)!important;
+        .sectionTitle h2,
+        .trust h2 {
+          margin: 14px 0 0;
+          font-size: clamp(34px, 4.5vw, 56px);
+          line-height: 1;
+          letter-spacing: -0.065em;
+          font-weight: 850;
         }
 
-        .optionItem.selected,.colorGrid.hasSelection .colorItem.selected,.customOtherBox.active{
-          background:var(--apple-blue-soft)!important;
-          border-color:var(--apple-blue)!important;
-          box-shadow:0 16px 40px rgba(0,113,227,.12)!important;
+        .benefits {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
         }
 
-        .colorGrid.hasSelection .colorItem{
-          opacity:.30!important;
-          filter:grayscale(.9)!important;
+        .benefits article,
+        .step {
+          background: #fff;
+          border: 1px solid #e5e5ea;
+          border-radius: 26px;
+          padding: 22px;
+          box-shadow: 0 14px 36px rgba(0, 0, 0, 0.04);
         }
 
-        .colorGrid.hasSelection .colorItem.selected{
-          opacity:1!important;
-          filter:none!important;
+        .benefits h3 {
+          margin: 0 0 10px;
+          font-size: 20px;
+          letter-spacing: -0.04em;
         }
 
-        .colorItem.selected:after{
-          background:var(--apple-blue)!important;
-          color:white!important;
+        .benefits p,
+        .trust p {
+          margin: 0;
+          color: #6e6e73;
+          font-size: 15px;
+          line-height: 1.55;
         }
 
-        .critical{
-          background:#fff5f5!important;
-          border:1px solid rgba(180,35,24,.18)!important;
-          color:#b42318!important;
+        .steps {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
         }
 
-        .priceBoxMain{
-          background:#fff!important;
-          border:2px solid var(--apple-blue)!important;
-          box-shadow:0 24px 70px rgba(0,113,227,.16)!important;
+        .step strong {
+          display: inline-flex;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: #0071e3;
+          color: #fff;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          margin-bottom: 18px;
         }
 
-        .priceBadge,.final button,.barTrack div{
-          background:var(--apple-blue)!important;
-          color:white!important;
+        .step p {
+          margin: 0;
+          font-weight: 700;
+          line-height: 1.4;
+          letter-spacing: -0.02em;
         }
 
-        .moneyInput span{
-          background:#f5f5f7!important;
-          color:var(--apple-muted)!important;
+        .trust {
+          max-width: 980px;
+          margin: 56px auto;
+          padding: 56px 28px;
+          text-align: center;
         }
 
-        .photoQualityPanel{
-          background:#fff!important;
-          border:1px solid rgba(0,0,0,.07)!important;
-          box-shadow:var(--apple-shadow)!important;
+        .trust p {
+          max-width: 620px;
+          margin: 16px auto 24px;
         }
 
-        .photoQualityPanel p{
-          color:var(--apple-muted)!important;
+        .footer {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 28px;
+          border-top: 1px solid #e5e5ea;
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
+          color: #86868b;
         }
 
-        .photoQualityPanel span,.marketIdentity,.final{
-          background:var(--apple-ink)!important;
-          color:white!important;
+        .footer p {
+          margin: 0;
         }
 
-        .photoGuideImage{
-          background:#f5f5f7!important;
-          border:1px solid rgba(0,0,0,.06)!important;
-        }
+        @media (max-width: 980px) {
+          .navRight a:not(.navCta) {
+            display: none;
+          }
 
-        .marketHeader b{
-          color:var(--apple-blue)!important;
-          background:var(--apple-blue-soft)!important;
-        }
+          .hero {
+            grid-template-columns: 1fr;
+            padding-top: 54px;
+          }
 
-        .marketStats div{
-          background:#f5f5f7!important;
-          border:1px solid rgba(0,0,0,.06)!important;
-        }
+          .benefits,
+          .steps {
+            grid-template-columns: 1fr;
+          }
 
-        .marketStats small,.sourceNote{
-          color:var(--apple-muted)!important;
-        }
-
-        .barTrack{
-          background:#e8e8ed!important;
-        }
-
-        .signal.green{background:#f0faf4!important;color:#2d8653!important}
-        .signal.red{background:#fff5f5!important;color:#b42318!important}
-        .signal.black{background:#f5f5f7!important;color:#1d1d1f!important}
-        .signal.neutral{background:#f5f5f7!important;color:#6e6e73!important}
-
-        @keyframes appleFloatIn{
-          from{opacity:0;transform:translateY(24px) rotateX(8deg) scale(.98)}
-          to{opacity:1;transform:translateY(0) rotateX(0) scale(1)}
-        }
-
-        @keyframes cardReveal{
-          from{opacity:.25;transform:translateY(34px) rotateX(7deg) scale(.985)}
-          to{opacity:1;transform:translateY(0) rotateX(0) scale(1)}
-        }
-
-        @keyframes sectionReveal{
-          from{opacity:.35;transform:translateY(26px)}
-          to{opacity:1;transform:translateY(0)}
-        }
-
-        @supports not (animation-timeline:view()){
-          .sectionTitle,.field,.optionBlock,.priceBox,.upload,.brandShowcaseWide{
-            animation:none!important;
+          .card {
+            max-width: 560px;
           }
         }
 
-        @media(max-width:900px){
-          .draft{display:none!important}
-          h1{font-size:clamp(44px,12vw,68px)!important}
-        }
-
-
-        .fieldHint{display:block;color:#6e6e73;font-size:11px;line-height:1.4;margin-top:-2px}
-
-
-        .mileageGaugeBox{display:grid;gap:12px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:22px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.035)}
-        .mileageGaugeTop{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;color:#6e6e73;font-size:11px;font-weight:650}
-        .mileageGaugeTop strong{font-size:18px;color:#1d1d1f;letter-spacing:-.03em;text-align:center}
-        .mileageGaugeTop span:last-child{text-align:right}
-        .mileageRange{padding:0!important;min-height:28px!important;background:transparent!important;border:0!important;box-shadow:none!important;accent-color:#0071e3}
-        .mileagePrecise{min-height:46px!important;border-radius:14px!important;font-size:13px!important}
-
-
-        .pricingGridExact{grid-template-columns:minmax(0,.92fr) minmax(0,1.24fr) minmax(0,.92fr)!important;align-items:stretch!important}
-        .priceBoxMinimum{transform:scale(.97);transform-origin:center}
-        .priceBoxDesired{transform:translateY(-8px) scale(1.03)!important;z-index:2;border:2px solid var(--apple-blue)!important;background:#fff!important;box-shadow:0 24px 70px rgba(0,113,227,.16)!important}
-        .priceBoxDesired .priceLabel{font-size:18px!important}
-        .moneyInputDesired input{font-size:31px!important;font-weight:760!important}
-        .priceBoxInstantExact{position:relative;border:1.6px dashed rgba(0,0,0,.25)!important;background:#fff!important;overflow:hidden}
-        .priceBoxInstantExact.instantEnabled{border-color:rgba(0,113,227,.42)!important}
-        .priceBoxInstantExact.instantLocked{border:2px solid #2d8653!important;background:#f0faf4!important;box-shadow:0 22px 62px rgba(45,134,83,.16)!important}
-        .instantHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-        .instantHeader small{display:block;color:#6e6e73;font-size:11px;margin-top:3px}
-        .instantCornerCheck{width:30px;height:30px;border-radius:999px;background:#2d8653;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;box-shadow:0 10px 28px rgba(45,134,83,.28)}
-        .instantEnableLine,.instantCommitLine{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.4;color:#6e6e73;font-weight:650}
-        .instantEnableLine input,.instantCommitLine input{width:auto!important;min-height:auto!important;margin-top:2px}
-        .instantCommitLine{background:#f0faf4;border:1px solid rgba(45,134,83,.20);border-radius:14px;padding:10px;color:#2d8653}
-        .instantCommitLine.locked{opacity:.92}
-        .priceInvalid{border-color:#b42318!important;background:#fff5f5!important}
-        .priceInvalid input::placeholder{color:#b42318!important;opacity:1;font-size:12px}
-        .priceError{color:#b42318;font-size:12px;font-weight:700;margin-top:-2px}
-        .shakeField{animation:shakePrice .34s ease}
-        .instantFlyingCheck{position:absolute;left:50%;top:50%;width:58px;height:58px;border-radius:50%;background:#2d8653;color:white;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:950;animation:instantCheckTravel .9s cubic-bezier(.16,.84,.28,1) forwards;pointer-events:none;z-index:5}
-        @keyframes shakePrice{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-        @keyframes instantCheckTravel{0%{opacity:0;transform:translate(-50%,-50%) scale(.18)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}100%{opacity:1;transform:translate(calc(-50% + 128px),calc(-50% - 108px)) scale(.38)}}
-        @media(max-width:1280px){.pricingGridExact{grid-template-columns:1fr!important}.priceBoxMinimum,.priceBoxDesired{transform:none!important}}
-
-
-        /* V19 - Pricing section: 3 horizontal square cards */
-        .pricingGridExact{
-          display:grid!important;
-          grid-template-columns:repeat(3,minmax(0,1fr))!important;
-          gap:20px!important;
-          align-items:stretch!important;
-          width:100%!important;
-        }
-
-        .pricingGridExact .priceBox{
-          aspect-ratio:1 / 1!important;
-          min-height:270px!important;
-          height:auto!important;
-          display:flex!important;
-          flex-direction:column!important;
-          justify-content:space-between!important;
-          padding:22px!important;
-        }
-
-        .pricingGridExact .priceBoxMinimum{
-          transform:none!important;
-        }
-
-        .pricingGridExact .priceBoxDesired{
-          transform:none!important;
-          scale:1.035;
-          z-index:2;
-        }
-
-        .pricingGridExact .priceBoxInstantExact{
-          transform:none!important;
-        }
-
-        .pricingGridExact .moneyInput{
-          min-height:58px!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput{
-          min-height:70px!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput input{
-          font-size:30px!important;
-        }
-
-        @media(max-width:1280px){
-          .pricingGridExact{
-            grid-template-columns:repeat(3,minmax(0,1fr))!important;
-          }
-          .pricingGridExact .priceBoxMinimum,
-          .pricingGridExact .priceBoxDesired,
-          .pricingGridExact .priceBoxInstantExact{
-            transform:none!important;
-          }
-        }
-
-        @media(max-width:760px){
-          .pricingGridExact{
-            grid-template-columns:1fr!important;
-          }
-          .pricingGridExact .priceBox{
-            aspect-ratio:auto!important;
-            min-height:auto!important;
-          }
-          .pricingGridExact .priceBoxDesired{
-            scale:1!important;
-          }
-        }
-
-
-        /* V20 - Pricing typography polish + single animated check */
-        .pricingGridExact{
-          gap:18px!important;
-        }
-
-        .pricingGridExact .priceBox{
-          min-height:255px!important;
-          padding:20px!important;
-          border-radius:28px!important;
-        }
-
-        .pricingGridExact .priceLabel{
-          font-size:17px!important;
-          line-height:1.18!important;
-          letter-spacing:-.025em!important;
-          font-weight:740!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .priceLabel{
-          font-size:18px!important;
-          line-height:1.15!important;
-        }
-
-        .pricingGridExact .priceBadge{
-          font-size:11px!important;
-          padding:7px 11px!important;
-          margin-bottom:2px!important;
-        }
-
-        .pricingGridExact .moneyInput{
-          min-height:52px!important;
-          border-radius:18px!important;
-        }
-
-        .pricingGridExact .moneyInput input{
-          font-size:22px!important;
-          line-height:1!important;
-          padding:12px 14px!important;
-          font-weight:720!important;
-        }
-
-        .pricingGridExact .moneyInput span{
-          font-size:11px!important;
-          padding:0 12px!important;
-          letter-spacing:.02em!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput{
-          min-height:58px!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput input{
-          font-size:28px!important;
-          font-weight:740!important;
-        }
-
-        .pricingGridExact .priceBox p{
-          font-size:15px!important;
-          line-height:1.42!important;
-          margin:8px 0 0!important;
-          color:#6e6e73!important;
-        }
-
-        .priceBoxMinimum p,
-        .priceBoxDesired p{
-          font-size:15px!important;
-        }
-
-        .instantHeader{
-          min-height:42px!important;
-        }
-
-        .instantHeader small{
-          font-size:12px!important;
-          line-height:1.2!important;
-        }
-
-        .instantEnableLine,
-        .instantCommitLine{
-          font-size:12px!important;
-          line-height:1.32!important;
-          gap:8px!important;
-        }
-
-        .instantCommitLine{
-          padding:9px 10px!important;
-          border-radius:13px!important;
-        }
-
-        .instantCornerCheck{
-          display:none!important;
-        }
-
-        .priceBoxInstantExact.instantLocked{
-          position:relative!important;
-        }
-
-        .instantFlyingCheck{
-          position:absolute!important;
-          left:50%!important;
-          top:50%!important;
-          width:60px!important;
-          height:60px!important;
-          border-radius:50%!important;
-          background:#2d8653!important;
-          color:#fff!important;
-          display:flex!important;
-          align-items:center!important;
-          justify-content:center!important;
-          font-size:34px!important;
-          font-weight:900!important;
-          z-index:8!important;
-          pointer-events:none!important;
-          animation:singleCheckTravel .9s cubic-bezier(.16,.84,.28,1) forwards!important;
-          box-shadow:0 18px 45px rgba(45,134,83,.28)!important;
-        }
-
-        @keyframes singleCheckTravel{
-          0%{
-            opacity:0;
-            transform:translate(-50%,-50%) scale(.25);
-          }
-          18%{
-            opacity:1;
-            transform:translate(-50%,-50%) scale(1.18);
-          }
-          72%{
-            opacity:1;
-          }
-          100%{
-            opacity:1;
-            left:calc(100% - 26px);
-            top:28px;
-            transform:translate(-50%,-50%) scale(.72);
-          }
-        }
-
-        @media(max-width:1280px){
-          .pricingGridExact .priceBox{
-            min-height:245px!important;
-          }
-        }
-
-        @media(max-width:760px){
-          .pricingGridExact .priceBox{
-            min-height:auto!important;
-          }
-          .pricingGridExact .priceBoxDesired .moneyInput input{
-            font-size:24px!important;
-          }
-        }
-
-
-        /* V21 - Pricing amount font reduced + reliable check travel */
-        .pricingGridExact .moneyInput input{
-          font-size:19px!important;
-          font-weight:700!important;
-          letter-spacing:-.02em!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput input{
-          font-size:22px!important;
-          font-weight:720!important;
-          letter-spacing:-.025em!important;
-        }
-
-        .pricingGridExact .moneyInput span{
-          font-size:10px!important;
-          padding:0 10px!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput{
-          min-height:56px!important;
-        }
-
-        .pricingGridExact .moneyInput{
-          min-height:50px!important;
-        }
-
-        .instantFlyingCheck{
-          left:auto!important;
-          top:18px!important;
-          right:18px!important;
-          width:42px!important;
-          height:42px!important;
-          font-size:26px!important;
-          transform-origin:center!important;
-          animation:singleCheckTravelV21 .95s cubic-bezier(.16,.84,.28,1) forwards!important;
-        }
-
-        @keyframes singleCheckTravelV21{
-          0%{
-            opacity:0;
-            transform:translate(-145px,115px) scale(.30);
-          }
-          18%{
-            opacity:1;
-            transform:translate(-145px,115px) scale(1.75);
-          }
-          55%{
-            opacity:1;
-            transform:translate(-68px,55px) scale(1.15);
-          }
-          100%{
-            opacity:1;
-            transform:translate(0,0) scale(1);
-          }
-        }
-
-        @media(max-width:760px){
-          .pricingGridExact .moneyInput input,
-          .pricingGridExact .priceBoxDesired .moneyInput input{
-            font-size:20px!important;
-          }
-          .instantFlyingCheck{
-            right:16px!important;
-            top:16px!important;
-          }
-        }
-
-
-        /* V22 - Smaller amount typography + smaller final check top-right */
-        .pricingGridExact .moneyInput input{
-          font-size:16px!important;
-          font-weight:600!important;
-          letter-spacing:-.01em!important;
-        }
-
-        .pricingGridExact .moneyInput input::placeholder{
-          font-size:14px!important;
-          font-weight:500!important;
-          color:#86868b!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput input{
-          font-size:18px!important;
-          font-weight:620!important;
-          letter-spacing:-.015em!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput input::placeholder{
-          font-size:15px!important;
-          font-weight:500!important;
-          color:#86868b!important;
-        }
-
-        .pricingGridExact .moneyInput span{
-          font-size:9px!important;
-          font-weight:650!important;
-          padding:0 9px!important;
-        }
-
-        .pricingGridExact .moneyInput{
-          min-height:46px!important;
-        }
-
-        .pricingGridExact .priceBoxDesired .moneyInput{
-          min-height:50px!important;
-        }
-
-        .instantFlyingCheck{
-          right:10px!important;
-          top:10px!important;
-          width:24px!important;
-          height:24px!important;
-          font-size:15px!important;
-          line-height:1!important;
-          box-shadow:0 8px 18px rgba(45,134,83,.22)!important;
-          animation:singleCheckTravelV22 .95s cubic-bezier(.16,.84,.28,1) forwards!important;
-        }
-
-        @keyframes singleCheckTravelV22{
-          0%{
-            opacity:0;
-            transform:translate(-165px,135px) scale(.35);
-          }
-          18%{
-            opacity:1;
-            transform:translate(-165px,135px) scale(3.00);
-          }
-          58%{
-            opacity:1;
-            transform:translate(-72px,58px) scale(1.55);
-          }
-          100%{
-            opacity:1;
-            transform:translate(0,0) scale(1);
-          }
-        }
-
-        @media(max-width:760px){
-          .pricingGridExact .moneyInput input,
-          .pricingGridExact .priceBoxDesired .moneyInput input{
-            font-size:17px!important;
+        @media (max-width: 640px) {
+          .nav,
+          .hero,
+          .section,
+          .trust,
+          .footer {
+            padding-left: 18px;
+            padding-right: 18px;
           }
 
-          .instantFlyingCheck{
-            right:10px!important;
-            top:10px!important;
-            width:24px!important;
-            height:24px!important;
-            font-size:15px!important;
-          }
-        }
-
-
-        /* V23 - Smooth immediate-price check animation + no negative price UX */
-        .instantFlyingCheck{
-          will-change:transform, opacity!important;
-          animation:singleCheckTravelV23 1.18s cubic-bezier(.22,1,.36,1) forwards!important;
-        }
-
-        @keyframes singleCheckTravelV23{
-          0%{
-            opacity:0;
-            transform:translate3d(-165px,135px,0) scale(.32);
-          }
-          12%{
-            opacity:1;
-            transform:translate3d(-165px,135px,0) scale(2.85);
-          }
-          34%{
-            opacity:1;
-            transform:translate3d(-132px,108px,0) scale(2.35);
-          }
-          56%{
-            opacity:1;
-            transform:translate3d(-86px,70px,0) scale(1.70);
-          }
-          78%{
-            opacity:1;
-            transform:translate3d(-34px,28px,0) scale(1.18);
-          }
-          100%{
-            opacity:1;
-            transform:translate3d(0,0,0) scale(1);
-          }
-        }
-
-        .pricingGridExact input[type="number"]{
-          appearance:textfield;
-          -moz-appearance:textfield;
-        }
-
-        .pricingGridExact input[type="number"]::-webkit-outer-spin-button,
-        .pricingGridExact input[type="number"]::-webkit-inner-spin-button{
-          -webkit-appearance:none;
-          margin:0;
-        }
-
-
-        /* V24 - Ultra smooth 100-step check animation */
-        .instantFlyingCheck{
-          will-change:transform, opacity!important;
-          animation:singleCheckTravelV24 1.35s linear forwards!important;
-          transform:translate3d(-165px,135px,0) scale(.32);
-        }
-
-        @keyframes singleCheckTravelV24{
-          0%{opacity:0.000;transform:translate3d(-165.00px,135.00px,0) scale(0.320);}
-          1%{opacity:0.125;transform:translate3d(-160.10px,130.99px,0) scale(0.478);}
-          2%{opacity:0.250;transform:translate3d(-155.30px,127.06px,0) scale(0.636);}
-          3%{opacity:0.375;transform:translate3d(-150.59px,123.21px,0) scale(0.794);}
-          4%{opacity:0.500;transform:translate3d(-145.98px,119.44px,0) scale(0.953);}
-          5%{opacity:0.625;transform:translate3d(-141.47px,115.75px,0) scale(1.111);}
-          6%{opacity:0.750;transform:translate3d(-137.05px,112.13px,0) scale(1.269);}
-          7%{opacity:0.875;transform:translate3d(-132.72px,108.59px,0) scale(1.427);}
-          8%{opacity:1.000;transform:translate3d(-128.48px,105.12px,0) scale(1.585);}
-          9%{opacity:1.000;transform:translate3d(-124.34px,101.73px,0) scale(1.743);}
-          10%{opacity:1.000;transform:translate3d(-120.29px,98.42px,0) scale(1.901);}
-          11%{opacity:1.000;transform:translate3d(-116.32px,95.17px,0) scale(2.059);}
-          12%{opacity:1.000;transform:translate3d(-112.44px,92.00px,0) scale(2.218);}
-          13%{opacity:1.000;transform:translate3d(-108.65px,88.90px,0) scale(2.376);}
-          14%{opacity:1.000;transform:translate3d(-104.95px,85.87px,0) scale(2.534);}
-          15%{opacity:1.000;transform:translate3d(-101.33px,82.91px,0) scale(2.692);}
-          16%{opacity:1.000;transform:translate3d(-97.80px,80.02px,0) scale(2.850);}
-          17%{opacity:1.000;transform:translate3d(-94.34px,77.19px,0) scale(2.785);}
-          18%{opacity:1.000;transform:translate3d(-90.98px,74.43px,0) scale(2.721);}
-          19%{opacity:1.000;transform:translate3d(-87.69px,71.74px,0) scale(2.659);}
-          20%{opacity:1.000;transform:translate3d(-84.48px,69.12px,0) scale(2.598);}
-          21%{opacity:1.000;transform:translate3d(-81.35px,66.56px,0) scale(2.539);}
-          22%{opacity:1.000;transform:translate3d(-78.30px,64.06px,0) scale(2.481);}
-          23%{opacity:1.000;transform:translate3d(-75.33px,61.63px,0) scale(2.425);}
-          24%{opacity:1.000;transform:translate3d(-72.43px,59.26px,0) scale(2.370);}
-          25%{opacity:1.000;transform:translate3d(-69.61px,56.95px,0) scale(2.317);}
-          26%{opacity:1.000;transform:translate3d(-66.86px,54.71px,0) scale(2.265);}
-          27%{opacity:1.000;transform:translate3d(-64.19px,52.52px,0) scale(2.214);}
-          28%{opacity:1.000;transform:translate3d(-61.59px,50.39px,0) scale(2.165);}
-          29%{opacity:1.000;transform:translate3d(-59.06px,48.32px,0) scale(2.117);}
-          30%{opacity:1.000;transform:translate3d(-56.59px,46.30px,0) scale(2.071);}
-          31%{opacity:1.000;transform:translate3d(-54.20px,44.35px,0) scale(2.025);}
-          32%{opacity:1.000;transform:translate3d(-51.88px,42.45px,0) scale(1.981);}
-          33%{opacity:1.000;transform:translate3d(-49.63px,40.60px,0) scale(1.939);}
-          34%{opacity:1.000;transform:translate3d(-47.44px,38.81px,0) scale(1.897);}
-          35%{opacity:1.000;transform:translate3d(-45.31px,37.07px,0) scale(1.857);}
-          36%{opacity:1.000;transform:translate3d(-43.25px,35.39px,0) scale(1.818);}
-          37%{opacity:1.000;transform:translate3d(-41.26px,33.76px,0) scale(1.780);}
-          38%{opacity:1.000;transform:translate3d(-39.32px,32.17px,0) scale(1.744);}
-          39%{opacity:1.000;transform:translate3d(-37.45px,30.64px,0) scale(1.708);}
-          40%{opacity:1.000;transform:translate3d(-35.64px,29.16px,0) scale(1.674);}
-          41%{opacity:1.000;transform:translate3d(-33.89px,27.73px,0) scale(1.641);}
-          42%{opacity:1.000;transform:translate3d(-32.19px,26.34px,0) scale(1.609);}
-          43%{opacity:1.000;transform:translate3d(-30.56px,25.00px,0) scale(1.578);}
-          44%{opacity:1.000;transform:translate3d(-28.98px,23.71px,0) scale(1.548);}
-          45%{opacity:1.000;transform:translate3d(-27.45px,22.46px,0) scale(1.519);}
-          46%{opacity:1.000;transform:translate3d(-25.98px,21.26px,0) scale(1.491);}
-          47%{opacity:1.000;transform:translate3d(-24.56px,20.10px,0) scale(1.465);}
-          48%{opacity:1.000;transform:translate3d(-23.20px,18.98px,0) scale(1.439);}
-          49%{opacity:1.000;transform:translate3d(-21.89px,17.91px,0) scale(1.414);}
-          50%{opacity:1.000;transform:translate3d(-20.62px,16.88px,0) scale(1.390);}
-          51%{opacity:1.000;transform:translate3d(-19.41px,15.88px,0) scale(1.367);}
-          52%{opacity:1.000;transform:translate3d(-18.25px,14.93px,0) scale(1.345);}
-          53%{opacity:1.000;transform:translate3d(-17.13px,14.02px,0) scale(1.324);}
-          54%{opacity:1.000;transform:translate3d(-16.06px,13.14px,0) scale(1.304);}
-          55%{opacity:1.000;transform:translate3d(-15.04px,12.30px,0) scale(1.284);}
-          56%{opacity:1.000;transform:translate3d(-14.06px,11.50px,0) scale(1.266);}
-          57%{opacity:1.000;transform:translate3d(-13.12px,10.73px,0) scale(1.248);}
-          58%{opacity:1.000;transform:translate3d(-12.22px,10.00px,0) scale(1.231);}
-          59%{opacity:1.000;transform:translate3d(-11.37px,9.30px,0) scale(1.215);}
-          60%{opacity:1.000;transform:translate3d(-10.56px,8.64px,0) scale(1.200);}
-          61%{opacity:1.000;transform:translate3d(-9.79px,8.01px,0) scale(1.185);}
-          62%{opacity:1.000;transform:translate3d(-9.05px,7.41px,0) scale(1.171);}
-          63%{opacity:1.000;transform:translate3d(-8.36px,6.84px,0) scale(1.158);}
-          64%{opacity:1.000;transform:translate3d(-7.70px,6.30px,0) scale(1.146);}
-          65%{opacity:1.000;transform:translate3d(-7.07px,5.79px,0) scale(1.134);}
-          66%{opacity:1.000;transform:translate3d(-6.49px,5.31px,0) scale(1.123);}
-          67%{opacity:1.000;transform:translate3d(-5.93px,4.85px,0) scale(1.112);}
-          68%{opacity:1.000;transform:translate3d(-5.41px,4.42px,0) scale(1.102);}
-          69%{opacity:1.000;transform:translate3d(-4.92px,4.02px,0) scale(1.093);}
-          70%{opacity:1.000;transform:translate3d(-4.46px,3.65px,0) scale(1.084);}
-          71%{opacity:1.000;transform:translate3d(-4.02px,3.29px,0) scale(1.076);}
-          72%{opacity:1.000;transform:translate3d(-3.62px,2.96px,0) scale(1.069);}
-          73%{opacity:1.000;transform:translate3d(-3.25px,2.66px,0) scale(1.061);}
-          74%{opacity:1.000;transform:translate3d(-2.90px,2.37px,0) scale(1.055);}
-          75%{opacity:1.000;transform:translate3d(-2.58px,2.11px,0) scale(1.049);}
-          76%{opacity:1.000;transform:translate3d(-2.28px,1.87px,0) scale(1.043);}
-          77%{opacity:1.000;transform:translate3d(-2.01px,1.64px,0) scale(1.038);}
-          78%{opacity:1.000;transform:translate3d(-1.76px,1.44px,0) scale(1.033);}
-          79%{opacity:1.000;transform:translate3d(-1.53px,1.25px,0) scale(1.029);}
-          80%{opacity:1.000;transform:translate3d(-1.32px,1.08px,0) scale(1.025);}
-          81%{opacity:1.000;transform:translate3d(-1.13px,0.93px,0) scale(1.021);}
-          82%{opacity:1.000;transform:translate3d(-0.96px,0.79px,0) scale(1.018);}
-          83%{opacity:1.000;transform:translate3d(-0.81px,0.66px,0) scale(1.015);}
-          84%{opacity:1.000;transform:translate3d(-0.68px,0.55px,0) scale(1.013);}
-          85%{opacity:1.000;transform:translate3d(-0.56px,0.46px,0) scale(1.011);}
-          86%{opacity:1.000;transform:translate3d(-0.45px,0.37px,0) scale(1.009);}
-          87%{opacity:1.000;transform:translate3d(-0.36px,0.30px,0) scale(1.007);}
-          88%{opacity:1.000;transform:translate3d(-0.29px,0.23px,0) scale(1.005);}
-          89%{opacity:1.000;transform:translate3d(-0.22px,0.18px,0) scale(1.004);}
-          90%{opacity:1.000;transform:translate3d(-0.16px,0.13px,0) scale(1.003);}
-          91%{opacity:1.000;transform:translate3d(-0.12px,0.10px,0) scale(1.002);}
-          92%{opacity:1.000;transform:translate3d(-0.08px,0.07px,0) scale(1.002);}
-          93%{opacity:1.000;transform:translate3d(-0.06px,0.05px,0) scale(1.001);}
-          94%{opacity:1.000;transform:translate3d(-0.04px,0.03px,0) scale(1.001);}
-          95%{opacity:1.000;transform:translate3d(-0.02px,0.02px,0) scale(1.000);}
-          96%{opacity:1.000;transform:translate3d(-0.01px,0.01px,0) scale(1.000);}
-          97%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
-          98%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
-          99%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
-          100%{opacity:1.000;transform:translate3d(0.00px,0.00px,0) scale(1.000);}
-        }
-
-
-        /* V25 - Premium experience: live preview, scoring, photo validation */
-        .livePreviewCard,.qualityCard{
-          border-radius:34px;
-          background:rgba(255,255,255,.84);
-          border:1px solid rgba(0,0,0,.06);
-          box-shadow:0 18px 60px rgba(0,0,0,.055);
-          overflow:hidden;
-          margin-bottom:18px;
-          backdrop-filter:blur(24px);
-        }
-
-        .livePreviewMedia{
-          height:168px;
-          background:#f5f5f7;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-        }
-
-        .livePreviewMedia img{
-          width:100%;
-          height:100%;
-          object-fit:cover;
-        }
-
-        .livePreviewEmpty{
-          color:#86868b;
-          font-size:13px;
-          font-weight:650;
-        }
-
-        .livePreviewBody{
-          padding:18px;
-          display:grid;
-          gap:8px;
-        }
-
-        .livePreviewBrand{
-          display:flex;
-          align-items:center;
-          gap:9px;
-          color:#6e6e73;
-          font-size:13px;
-          font-weight:650;
-        }
-
-        .livePreviewBrand img{
-          width:24px;
-          height:24px;
-          object-fit:contain;
-        }
-
-        .livePreviewBody strong{
-          font-size:20px;
-          letter-spacing:-.04em;
-        }
-
-        .livePreviewBody p{
-          margin:0;
-          color:#6e6e73;
-          font-size:13px;
-          line-height:1.45;
-        }
-
-        .livePreviewBody b{
-          font-size:22px;
-          letter-spacing:-.04em;
-        }
-
-        .verifiedMini{
-          width:max-content;
-          background:#f0faf4;
-          color:#2d8653;
-          border:1px solid rgba(45,134,83,.18);
-          border-radius:999px;
-          padding:6px 9px;
-          font-size:11px;
-          font-weight:760;
-        }
-
-        .qualityCard{
-          padding:18px;
-        }
-
-        .qualityHeader{
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:12px;
-        }
-
-        .qualityHeader span{
-          color:#6e6e73;
-          font-size:13px;
-          font-weight:650;
-        }
-
-        .qualityHeader strong{
-          font-size:28px;
-          letter-spacing:-.05em;
-        }
-
-        .qualityTrack{
-          height:9px;
-          background:#e8e8ed;
-          border-radius:999px;
-          overflow:hidden;
-          margin:12px 0;
-        }
-
-        .qualityTrack div{
-          height:100%;
-          background:#0071e3;
-          border-radius:999px;
-        }
-
-        .qualityCard b{
-          display:block;
-          font-size:16px;
-          margin-bottom:4px;
-        }
-
-        .qualityCard p{
-          margin:0;
-          color:#6e6e73;
-          font-size:12px;
-          line-height:1.45;
-        }
-
-        .recommendedBox{
-          background:#f0f7ff;
-          border:1px solid rgba(0,113,227,.14);
-          border-radius:18px;
-          padding:13px;
-          margin-bottom:14px;
-          display:grid;
-          gap:4px;
-        }
-
-        .recommendedBox small{
-          color:#0071e3;
-          font-size:10px;
-          text-transform:uppercase;
-          font-weight:760;
-          letter-spacing:.04em;
-        }
-
-        .recommendedBox strong{
-          font-size:17px;
-          letter-spacing:-.03em;
-        }
-
-        .recommendedBox span{
-          color:#6e6e73;
-          font-size:12px;
-        }
-
-        .photoAdded{
-          display:inline-flex;
-          width:max-content;
-          background:#f0faf4!important;
-          color:#2d8653!important;
-          border:1px solid rgba(45,134,83,.18)!important;
-          border-radius:999px;
-          padding:5px 9px;
-          font-size:11px;
-          font-style:normal;
-          font-weight:760;
-        }
-
-        .finalReview{
-          margin-top:36px;
-          border-radius:34px;
-          background:#1d1d1f;
-          box-shadow:0 30px 90px rgba(0,0,0,.20);
-          color:white;
-          padding:26px;
-          display:flex;
-          justify-content:space-between;
-          gap:24px;
-          align-items:flex-start;
-        }
-
-        .finalReview p{
-          color:rgba(255,255,255,.64);
-          margin:6px 0 0;
-        }
-
-        .finalReview ul{
-          margin:14px 0 0;
-          padding-left:18px;
-          color:rgba(255,255,255,.78);
-          line-height:1.6;
-          font-size:13px;
-        }
-
-        .finalReview button{
-          background:#0071e3;
-          color:white;
-          border:0;
-          border-radius:999px;
-          padding:16px 24px;
-          font-weight:760;
-          white-space:nowrap;
-        }
-
-        @media(max-width:900px){
-          .finalReview{
-            flex-direction:column;
-          }
-        }
-
-
-        /* V27 - Build-safe true multi-step journey */
-        .stepPanel{min-height:680px}
-        .stepHeader{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid rgba(0,0,0,.06)}
-        .stepHeader span{color:#0071e3;font-size:12px;font-weight:760}
-        .stepHeader h2{margin:6px 0 6px;font-size:42px;line-height:1;letter-spacing:-.06em;font-weight:760;color:#1d1d1f}
-        .stepHeader p{margin:0;color:#6e6e73;line-height:1.5;max-width:660px}
-        .stepPercent{min-width:76px;height:76px;border-radius:50%;background:#f0f7ff;color:#0071e3;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:760;box-shadow:inset 0 0 0 1px rgba(0,113,227,.14)}
-        .stepProgress{height:8px;background:#e8e8ed;border-radius:999px;overflow:hidden;margin-bottom:32px}
-        .stepProgress div{height:100%;background:#0071e3;border-radius:999px;transition:width .45s cubic-bezier(.22,1,.36,1)}
-        .journeyPane{display:none;animation:journeyPaneIn .42s cubic-bezier(.22,1,.36,1) both}
-        .journeyPane.active{display:block}
-        .stepActions{margin-top:34px;padding-top:22px;border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;gap:14px}
-        .primaryStep,.secondaryStep{min-height:48px;border:0;border-radius:999px;padding:0 22px;font-weight:760;cursor:pointer}
-        .primaryStep{background:#0071e3;color:white;box-shadow:0 16px 38px rgba(0,113,227,.22)}
-        .secondaryStep{background:#f5f5f7;color:#1d1d1f}
-        .secondaryStep:disabled{opacity:.4;cursor:not-allowed}
-        .leftNav a{display:none!important}
-        .leftNav button{width:100%;display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:16px;border:0;background:transparent;color:#6e6e73;font-size:13px;font-weight:650;cursor:pointer;text-align:left;transition:transform .18s ease,background .18s ease,color .18s ease}
-        .leftNav button:hover{background:#f5f5f7;color:#1d1d1f;transform:translateX(3px)}
-        .leftNav button small{color:#0071e3;font-weight:760}
-        .leftNav button.activeStepNav{background:#1d1d1f;color:#fff}
-        .leftNav button.activeStepNav small{color:#fff;opacity:.72}
-        @keyframes journeyPaneIn{from{opacity:0;transform:translateY(18px) scale(.992)}to{opacity:1;transform:translateY(0) scale(1)}}
-        @media(max-width:900px){.stepHeader{flex-direction:column}.stepPercent{width:64px;height:64px;min-width:64px;font-size:17px}.stepHeader h2{font-size:34px}}
-
-
-        /* V28 - Step actions always visible + mandatory fields validation */
-        .persistentStepActions{
-          display:flex!important;
-          position:sticky;
-          bottom:18px;
-          z-index:15;
-          background:rgba(255,255,255,.86);
-          backdrop-filter:blur(22px);
-          border:1px solid rgba(0,0,0,.06);
-          border-radius:26px;
-          padding:14px;
-          box-shadow:0 18px 60px rgba(0,0,0,.09);
-        }
-
-        .stepActionRight{
-          display:flex;
-          align-items:center;
-          gap:12px;
-          margin-left:auto;
-        }
-
-        .stepValidationHint{
-          color:#b42318;
-          font-size:12px;
-          font-weight:650;
-          max-width:260px;
-          text-align:right;
-          line-height:1.35;
-        }
-
-        .primaryStep:disabled{
-          opacity:.42;
-          cursor:not-allowed;
-          box-shadow:none!important;
-          background:#8ebff0!important;
-        }
-
-        @media(max-width:900px){
-          .persistentStepActions{
-            position:static;
-            flex-direction:column;
-            align-items:stretch;
-          }
-          .stepActionRight{
-            margin-left:0;
-            flex-direction:column;
-            align-items:stretch;
-          }
-          .stepValidationHint{
-            max-width:none;
-            text-align:left;
-          }
-        }
-
-
-        /* V29 - Locked left navigation */
-        .leftNav button.lockedStepNav{
-          opacity:.42;
-          cursor:not-allowed;
-          pointer-events:auto;
-        }
-
-        .leftNav button.lockedStepNav:hover{
-          background:transparent!important;
-          color:#6e6e73!important;
-          transform:none!important;
-        }
-
-        .leftNav button em{
-          margin-left:auto;
-          font-style:normal;
-          font-size:11px;
-          opacity:.72;
-        }
-
-
-        /* V30 - Phone numeric-only + stable left navigation */
-        input[type="tel"]{
-          letter-spacing:.01em;
-        }
-
-
-        /* V31 - Phone 10 digits required + no scroll on step navigation */
-        .fieldHintError{
-          color:#b42318!important;
-          font-weight:650;
-        }
-
-
-        /* V34 - Registration section JSX fixed */
-        .subSectionBox{
-          margin-top:28px;
-          background:#fff;
-          border:1px solid rgba(0,0,0,.07);
-          border-radius:28px;
-          padding:22px;
-          box-shadow:0 12px 38px rgba(0,0,0,.045);
-        }
-        .subSectionBox h3{
-          margin:0;
-          font-size:22px;
-          line-height:1.1;
-          letter-spacing:-.04em;
-          color:#1d1d1f;
-        }
-        .subSectionBox p{
-          margin:6px 0 18px;
-          color:#6e6e73;
-          line-height:1.5;
-        }
-
-
-        /* V36 - Recette: navigation libre */
-        .recetteBadge{
-          margin:0 8px 12px;
-          padding:8px 10px;
-          border-radius:999px;
-          background:#f0f7ff;
-          color:#0071e3;
-          font-size:11px;
-          font-weight:760;
-          text-align:center;
-        }
-
-        .leftNav button{
-          opacity:1!important;
-          cursor:pointer!important;
-        }
-
-        .leftNav button em{
-          display:none!important;
-        }
-
-
-        /* V37 - Premium upgrades */
-        .modeSwitch{margin:0 8px 10px;padding:8px 10px;border-radius:999px;background:#f0f7ff;color:#0071e3;font-size:11px;font-weight:760;display:flex;align-items:center;justify-content:center;gap:8px}
-        .modeSwitch input{width:auto!important;min-height:auto!important}
-        .resetDraftBtn{width:100%;border:0;border-radius:999px;background:#f5f5f7;color:#6e6e73;font-size:11px;font-weight:760;padding:9px 10px;margin:0 0 12px;cursor:pointer}
-        .leftNav button{position:relative;display:grid!important;grid-template-columns:auto 1fr auto;column-gap:10px;row-gap:2px}
-        .leftNav button b{grid-column:2 / 4;font-size:10px;color:#86868b;font-weight:650}
-        .leftNav button.activeStepNav b{color:rgba(255,255,255,.65)}
-        .leftNav button.completeStepNav:not(.activeStepNav){background:#f0faf4;color:#2d8653}
-        .leftNav button.completeStepNav:not(.activeStepNav) small{color:#2d8653}
-        .leftNav button.lockedStepNav{opacity:.42;cursor:not-allowed}
-        .smartAlertsBox{margin:0 0 26px;background:#fff8e8;border:1px solid rgba(176,124,0,.18);border-radius:22px;padding:14px 16px;display:grid;gap:8px}
-        .smartAlertsBox strong{font-size:13px;color:#8a5b00}
-        .smartAlertsBox span{font-size:12px;line-height:1.4;color:#6e4a00}
-        .trustBox{margin-top:24px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:28px;padding:22px;box-shadow:0 12px 38px rgba(0,0,0,.045)}
-        .trustBox h3{margin:0;font-size:22px;letter-spacing:-.04em}
-        .trustBox p{margin:6px 0 18px;color:#6e6e73}
-        .photoRequirement{width:max-content;border-radius:999px;background:#f0f7ff;color:#0071e3;font-size:10px;font-style:normal;font-weight:760;padding:4px 8px}
-        .upload:has(.photoAdded){border-color:rgba(45,134,83,.28)!important;background:#f9fffb!important}
-        .scoreMini{width:max-content;background:#f0f7ff;color:#0071e3;border:1px solid rgba(0,113,227,.16);border-radius:999px;padding:6px 9px;font-size:11px;font-weight:760}
-        .finalScorePill{width:max-content;background:rgba(0,113,227,.18);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:760;margin-bottom:10px}
-        .finalChecklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:16px}
-        .finalChecklist span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:9px 10px;font-size:12px;color:rgba(255,255,255,.72)}
-        .finalChecklist span.ok{color:#9ff0bb}
-        .recipeHint{color:#0071e3!important}
-        .journeyPane.active{animation:journeySlidePremium .5s cubic-bezier(.22,1,.36,1) both!important}
-        @keyframes journeySlidePremium{from{opacity:0;transform:translateX(24px) scale(.992)}to{opacity:1;transform:translateX(0) scale(1)}}
-
-
-        /* V39 - 15 premium upgrades */
-        .inlineError{color:#b42318;font-size:11px;font-weight:650}
-        .invalidInput{border-color:#b42318!important;background:#fff5f5!important;box-shadow:0 0 0 4px rgba(180,35,24,.10)!important}
-        .activeStepSummary{margin-bottom:16px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:13px 15px;display:grid;gap:3px;box-shadow:0 10px 28px rgba(0,0,0,.035)}
-        .activeStepSummary strong{font-size:15px;letter-spacing:-.02em}
-        .activeStepSummary span{font-size:12px;color:#6e6e73}
-        .publicationModeBox{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}
-        .publicationModeBox button,.descriptionStyles button{border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:999px;padding:11px 13px;font-weight:760;color:#6e6e73;cursor:pointer}
-        .publicationModeBox button.selected,.descriptionStyles button.selected{background:#0071e3;color:white;border-color:#0071e3}
-        .collapsibleBlock{border:1px solid rgba(0,0,0,.07);border-radius:24px;background:#fff;margin:16px 0;overflow:hidden}
-        .collapsibleBlock>button{width:100%;border:0;background:#fff;padding:15px 18px;display:flex;justify-content:space-between;font-weight:760;cursor:pointer}
-        .collapsibleContent{padding:0 18px 18px}
-        .fuelConditionalBox,.structuredDocsGrid,.descriptionAssistant{margin-top:22px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:28px;padding:22px;box-shadow:0 12px 38px rgba(0,0,0,.045)}
-        .fuelConditionalBox h3,.descriptionAssistant h3{margin:0 0 14px;font-size:20px;letter-spacing:-.035em}
-        .pricePercentileBox{background:#f5f5f7;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px;margin:0 0 12px;display:grid;gap:3px}
-        .pricePercentileBox strong{font-size:17px}
-        .pricePercentileBox span{font-size:12px;color:#6e6e73}
-        .structuredDocsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-        .structuredDoc{display:grid;gap:6px;border:1px dashed rgba(0,0,0,.16);border-radius:18px;padding:13px;cursor:pointer;background:#fafafa}
-        .structuredDoc.added{background:#f0faf4;border-color:rgba(45,134,83,.25)}
-        .structuredDoc strong{font-size:13px}
-        .structuredDoc span{font-size:11px;color:#6e6e73}
-        .structuredDoc input{font-size:11px;min-height:38px!important}
-        .descriptionStyles{display:flex;gap:10px;flex-wrap:wrap}
-        .dynamicBadges{display:flex;flex-wrap:wrap;gap:6px}
-        .dynamicBadges span{background:#f0f7ff;color:#0071e3;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:760}
-        .scoreDetailList{display:grid;gap:7px;margin-top:14px}
-        .scoreDetailList span{display:flex;justify-content:space-between;background:#f5f5f7;border-radius:12px;padding:8px 10px;font-size:12px}
-        .scoreDetailList em{font-style:normal;color:#0071e3;font-weight:760}
-        .scoreRecommendations{display:grid;gap:6px;margin-top:10px}
-        .scoreRecommendations small{background:#fff8e8;color:#6e4a00;border-radius:10px;padding:7px 8px;line-height:1.35}
-        @media(max-width:900px){.publicationModeBox{grid-template-columns:1fr}}
-
-
-        /* V41 - Stronger separation between input area and read-only help panels */
-        .workspace.withoutInsights{
-          grid-template-columns:230px minmax(0,1fr)!important;
-        }
-
-        .workspace.withoutInsights .rightRail{
-          display:none!important;
-        }
-
-        .formColumn{
-          min-width:0;
-        }
-
-        .formZoneBanner{
-          position:relative;
-          margin-bottom:18px;
-          padding:18px 20px 18px 24px;
-          border-radius:26px;
-          background:#ffffff;
-          border:1px solid rgba(0,113,227,.16);
-          box-shadow:0 14px 38px rgba(0,113,227,.08);
-          overflow:hidden;
-        }
-
-        .formZoneBanner:before{
-          content:"";
-          position:absolute;
-          left:0;
-          top:0;
-          bottom:0;
-          width:7px;
-          background:#0071e3;
-        }
-
-        .formZoneBanner span{
-          display:inline-flex;
-          width:max-content;
-          margin-bottom:7px;
-          padding:5px 9px;
-          border-radius:999px;
-          background:#f0f7ff;
-          color:#0071e3;
-          font-size:10px;
-          font-weight:900;
-          text-transform:uppercase;
-          letter-spacing:.08em;
-        }
-
-        .formZoneBanner strong{
-          display:block;
-          color:#1d1d1f;
-          font-size:18px;
-          line-height:1.25;
-          letter-spacing:-.02em;
-        }
-
-        .formZoneBanner p{
-          margin:5px 0 0;
-          color:#6e6e73;
-          font-size:13px;
-          line-height:1.45;
-        }
-
-        .rightRail{
-          padding:14px!important;
-          border-radius:32px!important;
-          background:linear-gradient(180deg,#f3f6fa 0%,#e9eef5 100%)!important;
-          border:1px solid #dde4ee!important;
-          box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 18px 50px rgba(15,23,42,.07)!important;
-        }
-
-        .rightRail:before{
-          content:"Panneaux d’aide";
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          margin-bottom:12px;
-          min-height:34px;
-          border-radius:999px;
-          background:#111827;
-          color:#fff;
-          font-size:11px;
-          font-weight:900;
-          text-transform:uppercase;
-          letter-spacing:.10em;
-        }
-
-        .railActions{
-          display:flex;
-          gap:8px;
-          align-items:center;
-          flex-wrap:wrap;
-          justify-content:flex-end;
-        }
-
-        .hideRailInlineBtn,
-        .toggleHelpPanelsTop{
-          border:1px solid #d1d5db;
-          background:#fff;
-          border-radius:999px;
-          padding:9px 12px;
-          font-size:12px;
-          font-weight:800;
-          color:#111827;
-          cursor:pointer;
-          white-space:nowrap;
-        }
-
-        .toggleHelpPanelsTop{
-          background:#f5f5f7;
-        }
-
-        .toggleHelpPanelsTop:hover,
-        .hideRailInlineBtn:hover{
-          border-color:#0071e3;
-          color:#0071e3;
-        }
-
-        .rightRail .livePreviewCard,
-        .rightRail .qualityCard,
-        .rightRail .marketCard{
-          opacity:.96;
-        }
-
-        .rightRail .livePreviewCard:hover,
-        .rightRail .qualityCard:hover,
-        .rightRail .marketCard:hover{
-          opacity:1;
-          transform:translateY(-1px);
-        }
-
-        @media(max-width:1380px){
-          .workspace.withoutInsights{
-            grid-template-columns:220px minmax(0,1fr)!important;
-          }
-          .formColumn{
-            grid-column:2;
-          }
-          .workspace.withoutInsights .formColumn{
-            grid-column:2;
-          }
-        }
-
-        @media(max-width:900px){
-          .formColumn,
-          .workspace.withoutInsights .formColumn{
-            grid-column:auto;
+          .navCta {
+            display: none;
           }
 
-          .topRight{
-            flex-wrap:wrap;
-            justify-content:flex-end;
+          h1 {
+            font-size: 44px;
           }
 
-          .toggleHelpPanelsTop{
-            padding:8px 10px;
-          }
-        }
-
-
-        /* V42 - Simplified, calming user journey */
-        .workspace{
-          grid-template-columns:220px minmax(0,860px) minmax(280px,330px)!important;
-          justify-content:center;
-          gap:24px!important;
-        }
-
-        .workspace.withoutInsights{
-          grid-template-columns:220px minmax(0,900px)!important;
-        }
-
-        .panel.stepPanel{
-          background:#fff!important;
-          box-shadow:0 24px 70px rgba(15,23,42,.07)!important;
-          border:1px solid rgba(0,0,0,.06)!important;
-        }
-
-        .stepHeader{
-          border-bottom:0!important;
-          margin-bottom:12px!important;
-        }
-
-        .stepHeader h2{
-          font-size:38px!important;
-          letter-spacing:-.055em!important;
-        }
-
-        .stepHeader p{
-          font-size:15px!important;
-          color:#6e6e73!important;
-          max-width:560px!important;
-        }
-
-        .calmJourneyIntro{
-          margin:12px 0 18px;
-          padding:15px 18px;
-          border-radius:22px;
-          background:#f5f7fb;
-          border:1px solid #e8edf5;
-          display:grid;
-          gap:3px;
-        }
-
-        .calmJourneyIntro strong{
-          color:#1d1d1f;
-          font-size:15px;
-          letter-spacing:-.02em;
-        }
-
-        .calmJourneyIntro span{
-          color:#6e6e73;
-          font-size:13px;
-          line-height:1.45;
-        }
-
-        .leftNav{
-          background:#fff!important;
-          border:1px solid rgba(0,0,0,.06)!important;
-          box-shadow:0 16px 48px rgba(15,23,42,.06)!important;
-        }
-
-        .leftNav button{
-          min-height:54px;
-          border-radius:18px!important;
-        }
-
-        .leftNav button b{
-          display:none!important;
-        }
-
-        .leftNav button em{
-          font-size:13px!important;
-        }
-
-        .formZoneBanner{
-          background:#fff!important;
-          box-shadow:0 12px 34px rgba(0,113,227,.06)!important;
-        }
-
-        .formZoneBanner p{
-          display:none;
-        }
-
-        .smartAlertsBox{
-          background:#fff8ed!important;
-          border-color:#f1dfbe!important;
-          box-shadow:none!important;
-        }
-
-        .smartAlertsBox strong{
-          font-size:12px!important;
-        }
-
-        .smartAlertsBox span{
-          font-size:12px!important;
-        }
-
-        .rightRail{
-          background:#f7f8fa!important;
-          box-shadow:none!important;
-          border:1px solid #e5e7eb!important;
-        }
-
-        .rightRail:before{
-          content:"Aperçu";
-          background:#f0f2f5!important;
-          color:#6e6e73!important;
-        }
-
-        .infoRailHint{
-          background:#fff!important;
-          border-color:#e5e7eb!important;
-          color:#6e6e73!important;
-        }
-
-        .rightRail .qualityCard,
-        .rightRail .marketCard{
-          display:none!important;
-        }
-
-        .rightRail.expandedInsights .qualityCard,
-        .rightRail.expandedInsights .marketCard{
-          display:block!important;
-        }
-
-        .calmPriceHelp{
-          background:#f5f7fb;
-          border:1px solid #e6ebf2;
-          border-radius:18px;
-          padding:13px;
-          display:grid;
-          gap:4px;
-          margin-bottom:12px;
-        }
-
-        .calmPriceHelp strong{
-          font-size:14px;
-          color:#1d1d1f;
-        }
-
-        .calmPriceHelp span{
-          font-size:12px;
-          color:#6e6e73;
-          line-height:1.45;
-        }
-
-        .marketCard .chart,
-        .marketCard .marketStats,
-        .marketCard .pricePercentileBox{
-          display:none!important;
-        }
-
-        .sectionTitle{
-          margin-top:32px!important;
-        }
-
-        .sectionTitle h2{
-          font-size:26px!important;
-        }
-
-        .field label{
-          font-size:12px!important;
-          color:#1d1d1f!important;
-        }
-
-        input,select,textarea{
-          border-radius:16px!important;
-          background:#fafafa!important;
-          border-color:#e5e7eb!important;
-        }
-
-        input:focus,select:focus,textarea:focus{
-          border-color:#0071e3!important;
-          box-shadow:0 0 0 4px rgba(0,113,227,.12)!important;
-        }
-
-        .publicationModeBox,
-        .activeStepSummary{
-          display:none!important;
-        }
-
-        .modeSwitch,
-        .resetDraftBtn{
-          display:none!important;
-        }
-
-        @media(max-width:1380px){
-          .workspace{
-            grid-template-columns:210px minmax(0,900px)!important;
-          }
-          .rightRail{
-            grid-column:2!important;
-          }
-          .infoCardsWrap{
-            display:none!important;
-          }
-          .rightRail.expandedInsights .infoCardsWrap{
-            display:grid!important;
-          }
-        }
-
-        @media(max-width:900px){
-          .workspace,
-          .workspace.withoutInsights{
-            grid-template-columns:1fr!important;
-          }
-          .formColumn,
-          .workspace.withoutInsights .formColumn,
-          .rightRail{
-            grid-column:auto!important;
-          }
-          .leftNav{
-            position:static!important;
-          }
-        }
-
-
-        /* V43 - Clean refactor: single-column, calm, Apple-like flow */
-        .page{
-          background:#f5f5f7!important;
-          color:#1d1d1f!important;
-        }
-
-        .topbar{
-          height:72px!important;
-          max-width:1180px!important;
-          padding:0 28px!important;
-        }
-
-        .logo{
-          font-size:23px!important;
-          letter-spacing:-.045em!important;
-        }
-
-        .draft{
-          display:none!important;
-        }
-
-        .back{
-          background:#1d1d1f!important;
-          color:#fff!important;
-          border-radius:999px!important;
-          padding:10px 16px!important;
-          font-size:13px!important;
-        }
-
-        .hero{
-          max-width:980px!important;
-          padding:48px 28px 20px!important;
-          display:block!important;
-        }
-
-        .heroGlass{
-          display:none!important;
-        }
-
-        .eyebrow{
-          background:#fff!important;
-          border:1px solid #e5e5ea!important;
-          color:#0071e3!important;
-          font-size:11px!important;
-          letter-spacing:.12em!important;
-        }
-
-        h1{
-          max-width:880px!important;
-          margin:16px 0 14px!important;
-          font-size:clamp(42px,6vw,72px)!important;
-          line-height:.96!important;
-          letter-spacing:-.075em!important;
-          color:#1d1d1f!important;
-        }
-
-        h1 em{
-          background:none!important;
-          -webkit-background-clip:unset!important;
-          color:#0071e3!important;
-        }
-
-        .hero p{
-          max-width:680px!important;
-          color:#6e6e73!important;
-          font-size:18px!important;
-          line-height:1.55!important;
-        }
-
-        .cleanWorkspace,
-        .workspace,
-        .workspace.withoutInsights{
-          max-width:980px!important;
-          margin:auto!important;
-          padding:24px 28px 92px!important;
-          display:block!important;
-        }
-
-        .rightRail,
-        .leftNav,
-        .formZoneBanner,
-        .infoRailHeader,
-        .infoRailHint,
-        .infoCardsWrap,
-        .smartAlertsBox,
-        .publicationModeBox,
-        .activeStepSummary,
-        .modeSwitch,
-        .resetDraftBtn{
-          display:none!important;
-        }
-
-        .formColumn{
-          display:block!important;
-          grid-column:auto!important;
-          width:100%!important;
-        }
-
-        .cleanPanel,
-        .panel.stepPanel{
-          max-width:900px!important;
-          margin:0 auto!important;
-          border-radius:34px!important;
-          background:#fff!important;
-          border:1px solid #e5e5ea!important;
-          box-shadow:0 28px 70px rgba(0,0,0,.08)!important;
-          padding:34px!important;
-        }
-
-        .cleanStepIndicator{
-          display:grid;
-          grid-template-columns:repeat(4,1fr);
-          gap:8px;
-          margin-bottom:30px;
-          padding:6px;
-          border-radius:22px;
-          background:#f5f5f7;
-          border:1px solid #ececf0;
-        }
-
-        .cleanStepIndicator button{
-          border:0;
-          min-height:66px;
-          border-radius:18px;
-          background:transparent;
-          color:#6e6e73;
-          display:grid;
-          place-items:center;
-          gap:4px;
-          cursor:pointer;
-          transition:background .2s ease,color .2s ease,transform .2s ease;
-        }
-
-        .cleanStepIndicator button span{
-          width:24px;
-          height:24px;
-          border-radius:50%;
-          background:#e8e8ed;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          font-size:12px;
-          font-weight:700;
-        }
-
-        .cleanStepIndicator button b{
-          font-size:12px;
-          font-weight:700;
-          letter-spacing:-.01em;
-        }
-
-        .cleanStepIndicator button.active{
-          background:#fff;
-          color:#1d1d1f;
-          box-shadow:0 10px 30px rgba(0,0,0,.08);
-        }
-
-        .cleanStepIndicator button.active span{
-          background:#0071e3;
-          color:#fff;
-        }
-
-        .cleanStepIndicator button.done span{
-          background:#34c759;
-          color:#fff;
-        }
-
-        .stepHeader{
-          display:flex!important;
-          align-items:flex-start!important;
-          justify-content:space-between!important;
-          gap:24px!important;
-          margin-bottom:22px!important;
-          padding:0!important;
-          border:0!important;
-        }
-
-        .stepHeader span{
-          color:#0071e3!important;
-          font-size:12px!important;
-          font-weight:700!important;
-        }
-
-        .stepHeader h2{
-          font-size:42px!important;
-          line-height:1!important;
-          letter-spacing:-.065em!important;
-          margin:6px 0 8px!important;
-          color:#1d1d1f!important;
-          font-weight:800!important;
-        }
-
-        .stepHeader p{
-          max-width:560px!important;
-          color:#6e6e73!important;
-          font-size:15px!important;
-          line-height:1.5!important;
-        }
-
-        .stepPercent{
-          min-width:68px!important;
-          width:68px!important;
-          height:68px!important;
-          background:#f0f7ff!important;
-          color:#0071e3!important;
-          font-size:18px!important;
-          box-shadow:none!important;
-        }
-
-        .stepProgress{
-          height:6px!important;
-          background:#e8e8ed!important;
-          margin-bottom:28px!important;
-        }
-
-        .stepProgress div{
-          background:#0071e3!important;
-        }
-
-        .journeyPane.active{
-          animation:cleanPaneIn .38s cubic-bezier(.22,1,.36,1) both!important;
-        }
-
-        @keyframes cleanPaneIn{
-          from{opacity:0;transform:translateY(10px)}
-          to{opacity:1;transform:translateY(0)}
-        }
-
-        .sectionTitle{
-          margin:26px 0 18px!important;
-          padding:0!important;
-          border:0!important;
-        }
-
-        .sectionTitle h2{
-          font-size:26px!important;
-          letter-spacing:-.05em!important;
-          font-weight:800!important;
-          color:#1d1d1f!important;
-        }
-
-        .sectionTitle p{
-          color:#6e6e73!important;
-          font-size:14px!important;
-          line-height:1.45!important;
-          max-width:620px!important;
-        }
-
-        .grid{
-          gap:18px!important;
-        }
-
-        .field{
-          gap:7px!important;
-        }
-
-        .field label{
-          font-size:12px!important;
-          font-weight:700!important;
-          color:#1d1d1f!important;
-        }
-
-        input,select,textarea{
-          min-height:52px!important;
-          border-radius:15px!important;
-          border:1px solid #dcdce1!important;
-          background:#fbfbfd!important;
-          color:#1d1d1f!important;
-          font-size:15px!important;
-          padding:13px 14px!important;
-          box-shadow:none!important;
-        }
-
-        input:focus,select:focus,textarea:focus{
-          background:#fff!important;
-          border-color:#0071e3!important;
-          box-shadow:0 0 0 4px rgba(0,113,227,.13)!important;
-        }
-
-        .brandShowcaseWide{
-          background:#f8f8fa!important;
-          border:1px solid #e5e5ea!important;
-          box-shadow:none!important;
-          border-radius:24px!important;
-          padding:18px!important;
-          margin-bottom:20px!important;
-        }
-
-        .brandLogoSlot{
-          height:86px!important;
-          border-radius:18px!important;
-          background:#fff!important;
-        }
-
-        .brandPngLogo{
-          max-height:62px!important;
-        }
-
-        .brandShowcaseCopy strong{
-          font-size:18px!important;
-        }
-
-        .brandShowcaseCopy small{
-          font-size:12px!important;
-          color:#86868b!important;
-        }
-
-        .subSectionBox,
-        .trustBox,
-        .structuredDocsGrid,
-        .fuelConditionalBox,
-        .descriptionAssistant{
-          background:#f8f8fa!important;
-          border:1px solid #e5e5ea!important;
-          border-radius:22px!important;
-          box-shadow:none!important;
-          padding:18px!important;
-        }
-
-        .optionBlock,
-        .fuelConditionalBox,
-        .trustBox{
-          margin-top:18px!important;
-        }
-
-        .optionBlock h3,
-        .trustBox h3,
-        .fuelConditionalBox h3,
-        .descriptionAssistant h3{
-          font-size:18px!important;
-          margin:0 0 12px!important;
-          letter-spacing:-.035em!important;
-        }
-
-        .pill,.optionItem,.colorItem{
-          background:#fff!important;
-          border:1px solid #e5e5ea!important;
-          border-radius:14px!important;
-          font-weight:600!important;
-          color:#1d1d1f!important;
-        }
-
-        .pricingGridExact{
-          grid-template-columns:repeat(3,1fr)!important;
-          gap:14px!important;
-        }
-
-        .pricingGridExact .priceBox{
-          aspect-ratio:auto!important;
-          min-height:220px!important;
-          border-radius:24px!important;
-          background:#f8f8fa!important;
-          border:1px solid #e5e5ea!important;
-          box-shadow:none!important;
-        }
-
-        .priceBoxDesired{
-          background:#f0f7ff!important;
-          border-color:rgba(0,113,227,.25)!important;
-        }
-
-        .priceBadge{
-          background:#0071e3!important;
-          color:#fff!important;
-        }
-
-        .critical{
-          background:#fff7f7!important;
-          border:1px solid #ffd6d6!important;
-          color:#b42318!important;
-          border-radius:18px!important;
-        }
-
-        .photoGrid{
-          grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))!important;
-          gap:14px!important;
-        }
-
-        .upload{
-          border-radius:22px!important;
-          background:#fff!important;
-          border:1px solid #e5e5ea!important;
-          box-shadow:none!important;
-        }
-
-        .photoGuideImage{
-          height:112px!important;
-          border-radius:16px!important;
-        }
-
-        .preview,
-        .finalReview{
-          border-radius:24px!important;
-        }
-
-        .preview{
-          background:#f8f8fa!important;
-          border:1px solid #e5e5ea!important;
-          box-shadow:none!important;
-        }
-
-        .stepActions.persistentStepActions{
-          position:sticky!important;
-          bottom:18px!important;
-          z-index:20!important;
-          margin-top:30px!important;
-          padding:12px!important;
-          border-radius:24px!important;
-          background:rgba(255,255,255,.82)!important;
-          backdrop-filter:blur(18px)!important;
-          border:1px solid #e5e5ea!important;
-          box-shadow:0 18px 50px rgba(0,0,0,.12)!important;
-        }
-
-        .primaryStep,.secondaryStep{
-          min-height:46px!important;
-          border-radius:999px!important;
-          padding:0 20px!important;
-          font-weight:700!important;
-        }
-
-        .primaryStep{
-          background:#0071e3!important;
-          color:#fff!important;
-          box-shadow:none!important;
-        }
-
-        .secondaryStep{
-          background:#f5f5f7!important;
-          color:#1d1d1f!important;
-        }
-
-        .stepValidationHint{
-          font-size:12px!important;
-        }
-
-        @media(max-width:900px){
-          .cleanStepIndicator{
-            grid-template-columns:1fr 1fr;
+          .meta {
+            grid-template-columns: 1fr;
           }
 
-          .cleanPanel,
-          .panel.stepPanel{
-            padding:22px!important;
-            border-radius:26px!important;
-          }
-
-          .stepHeader{
-            flex-direction:column!important;
-          }
-
-          .stepHeader h2{
-            font-size:34px!important;
-          }
-
-          .pricingGridExact{
-            grid-template-columns:1fr!important;
-          }
-
-          .stepActions.persistentStepActions{
-            position:static!important;
+          .footer {
+            flex-direction: column;
           }
         }
-
-
-        /* V44 - Etat step: unified colors + compact exhaustive options */
-        .colorGrid{
-          grid-template-columns:repeat(auto-fit,minmax(96px,1fr))!important;
-          gap:8px!important;
-        }
-
-        .colorItem{
-          min-height:40px!important;
-          padding:8px 9px!important;
-          border-radius:13px!important;
-          font-size:12px!important;
-          font-weight:650!important;
-          justify-content:flex-start!important;
-        }
-
-        .swatch{
-          width:14px!important;
-          height:14px!important;
-          border-radius:50%!important;
-          flex:0 0 auto!important;
-        }
-
-        .colorGrid.hasSelection .colorItem{
-          opacity:.28!important;
-        }
-
-        .colorGrid.hasSelection .colorItem.selected{
-          opacity:1!important;
-          box-shadow:0 8px 22px rgba(0,113,227,.10)!important;
-          border-color:#0071e3!important;
-        }
-
-        .compactOptionBlock{
-          padding:16px!important;
-          border:1px solid #e5e5ea!important;
-          border-radius:22px!important;
-          background:#f8f8fa!important;
-        }
-
-        .optionBlockHeader{
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          margin-bottom:12px;
-        }
-
-        .optionBlockHeader h3{
-          margin:0!important;
-          font-size:17px!important;
-          letter-spacing:-.03em!important;
-        }
-
-        .optionBlockHeader span{
-          color:#6e6e73;
-          font-size:12px;
-          font-weight:650;
-          white-space:nowrap;
-        }
-
-        .compactOptionsGrid{
-          grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;
-          gap:7px!important;
-        }
-
-        .compactOptionItem{
-          min-height:38px!important;
-          padding:8px 9px!important;
-          border-radius:12px!important;
-          font-size:12px!important;
-          line-height:1.2!important;
-          background:#fff!important;
-        }
-
-        .compactOptionItem input{
-          width:14px!important;
-          height:14px!important;
-          min-height:auto!important;
-          flex:0 0 auto!important;
-        }
-
-        .compactOptionItem.selected{
-          background:#f0f7ff!important;
-          border-color:#0071e3!important;
-          color:#0071e3!important;
-          box-shadow:none!important;
-        }
-
-        .showMoreOptions{
-          margin-top:10px;
-          border:1px solid #dcdce1;
-          background:#fff;
-          border-radius:999px;
-          min-height:36px;
-          padding:0 13px;
-          color:#0071e3;
-          font-size:12px;
-          font-weight:750;
-          cursor:pointer;
-        }
-
-        .compactCustomGrid{
-          grid-template-columns:repeat(auto-fit,minmax(190px,1fr))!important;
-          gap:8px!important;
-          margin-top:10px!important;
-        }
-
-        .customOtherBox{
-          padding:8px 9px!important;
-          border-radius:13px!important;
-        }
-
-        .customOtherInput{
-          min-height:34px!important;
-        }
-
-        @media(max-width:900px){
-          .compactOptionsGrid{
-            grid-template-columns:1fr!important;
-          }
-          .colorGrid{
-            grid-template-columns:repeat(2,1fr)!important;
-          }
-        }
-
       `}</style>
     </main>
   );
-}
-
-function CollapsibleBlock({ title, open, onToggle, children }: { title: string; open: boolean; onToggle: () => void; children?: ReactNode }) {
-  return <div className="collapsibleBlock"><button type="button" onClick={onToggle}><span>{title}</span><b>{open ? "−" : "+"}</b></button>{open && <div className="collapsibleContent">{children}</div>}</div>;
-}
-
-function Section({ id, title, subtitle }: { id: string; title: string; subtitle: string }) {
-  return <div id={id} className="sectionTitle"><h2>{title}</h2><p>{subtitle}</p></div>;
-}
-
-function Field({ label, required, children }: { label: string; required?: boolean; children?: ReactNode; key?: string }) {
-  return <div className="field"><label>{label} {required && <span className="req">*</span>}</label>{children}</div>;
-}
-
-function PillGroup({ items, onPick }: { items: string[]; onPick: (value: string) => void }) {
-  return <div className="pillGroup">{items.map(item => <label key={item} className="pill"><input type="radio" name={items.join("-")} onChange={() => onPick(item)} />{item}</label>)}</div>;
-}
-
-function ColorGrid({ items, selectedColor, onPick }: { items: string[]; selectedColor: string; onPick: (value: string) => void }) {
-  const colors: Record<string, string> = { Beige:"#d7b98c", Bleu:"#3267d6", Brun:"#7a4f16", Jaune:"#f1d000", Or:"#c9a227", Vert:"#73b63a", Gris:"#a8a8a8", Orange:"#f97316", Rouge:"#ef4444", Noir:"#2f3437", Argent:"#d8d8d8", Violet:"#8b5cf6", Blanc:"#fff", Crème:"#f5ead8", Bordeaux:"#7f1d1d", Cognac:"#b56b2c", Mat:"#e5e7eb", Métallique:"#cbd5e1" };
-  return <div className={`colorGrid ${selectedColor ? "hasSelection" : ""}`}>{items.map(item => <button key={item} type="button" className={`colorItem ${selectedColor === item ? "selected" : ""}`} onClick={() => onPick(item)}><span className="swatch" style={{ background: colors[item] || "#ddd" }} />{item}</button>)}</div>;
-}
-
-function OptionBlock({ title, items, selected, toggle, customPrefix, customFields, toggleCustom, setCustomValue, expanded, onToggleExpanded }: { title: string; items: string[]; selected: string[]; toggle: (value: string) => void; customPrefix: string; customFields: Record<string, { checked: boolean; value: string }>; toggleCustom: (key: string) => void; setCustomValue: (key: string, value: string) => void; expanded?: boolean; onToggleExpanded?: () => void }) {
-  const customKeys = [`${customPrefix}_other1`, `${customPrefix}_other2`, `${customPrefix}_other3`];
-  const visibleItems = expanded ? items : items.slice(0, 12);
-
-  return (
-    <div className="optionBlock compactOptionBlock">
-      <div className="optionBlockHeader">
-        <h3>{title}</h3>
-        <span>{selected.filter(item => items.includes(item)).length} sélectionnée(s)</span>
-      </div>
-
-      <div className="optionsGrid compactOptionsGrid">
-        {visibleItems.map(item => (
-          <label key={item} className={`optionItem compactOptionItem ${selected.includes(item) ? "selected" : ""}`}>
-            <input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} />
-            <span>{item}</span>
-          </label>
-        ))}
-      </div>
-
-      {items.length > 12 && (
-        <button type="button" className="showMoreOptions" onClick={onToggleExpanded}>
-          {expanded ? "Afficher moins" : `Afficher toutes les options (${items.length})`}
-        </button>
-      )}
-
-      <div className="customOtherGrid compactCustomGrid">
-        {customKeys.map((key, index) => {
-          const checked = customFields[key]?.checked || false;
-          return (
-            <div key={key} className={`customOtherBox ${checked ? "active" : ""}`}>
-              <label className="customOtherCheck"><input type="checkbox" checked={checked} onChange={() => toggleCustom(key)} /><span>Autre {index + 1}</span></label>
-              <input className="customOtherInput" type="text" placeholder="Préciser" disabled={!checked} value={customFields[key]?.value || ""} onChange={e => setCustomValue(key, e.target.value)} />
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function PriceBox({ label, placeholder, text, onChange, main }: { label: string; placeholder: string; text: string; onChange: (value: string) => void; main?: boolean }) {
-  return <div className={`priceBox ${main ? "priceBoxMain" : ""}`}>{main && <div className="priceBadge">Prix de référence</div>}<div className="priceLabel">{label} <span>*</span></div><div className="moneyInput"><input type="number" min="0" inputMode="numeric" placeholder={placeholder} onKeyDown={e => { if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault(); }} onChange={e => onChange(Number(e.target.value) < 0 ? "" : e.target.value)} /><span>Dirhams</span></div><p>{text}</p></div>;
 }
