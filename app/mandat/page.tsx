@@ -3,8 +3,18 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+const BRAND_LOGO_OVERRIDES: Record<string, string> = {
+  "Lynk & Co": "/brands/lynk-&-co.png",
+  "Lynk&Co": "/brands/lynk-&-co.png",
+  "DS Automobiles": "/brands/ds-automobiles.png",
+  "Mercedes-Benz": "/brands/mercedes-benz.png",
+  "Land Rover": "/brands/land-rover.png",
+  "Alfa Romeo": "/brands/alfa-romeo.png"
+};
+
 function getBrandLogo(brand: string) {
   if (!brand) return null;
+  if (BRAND_LOGO_OVERRIDES[brand]) return BRAND_LOGO_OVERRIDES[brand];
 
   const normalized = brand
     .toLowerCase()
@@ -51,37 +61,37 @@ const MODELS: Record<string, string[]> = {
   "Volvo":["S60","S90","XC40","XC60","XC90","Autre"],
   "Abarth":["Autre"],
   "Alfa Romeo":["Autre"],
-  "BAIC":["Autre"],
-  "BYD":["Autre"],
-  "Changan":["Autre"],
-  "Chery":["Autre"],
-  "Cupra":["Autre"],
+  "BAIC":["X35","X55","X7","BJ40","BJ60","EU5","Autre"],
+  "BYD":["Atto 3","Dolphin","Seal","Seal U","Tang","Han","Song Plus","Qin Plus","Autre"],
+  "Changan":["Alsvin","Eado","CS35 Plus","CS55 Plus","CS75 Plus","UNI-K","UNI-T","Deepal S07","Autre"],
+  "Chery":["Tiggo 2 Pro","Tiggo 4 Pro","Tiggo 7 Pro","Tiggo 8 Pro","Arrizo 5","Arrizo 6","Autre"],
+  "Cupra":["Born","Formentor","Leon","Ateca","Tavascan","Terramar","Autre"],
   "Deepal":["Autre"],
-  "DFSK":["Autre"],
-  "Dongfeng":["Autre"],
-  "DS Automobiles":["Autre"],
+  "DFSK":["K01","K05","K07","C31","C32","Glory 500","Glory 580","Fengon 500","Fengon 580","Autre"],
+  "Dongfeng":["Aeolus Shine","Aeolus AX7","Forthing T5 Evo","Forthing U-Tour","M-Hero 917","Autre"],
+  "DS Automobiles":["DS 3","DS 4","DS 7","DS 9","Autre"],
   "Exeed":["Autre"],
-  "Geely":["Autre"],
-  "GWM":["Autre"],
-  "JAC":["Autre"],
-  "Jaecoo":["Autre"],
-  "Jaguar":["Autre"],
-  "Jetour":["Autre"],
-  "KGM":["Autre"],
-  "Leapmotor":["Autre"],
-  "Lexus":["Autre"],
-  "Lynk & Co":["Autre"],
-  "Mahindra":["Autre"],
-  "Maserati":["Autre"],
-  "MG":["Autre"],
-  "Mitsubishi":["Autre"],
-  "Omoda":["Autre"],
+  "Geely":["Coolray","Azkarra","Atlas","Emgrand","Geometry C","Starray","Okavango","Autre"],
+  "GWM":["Haval H6","Haval Jolion","Tank 300","Tank 500","Ora 03","Poer","Autre"],
+  "JAC":["JS2","JS3","JS4","JS6","S2","S3","T8","T9","E10X","Autre"],
+  "Jaecoo":["J7","J8","Autre"],
+  "Jaguar":["XE","XF","F-Pace","E-Pace","I-Pace","F-Type","Autre"],
+  "Jetour":["X70","X70 Plus","X90 Plus","Dashing","T2","Autre"],
+  "KGM":["Tivoli","Korando","Torres","Rexton","Musso","Autre"],
+  "Leapmotor":["T03","C10","C11","C01","Autre"],
+  "Lexus":["CT","IS","ES","GS","LS","UX","NX","RX","LX","LC","Autre"],
+  "Lynk & Co":["01","02","03","05","06","07","08","09","Autre"],
+  "Mahindra":["KUV100","XUV300","XUV500","XUV700","Scorpio","Thar","Pick Up","Autre"],
+  "Maserati":["Ghibli","Quattroporte","Levante","Grecale","GranTurismo","MC20","Autre"],
+  "MG":["MG3","MG4","MG5","ZS","HS","EHS","Marvel R","Cyberster","Autre"],
+  "Mitsubishi":["Space Star","ASX","Eclipse Cross","Outlander","L200","Pajero Sport","Autre"],
+  "Omoda":["C5","E5","Autre"],
   "ROX":["Autre"],
-  "Seres":["Autre"],
-  "Smart":["Autre"],
+  "Seres":["3","5","7","Autre"],
+  "Smart":["Fortwo","Forfour","#1","#3","Autre"],
   "Soueast":["Autre"],
-  "Xpeng":["Autre"],
-  "Zeekr":["Autre"],
+  "Xpeng":["G6","G9","P7","P7i","Autre"],
+  "Zeekr":["001","007","X","7X","009","Autre"],
   "Autre":["Autre"]
 };
 
