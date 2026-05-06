@@ -1269,6 +1269,74 @@ export default function MandatPage() {
           }
         }
 
+
+        /* V21 - Pricing amount font reduced + reliable check travel */
+        .pricingGridExact .moneyInput input{
+          font-size:19px!important;
+          font-weight:700!important;
+          letter-spacing:-.02em!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput input{
+          font-size:22px!important;
+          font-weight:720!important;
+          letter-spacing:-.025em!important;
+        }
+
+        .pricingGridExact .moneyInput span{
+          font-size:10px!important;
+          padding:0 10px!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput{
+          min-height:56px!important;
+        }
+
+        .pricingGridExact .moneyInput{
+          min-height:50px!important;
+        }
+
+        .instantFlyingCheck{
+          left:auto!important;
+          top:18px!important;
+          right:18px!important;
+          width:42px!important;
+          height:42px!important;
+          font-size:26px!important;
+          transform-origin:center!important;
+          animation:singleCheckTravelV21 .95s cubic-bezier(.16,.84,.28,1) forwards!important;
+        }
+
+        @keyframes singleCheckTravelV21{
+          0%{
+            opacity:0;
+            transform:translate(-145px,115px) scale(.30);
+          }
+          18%{
+            opacity:1;
+            transform:translate(-145px,115px) scale(1.75);
+          }
+          55%{
+            opacity:1;
+            transform:translate(-68px,55px) scale(1.15);
+          }
+          100%{
+            opacity:1;
+            transform:translate(0,0) scale(1);
+          }
+        }
+
+        @media(max-width:760px){
+          .pricingGridExact .moneyInput input,
+          .pricingGridExact .priceBoxDesired .moneyInput input{
+            font-size:20px!important;
+          }
+          .instantFlyingCheck{
+            right:16px!important;
+            top:16px!important;
+          }
+        }
+
       `}</style>
     </main>
   );
