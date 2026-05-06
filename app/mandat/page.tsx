@@ -498,6 +498,24 @@ export default function MandatPage() {
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
   };
 
+  const stepRequiredOk = [
+    Boolean(form.first && form.last && form.phone && form.city),
+    Boolean(brand && displayModel && displayEngine && trim && form.year && form.mileage),
+    Boolean(form.fuel && form.gearbox),
+    true,
+    Boolean(priceMin && priceDesired && Number(priceMin) < Number(priceDesired) && (!instantEnabled || !priceInstant || Number(priceInstant) > Number(priceMin))),
+    uploadedRequiredPhotos === requiredPhotoLabels.length,
+    true,
+    true
+  ];
+
+  const currentStepValid = stepRequiredOk[activeStep];
+
+  const handleNextStep = () => {
+    if (!currentStepValid) return;
+    goNext();
+  };
+
   return (
     <main className="page">
       <nav className="topbar">
@@ -787,11 +805,16 @@ export default function MandatPage() {
             </div>
             <button type="button">{missingItems.length ? "Continuer à compléter" : "Finaliser mon annonce"}</button>
           </div>
-          <div className="stepActions">
-            <button type="button" className="secondaryStep" onClick={goPrev} disabled={activeStep === 0}>Retour</button>
-            <button type="button" className="primaryStep" onClick={goNext}>{isLastStep ? "Finaliser" : "Continuer"}</button>
-          </div>
         </div>
+          <div className="stepActions persistentStepActions">
+            <button type="button" className="secondaryStep" onClick={goPrev} disabled={activeStep === 0}>Retour</button>
+            <div className="stepActionRight">
+              {!currentStepValid && <span className="stepValidationHint">Complétez les champs obligatoires (*) pour continuer.</span>}
+              <button type="button" className="primaryStep" onClick={handleNextStep} disabled={!currentStepValid}>
+                {isLastStep ? "Finaliser" : "Continuer"}
+              </button>
+            </div>
+          </div>
         </form>
 
         <aside className="rightRail">
@@ -2003,6 +2026,61 @@ export default function MandatPage() {
         .leftNav button.activeStepNav small{color:#fff;opacity:.72}
         @keyframes journeyPaneIn{from{opacity:0;transform:translateY(18px) scale(.992)}to{opacity:1;transform:translateY(0) scale(1)}}
         @media(max-width:900px){.stepHeader{flex-direction:column}.stepPercent{width:64px;height:64px;min-width:64px;font-size:17px}.stepHeader h2{font-size:34px}}
+
+
+        /* V28 - Step actions always visible + mandatory fields validation */
+        .persistentStepActions{
+          display:flex!important;
+          position:sticky;
+          bottom:18px;
+          z-index:15;
+          background:rgba(255,255,255,.86);
+          backdrop-filter:blur(22px);
+          border:1px solid rgba(0,0,0,.06);
+          border-radius:26px;
+          padding:14px;
+          box-shadow:0 18px 60px rgba(0,0,0,.09);
+        }
+
+        .stepActionRight{
+          display:flex;
+          align-items:center;
+          gap:12px;
+          margin-left:auto;
+        }
+
+        .stepValidationHint{
+          color:#b42318;
+          font-size:12px;
+          font-weight:650;
+          max-width:260px;
+          text-align:right;
+          line-height:1.35;
+        }
+
+        .primaryStep:disabled{
+          opacity:.42;
+          cursor:not-allowed;
+          box-shadow:none!important;
+          background:#8ebff0!important;
+        }
+
+        @media(max-width:900px){
+          .persistentStepActions{
+            position:static;
+            flex-direction:column;
+            align-items:stretch;
+          }
+          .stepActionRight{
+            margin-left:0;
+            flex-direction:column;
+            align-items:stretch;
+          }
+          .stepValidationHint{
+            max-width:none;
+            text-align:left;
+          }
+        }
 
       `}</style>
     </main>
