@@ -5,15 +5,15 @@ import Link from "next/link";
 const pillars = [
   {
     title: "Annonce guidée",
-    text: "Un parcours clair pour renseigner les informations essentielles sans se perdre."
+    text: "Un parcours clair pour préparer une annonce structurée, complète et simple à comprendre."
   },
   {
-    title: "Prix plus cohérent",
-    text: "Un repère marché aide à positionner le véhicule avec plus de justesse."
+    title: "Prix mieux positionné",
+    text: "Un repère marché vous aide à fixer un prix cohérent et plus rassurant pour les acheteurs."
   },
   {
-    title: "Dossier rassurant",
-    text: "Photos, état, historique et documents sont structurés pour inspirer confiance."
+    title: "Dossier plus crédible",
+    text: "Photos, état, historique et documents utiles sont mis en avant avec une présentation propre."
   }
 ];
 
@@ -29,11 +29,21 @@ export default function HomePage() {
     <main className="home">
       <header className="blueBar">
         <div className="blueInner">
-          <Link href="/" className="brand">Auto<span>Souk</span></Link>
-          <nav className="topLinks" aria-label="Navigation principale">
-            <a href="#how">Comment ça marche</a>
-            <Link href="/espace" className="accountLink">Accéder à mon espace personnel</Link>
-          </nav>
+          <Link href="/" className="headerLogo" aria-label="Accueil AutoSouk">
+            <img src="/autosouk-mark.svg" alt="" className="logoMark" />
+            <div className="brandTexts">
+              <div className="brandLine">
+                <span className="brandAuto">Auto</span>
+                <span className="brandSouk">Souk</span>
+                <span className="brandDot">.</span>
+              </div>
+              <span className="brandSlogan">Le prix, le bon, pour tous !</span>
+            </div>
+          </Link>
+
+          <Link href="/espace" className="accountPill">
+            Accéder à mon espace personnel
+          </Link>
         </div>
       </header>
 
@@ -71,7 +81,7 @@ export default function HomePage() {
           <div className="announcementInfo">
             <div>
               <small>Repère marché</small>
-              <b>210 000 - 225 000 DH</b>
+              <b>210 000 – 225 000 DH</b>
             </div>
             <div>
               <small>Dossier</small>
@@ -86,17 +96,14 @@ export default function HomePage() {
         </aside>
       </section>
 
-      <section className="introStrip">
-        <p>
-          Une annonce bien préparée réduit les hésitations, clarifie les échanges
-          et aide l’acheteur à se projeter plus rapidement.
-        </p>
+      <section className="brandPanel" aria-label="Signature AutoSouk">
+        <img src="/autosouk-logo-header.svg" alt="AutoSouk - Le prix, le bon, pour tous !" />
       </section>
 
       <section className="section">
         <div className="sectionTitle">
           <span>Pourquoi AutoSouk ?</span>
-          <h2>Un accompagnement simple pour mieux présenter votre voiture.</h2>
+          <h2>Une annonce mieux préparée inspire plus confiance.</h2>
         </div>
 
         <div className="pillars">
@@ -138,8 +145,8 @@ export default function HomePage() {
       </section>
 
       <footer className="footer">
-        <Link href="/" className="footerBrand">AutoSouk</Link>
-        <p>Vente automobile accompagnée au Maroc.</p>
+        <Link href="/" className="footerBrand">AutoSouk.</Link>
+        <p>Le prix, le bon, pour tous !</p>
       </footer>
 
       <style jsx>{`
@@ -156,71 +163,112 @@ export default function HomePage() {
         }
 
         .blueBar {
-          background: #0071e3;
-          color: #fff;
           position: sticky;
           top: 0;
-          z-index: 40;
-          box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset;
+          z-index: 50;
+          background: linear-gradient(180deg, #2f5bea 0%, #2650d9 100%);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+          box-shadow: 0 12px 34px rgba(20, 72, 180, 0.18);
         }
 
         .blueInner {
           max-width: 1180px;
-          height: 64px;
+          height: 76px;
           margin: 0 auto;
           padding: 0 28px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 28px;
+          gap: 24px;
         }
 
-        .brand {
-          color: #fff;
-          text-decoration: none;
-          font-size: 23px;
-          font-weight: 800;
-          letter-spacing: -0.045em;
-        }
-
-        .brand span {
-          color: rgba(255, 255, 255, 0.74);
-        }
-
-        .topLinks {
-          display: flex;
-          align-items: center;
-          gap: 22px;
-        }
-
-        .topLinks a {
-          color: rgba(255, 255, 255, 0.88);
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 650;
-        }
-
-        .topLinks a:hover {
-          color: #fff;
-        }
-
-        .accountLink {
-          min-height: 38px;
+        .headerLogo {
           display: inline-flex;
           align-items: center;
-          border: 1px solid rgba(255, 255, 255, 0.42);
+          gap: 13px;
+          text-decoration: none;
+          color: #fff;
+        }
+
+        .logoMark {
+          width: 42px;
+          height: 42px;
+          border-radius: 14px;
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+          background: #fff;
+        }
+
+        .brandTexts {
+          display: grid;
+          gap: 2px;
+        }
+
+        .brandLine {
+          display: inline-flex;
+          align-items: baseline;
+          line-height: 0.92;
+        }
+
+        .brandAuto {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 30px;
+          font-weight: 300;
+          letter-spacing: -0.055em;
+        }
+
+        .brandSouk {
+          color: #fff;
+          font-size: 30px;
+          font-weight: 850;
+          letter-spacing: -0.058em;
+        }
+
+        .brandDot {
+          color: #fff;
+          font-size: 34px;
+          font-weight: 950;
+          margin-left: 1px;
+          transform: translateY(-1px);
+        }
+
+        .brandSlogan {
+          color: rgba(255, 255, 255, 0.72);
+          font-size: 10px;
+          font-weight: 750;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .accountPill {
+          min-height: 42px;
+          padding: 0 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           border-radius: 999px;
-          padding: 0 14px;
-          background: rgba(255, 255, 255, 0.12);
-          backdrop-filter: blur(12px);
+          background: #fff;
+          color: #2f5bea;
+          text-decoration: none;
+          border: 1px solid rgba(255, 255, 255, 0.72);
+          box-shadow: 0 10px 24px rgba(0, 35, 110, 0.14);
+          font-size: 14px;
+          font-weight: 750;
+          letter-spacing: -0.01em;
+          transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .accountPill:hover {
+          transform: translateY(-1px);
+          background: #f7fbff;
+          box-shadow: 0 14px 28px rgba(0, 35, 110, 0.18);
         }
 
         .hero {
           max-width: 1180px;
           margin: 0 auto;
-          padding: 92px 28px 66px;
+          padding: 92px 28px 58px;
           display: grid;
-          grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.72fr);
+          grid-template-columns: minmax(0, 1.24fr) minmax(260px, 0.68fr);
           gap: 58px;
           align-items: center;
         }
@@ -233,7 +281,7 @@ export default function HomePage() {
           border-radius: 999px;
           background: #fff;
           border: 1px solid #e5e5ea;
-          color: #0071e3;
+          color: #2f5bea;
           padding: 7px 11px;
           font-size: 11px;
           font-weight: 800;
@@ -282,13 +330,13 @@ export default function HomePage() {
         }
 
         .primaryButton {
-          background: #0071e3;
+          background: #2f5bea;
           color: #fff;
-          border: 1px solid #0071e3;
+          border: 1px solid #2f5bea;
         }
 
         .primaryButton:hover {
-          background: #0077ed;
+          background: #244ed8;
           transform: translateY(-1px);
         }
 
@@ -304,26 +352,26 @@ export default function HomePage() {
         }
 
         .announcement {
-          width: min(100%, 340px);
+          width: min(100%, 300px);
           justify-self: end;
           background: #fff;
           border: 1px solid #e5e5ea;
-          border-radius: 30px;
-          padding: 20px;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
+          border-radius: 28px;
+          padding: 18px;
+          box-shadow: 0 22px 54px rgba(0, 0, 0, 0.07);
         }
 
         .announcementHeader {
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
-          gap: 16px;
+          gap: 14px;
         }
 
         .announcementHeader small {
           display: block;
           margin-bottom: 6px;
-          color: #0071e3;
+          color: #2f5bea;
           font-size: 11px;
           font-weight: 750;
         }
@@ -331,7 +379,7 @@ export default function HomePage() {
         .announcementHeader strong {
           display: block;
           color: #1d1d1f;
-          font-size: 21px;
+          font-size: 20px;
           line-height: 1.05;
           letter-spacing: -0.05em;
         }
@@ -339,28 +387,28 @@ export default function HomePage() {
         .announcementHeader p {
           margin: 6px 0 0;
           color: #6e6e73;
-          font-size: 13px;
+          font-size: 12px;
         }
 
         .announcementHeader span {
-          width: 48px;
-          height: 48px;
+          width: 44px;
+          height: 44px;
           flex: 0 0 auto;
           border-radius: 50%;
-          background: #f0f7ff;
-          color: #0071e3;
+          background: #f0f4ff;
+          color: #2f5bea;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 19px;
+          font-size: 18px;
           font-weight: 820;
         }
 
         .vehicleVisual {
           position: relative;
-          height: 132px;
-          margin: 18px 0;
-          border-radius: 24px;
+          height: 118px;
+          margin: 16px 0;
+          border-radius: 22px;
           background: linear-gradient(180deg, #f8fafc, #edf2f7);
           overflow: hidden;
         }
@@ -370,9 +418,9 @@ export default function HomePage() {
           left: 50%;
           top: 55%;
           width: 68%;
-          height: 40px;
+          height: 36px;
           transform: translate(-50%, -50%);
-          border-radius: 60px 70px 26px 26px;
+          border-radius: 60px 70px 24px 24px;
           background: linear-gradient(135deg, #1d1d1f, #3a3a3c);
         }
 
@@ -380,9 +428,9 @@ export default function HomePage() {
           content: "";
           position: absolute;
           left: 24%;
-          top: -26px;
+          top: -23px;
           width: 38%;
-          height: 31px;
+          height: 28px;
           border-radius: 34px 34px 7px 7px;
           background: #3a3a3c;
           transform: skewX(-16deg);
@@ -390,9 +438,9 @@ export default function HomePage() {
 
         .wheel {
           position: absolute;
-          bottom: 36px;
-          width: 22px;
-          height: 22px;
+          bottom: 31px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           background: #111;
           border: 5px solid #555;
@@ -414,8 +462,8 @@ export default function HomePage() {
 
         .announcementInfo div {
           background: #f5f5f7;
-          border-radius: 15px;
-          padding: 11px;
+          border-radius: 14px;
+          padding: 10px;
         }
 
         .announcementInfo small {
@@ -427,7 +475,7 @@ export default function HomePage() {
 
         .announcementInfo b {
           color: #1d1d1f;
-          font-size: 12px;
+          font-size: 11px;
           letter-spacing: -0.02em;
         }
 
@@ -439,31 +487,26 @@ export default function HomePage() {
         }
 
         .badges span {
-          background: #f0f7ff;
-          color: #0071e3;
+          background: #f0f4ff;
+          color: #2f5bea;
           border-radius: 999px;
           padding: 6px 8px;
           font-size: 11px;
           font-weight: 750;
         }
 
-        .introStrip {
-          max-width: 1124px;
-          margin: 0 auto 16px;
+        .brandPanel {
+          max-width: 620px;
+          margin: 0 auto 18px;
           padding: 0 28px;
         }
 
-        .introStrip p {
-          margin: 0;
-          border-radius: 28px;
-          background: #fff;
-          border: 1px solid #e5e5ea;
-          padding: 24px 28px;
-          color: #1d1d1f;
-          font-size: clamp(20px, 2.6vw, 30px);
-          line-height: 1.22;
-          letter-spacing: -0.05em;
-          font-weight: 760;
+        .brandPanel img {
+          width: 100%;
+          height: auto;
+          display: block;
+          border-radius: 34px;
+          box-shadow: 0 22px 58px rgba(47, 91, 234, 0.14);
         }
 
         .section {
@@ -536,7 +579,7 @@ export default function HomePage() {
         }
 
         .step span {
-          color: #0071e3;
+          color: #2f5bea;
           font-size: 13px;
           font-weight: 820;
         }
@@ -584,7 +627,7 @@ export default function HomePage() {
         .footerBrand {
           color: #1d1d1f;
           text-decoration: none;
-          font-weight: 800;
+          font-weight: 850;
           letter-spacing: -0.04em;
         }
 
@@ -607,28 +650,44 @@ export default function HomePage() {
           .trustPanel {
             grid-template-columns: 1fr;
           }
-
-          .topLinks a:first-child {
-            display: none;
-          }
         }
 
         @media (max-width: 640px) {
           .blueInner,
           .hero,
           .section,
-          .introStrip,
+          .brandPanel,
           .footer {
             padding-left: 18px;
             padding-right: 18px;
           }
 
           .blueInner {
-            height: 60px;
+            height: 64px;
           }
 
-          .accountLink {
+          .brandAuto,
+          .brandSouk {
+            font-size: 23px;
+          }
+
+          .brandDot {
+            font-size: 27px;
+          }
+
+          .brandSlogan {
             display: none;
+          }
+
+          .logoMark {
+            width: 36px;
+            height: 36px;
+          }
+
+          .accountPill {
+            min-height: 38px;
+            padding: 0 12px;
+            font-size: 12px;
           }
 
           h1 {
