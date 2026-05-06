@@ -848,7 +848,7 @@ export default function MandatPage() {
         <Link href="/" className="logo">Auto<span>Souk</span></Link>
         <div className="topRight">
           <span className="draft">Brouillon sauvegardé{draftSavedAt ? ` · ${draftSavedAt}` : ""}</span>
-          <button type="button" className="toggleHelpPanelsTop" onClick={() => setHideHelpPanels(prev => !prev)}>{hideHelpPanels ? "Voir l’aperçu" : "Masquer l’aperçu"}</button><Link href="/" className="back">Retour au site</Link>
+          <Link href="/" className="back">Retour au site</Link>
         </div>
       </nav>
 
@@ -865,61 +865,31 @@ export default function MandatPage() {
         </div>
       </section>
 
-      <section className={`workspace ${hideHelpPanels ? "withoutInsights" : ""}`}>
-        <aside className="leftNav">
-          <div className="navTitle">Publication</div>
-          <label className="modeSwitch">
-            <input type="checkbox" checked={isRecipeMode} onChange={e => setIsRecipeMode(e.target.checked)} />
-            <span>{isRecipeMode ? "Recette" : "Production"}</span>
-          </label>
-          <button type="button" className="resetDraftBtn" onClick={resetDraft}>Réinitialiser</button>
-          {journeySteps.map((step, i) => (
-            <button
-              type="button"
-              key={step.title}
-              className={`${activeStep === i ? "activeStepNav" : ""} ${stepStatuses[i] === "complete" ? "completeStepNav" : ""} ${!isRecipeMode && i > maxUnlockedStep ? "lockedStepNav" : ""}`}
-              onClick={() => handleStepNavClick(i)}
-              disabled={!isRecipeMode && i > maxUnlockedStep}
-            >
-              <small>{String(i + 1).padStart(2, "0")}</small>
-              <span>{step.title}</span>
-              <em>{stepStatuses[i] === "complete" ? "✓" : stepStatuses[i] === "current" ? "•" : (!isRecipeMode && i > maxUnlockedStep ? "🔒" : "○")}</em>
-              <b>{stepCompletion[i].done}/{stepCompletion[i].total}</b>
-            </button>
-          ))}
-        </aside>
-
-        <div className="formColumn">
-          <div className="formZoneBanner">
-            <span>Zone de saisie</span>
-            <strong>Les champs à compléter sont uniquement dans ce bloc.</strong>
-            <p>Les panneaux d’aide et d’aperçu sont séparés pour éviter toute confusion pendant la publication.</p>
+      <section className="workspace cleanWorkspace">
+        <form className="panel stepPanel cleanPanel">
+          <div className="cleanStepIndicator">
+            {journeySteps.map((step, index) => (
+              <button
+                key={step.title}
+                type="button"
+                className={`${activeStep === index ? "active" : ""} ${stepStatuses[index] === "complete" ? "done" : ""}`}
+                onClick={() => handleStepNavClick(index)}
+              >
+                <span>{index + 1}</span>
+                <b>{step.title}</b>
+              </button>
+            ))}
           </div>
-
-        <form className="panel stepPanel">
           <div className="stepHeader">
             <div>
               <span>Étape {activeStep + 1} sur {journeySteps.length}</span>
               <h2>{journeySteps[activeStep].title}</h2>
-              <p>Répondez simplement aux questions essentielles. Les options avancées restent disponibles plus bas.</p>
+              <p>Quelques informations essentielles suffisent. Vous pourrez finaliser votre annonce en quelques minutes.</p>
             </div>
             <div className="stepPercent">{stepProgress}%</div>
           </div>
-          <div className="activeStepSummary">
-            <strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong>
-            <span>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.city || "Ville"}</span>
-          </div>
-          <div className="publicationModeBox">
-            <button type="button" className={publicationMode === "Rapide" ? "selected" : ""} onClick={() => setPublicationMode("Rapide")}>Publication rapide · 3 min</button>
-            <button type="button" className={publicationMode === "Premium" ? "selected" : ""} onClick={() => setPublicationMode("Premium")}>Publication premium · dossier complet</button>
-          </div>
-          <div className="calmJourneyIntro"><strong>On vous guide étape par étape.</strong><span>Les champs affichés ici sont les seuls à compléter pour avancer.</span></div><div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
-          {smartAlerts.length > 0 && (
-            <div className="smartAlertsBox">
-              <strong>Alertes intelligentes</strong>
-              {[...smartAlerts, ...coherenceAlerts].slice(0, 2).map(alert => <span key={alert}>{alert}</span>)}
-            </div>
-          )}
+          <div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
+          
           <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
           <Section id="s1" title="Identité vendeur" subtitle="Ces informations restent privées et ne sont jamais publiées." />
           <div className="grid">
@@ -1287,7 +1257,7 @@ export default function MandatPage() {
           </div>
 
           <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>
-          <Section id="s10" title="Preview de l’annonce" subtitle="Résumé public généré automatiquement." />
+          <Section id="s10" title="Aperçu final" subtitle="Relisez votre annonce avant de l’envoyer en revue." />
           <div className="descriptionAssistant">
             <h3>Description assistée</h3>
             <div className="descriptionStyles">
@@ -1318,77 +1288,13 @@ export default function MandatPage() {
             <div className="stepActionRight">
               {!currentStepValid && !isRecipeMode && <span className="stepValidationHint">Complétez les champs obligatoires (*) pour continuer.</span>}{!currentStepValid && isRecipeMode && <span className="stepValidationHint recipeHint">Mode recette : validation non bloquante.</span>}
               <button type="button" className="primaryStep" onClick={handleNextStep} disabled={!isRecipeMode && !currentStepValid}>
-                {isLastStep ? "Finaliser" : "Continuer"}
+                {isLastStep ? "Envoyer mon annonce" : "Continuer"}
               </button>
             </div>
           </div>
         </form>
-        </div>
 
-        <aside className={`rightRail ${showInsights ? "expandedInsights" : "collapsedInsights"}`}>
-          <div className="infoRailHeader">
-            <div>
-              <span className="infoRailEyebrow">Lecture seule</span>
-              <strong>Aperçu & indicateurs</strong>
-              <p>Bloc informatif uniquement. Aucune action n'est requise ici.</p>
-            </div>
-            <div className="railActions">
-              <button type="button" className="toggleInsightsBtn" onClick={() => setShowInsights(prev => !prev)}>
-                {showInsights ? "Masquer" : "Afficher"}
-              </button>
-              <button type="button" className="hideRailInlineBtn" onClick={() => setHideHelpPanels(true)}>
-                Masquer
-              </button>
-            </div>
-          </div>
-
-          <div className="infoRailHint">Ces cartes servent à vous guider pendant la saisie. Les champs à remplir se trouvent uniquement dans la colonne centrale.</div>
-
-          <div className="infoCardsWrap">
-            <div className="livePreviewCard">
-              <div className="cardReadOnlyTag">Aperçu</div>
-              <div className="livePreviewMedia">
-                {previewPhoto ? <img src={previewPhoto} alt="Photo principale" /> : <div className="livePreviewEmpty">Photo principale</div>}
-              </div>
-              <div className="livePreviewBody">
-                <div className="livePreviewBrand">
-                  {brand && !brandLogoMissing && getBrandLogo(brand) && <img src={getBrandLogo(brand) || ""} alt={brand} onError={() => setBrandLogoMissing(true)} />}
-                  <span>{brand || "Marque"} {displayModel || "Modèle"}</span>
-                </div>
-                <strong>{displayEngine || "Motorisation"} {trim || ""}</strong>
-                <p>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.fuel || "Carburant"} · {form.city || "Ville"}</p>
-                <b>{priceDesired ? formatDh(Number(priceDesired)) : "Prix à renseigner"}</b><div className="dynamicBadges">{dynamicBadges.slice(0, 5).map(badge => <span key={badge}>{badge}</span>)}</div>
-                <small className="scoreMini">Score annonce : {qualityScore}/100</small>{docs && <small className="verifiedMini">Verified potentiel</small>}
-              </div>
-            </div>
-
-            <div className="qualityCard">
-              <div className="cardReadOnlyTag">Indicateur</div>
-              <div className="qualityHeader">
-                <span>Qualité annonce</span>
-                <strong>{qualityScore}/100</strong>
-              </div>
-              <div className="qualityTrack"><div style={{ width: `${qualityScore}%` }} /></div>
-              <b>{qualityLabel}</b>
-              <p>{uploadedRequiredPhotos}/{requiredPhotoLabels.length} photos obligatoires ajoutées · {missingItems.length ? `${missingItems.length} point(s) à compléter` : "Dossier prêt pour revue"}</p><div className="scoreDetailList">{detailedScores.map(s => <span key={s.label}><b>{s.label}</b><em>{s.value}%</em></span>)}</div>{scoreRecommendations.length > 0 && <div className="scoreRecommendations">{scoreRecommendations.slice(0, 2).map(r => <small key={r}>{r}</small>)}</div>}
-            </div>
-
-            <div className="marketCard">
-              <div className="cardReadOnlyTag">Indicateur</div>
-              <div className="marketHeader"><span>Argus AutoSouk</span><b>Benchmark mensuel</b></div>
-              <div className="marketIdentity"><strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong><small>{trim || "Finition"} · {form.year || "Année"} · {form.mileage || "Kilométrage"}</small></div>
-              <div className="calmPriceHelp"><strong>Repère marché</strong><span>Prix généralement observé : {formatDh(recommendedLow)} – {formatDh(recommendedHigh)}. Ce repère reste indicatif et peut être ajusté selon l’état du véhicule.</span></div><div className="pricePercentileBox"><strong>{priceDesired ? `${Math.min(99, Math.max(1, Math.round((MARKET_PRICES.filter(p => p <= Number(priceDesired)).length / MARKET_PRICES.length) * 100)))}e percentile` : "Position à calculer"}</strong><span>{priceDesired ? `Écart médiane : ${Math.round(((Number(priceDesired) - median(MARKET_PRICES)) / median(MARKET_PRICES)) * 100)}%` : "Renseignez un prix souhaité"}</span></div><div className="recommendedBox">
-                <small>Fourchette recommandée</small>
-                <strong>{formatDh(recommendedLow)} – {formatDh(recommendedHigh)}</strong>
-                <span>Délai estimé : {estimatedDelay}</span>
-              </div>
-              <div className="marketStats"><div><small>Min</small><strong>{formatDh(Math.min(...MARKET_PRICES))}</strong></div><div><small>Moy.</small><strong>{formatDh(average)}</strong></div><div><small>Médiane</small><strong>{formatDh(median(MARKET_PRICES))}</strong></div><div><small>Max</small><strong>{formatDh(Math.max(...MARKET_PRICES))}</strong></div></div>
-              <div className="chart">{buildHistogram(MARKET_PRICES).map((bar, i) => <div className="barRow" key={i}><span>{Math.round(bar.low/1000)}-{Math.round(bar.high/1000)}k</span><div className="barTrack"><div style={{ width: `${Math.max(bar.pct,3)}%` }} /></div><b>{bar.pct}%</b></div>)}</div>
-              <div className={`signal ${priceSignal.tone}`}><strong>{priceSignal.badge}</strong><p>{priceSignal.label}</p></div>
-              <p className="sourceNote">Base démo. À connecter ensuite à une base benchmark mensuelle réelle.</p>
-            </div>
-          </div>
-        </aside>
+        
       </section>
 
       <style>{`
@@ -3129,6 +3035,471 @@ export default function MandatPage() {
             grid-column:auto!important;
           }
           .leftNav{
+            position:static!important;
+          }
+        }
+
+
+        /* V43 - Clean refactor: single-column, calm, Apple-like flow */
+        .page{
+          background:#f5f5f7!important;
+          color:#1d1d1f!important;
+        }
+
+        .topbar{
+          height:72px!important;
+          max-width:1180px!important;
+          padding:0 28px!important;
+        }
+
+        .logo{
+          font-size:23px!important;
+          letter-spacing:-.045em!important;
+        }
+
+        .draft{
+          display:none!important;
+        }
+
+        .back{
+          background:#1d1d1f!important;
+          color:#fff!important;
+          border-radius:999px!important;
+          padding:10px 16px!important;
+          font-size:13px!important;
+        }
+
+        .hero{
+          max-width:980px!important;
+          padding:48px 28px 20px!important;
+          display:block!important;
+        }
+
+        .heroGlass{
+          display:none!important;
+        }
+
+        .eyebrow{
+          background:#fff!important;
+          border:1px solid #e5e5ea!important;
+          color:#0071e3!important;
+          font-size:11px!important;
+          letter-spacing:.12em!important;
+        }
+
+        h1{
+          max-width:880px!important;
+          margin:16px 0 14px!important;
+          font-size:clamp(42px,6vw,72px)!important;
+          line-height:.96!important;
+          letter-spacing:-.075em!important;
+          color:#1d1d1f!important;
+        }
+
+        h1 em{
+          background:none!important;
+          -webkit-background-clip:unset!important;
+          color:#0071e3!important;
+        }
+
+        .hero p{
+          max-width:680px!important;
+          color:#6e6e73!important;
+          font-size:18px!important;
+          line-height:1.55!important;
+        }
+
+        .cleanWorkspace,
+        .workspace,
+        .workspace.withoutInsights{
+          max-width:980px!important;
+          margin:auto!important;
+          padding:24px 28px 92px!important;
+          display:block!important;
+        }
+
+        .rightRail,
+        .leftNav,
+        .formZoneBanner,
+        .infoRailHeader,
+        .infoRailHint,
+        .infoCardsWrap,
+        .smartAlertsBox,
+        .publicationModeBox,
+        .activeStepSummary,
+        .modeSwitch,
+        .resetDraftBtn{
+          display:none!important;
+        }
+
+        .formColumn{
+          display:block!important;
+          grid-column:auto!important;
+          width:100%!important;
+        }
+
+        .cleanPanel,
+        .panel.stepPanel{
+          max-width:900px!important;
+          margin:0 auto!important;
+          border-radius:34px!important;
+          background:#fff!important;
+          border:1px solid #e5e5ea!important;
+          box-shadow:0 28px 70px rgba(0,0,0,.08)!important;
+          padding:34px!important;
+        }
+
+        .cleanStepIndicator{
+          display:grid;
+          grid-template-columns:repeat(4,1fr);
+          gap:8px;
+          margin-bottom:30px;
+          padding:6px;
+          border-radius:22px;
+          background:#f5f5f7;
+          border:1px solid #ececf0;
+        }
+
+        .cleanStepIndicator button{
+          border:0;
+          min-height:66px;
+          border-radius:18px;
+          background:transparent;
+          color:#6e6e73;
+          display:grid;
+          place-items:center;
+          gap:4px;
+          cursor:pointer;
+          transition:background .2s ease,color .2s ease,transform .2s ease;
+        }
+
+        .cleanStepIndicator button span{
+          width:24px;
+          height:24px;
+          border-radius:50%;
+          background:#e8e8ed;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:12px;
+          font-weight:700;
+        }
+
+        .cleanStepIndicator button b{
+          font-size:12px;
+          font-weight:700;
+          letter-spacing:-.01em;
+        }
+
+        .cleanStepIndicator button.active{
+          background:#fff;
+          color:#1d1d1f;
+          box-shadow:0 10px 30px rgba(0,0,0,.08);
+        }
+
+        .cleanStepIndicator button.active span{
+          background:#0071e3;
+          color:#fff;
+        }
+
+        .cleanStepIndicator button.done span{
+          background:#34c759;
+          color:#fff;
+        }
+
+        .stepHeader{
+          display:flex!important;
+          align-items:flex-start!important;
+          justify-content:space-between!important;
+          gap:24px!important;
+          margin-bottom:22px!important;
+          padding:0!important;
+          border:0!important;
+        }
+
+        .stepHeader span{
+          color:#0071e3!important;
+          font-size:12px!important;
+          font-weight:700!important;
+        }
+
+        .stepHeader h2{
+          font-size:42px!important;
+          line-height:1!important;
+          letter-spacing:-.065em!important;
+          margin:6px 0 8px!important;
+          color:#1d1d1f!important;
+          font-weight:800!important;
+        }
+
+        .stepHeader p{
+          max-width:560px!important;
+          color:#6e6e73!important;
+          font-size:15px!important;
+          line-height:1.5!important;
+        }
+
+        .stepPercent{
+          min-width:68px!important;
+          width:68px!important;
+          height:68px!important;
+          background:#f0f7ff!important;
+          color:#0071e3!important;
+          font-size:18px!important;
+          box-shadow:none!important;
+        }
+
+        .stepProgress{
+          height:6px!important;
+          background:#e8e8ed!important;
+          margin-bottom:28px!important;
+        }
+
+        .stepProgress div{
+          background:#0071e3!important;
+        }
+
+        .journeyPane.active{
+          animation:cleanPaneIn .38s cubic-bezier(.22,1,.36,1) both!important;
+        }
+
+        @keyframes cleanPaneIn{
+          from{opacity:0;transform:translateY(10px)}
+          to{opacity:1;transform:translateY(0)}
+        }
+
+        .sectionTitle{
+          margin:26px 0 18px!important;
+          padding:0!important;
+          border:0!important;
+        }
+
+        .sectionTitle h2{
+          font-size:26px!important;
+          letter-spacing:-.05em!important;
+          font-weight:800!important;
+          color:#1d1d1f!important;
+        }
+
+        .sectionTitle p{
+          color:#6e6e73!important;
+          font-size:14px!important;
+          line-height:1.45!important;
+          max-width:620px!important;
+        }
+
+        .grid{
+          gap:18px!important;
+        }
+
+        .field{
+          gap:7px!important;
+        }
+
+        .field label{
+          font-size:12px!important;
+          font-weight:700!important;
+          color:#1d1d1f!important;
+        }
+
+        input,select,textarea{
+          min-height:52px!important;
+          border-radius:15px!important;
+          border:1px solid #dcdce1!important;
+          background:#fbfbfd!important;
+          color:#1d1d1f!important;
+          font-size:15px!important;
+          padding:13px 14px!important;
+          box-shadow:none!important;
+        }
+
+        input:focus,select:focus,textarea:focus{
+          background:#fff!important;
+          border-color:#0071e3!important;
+          box-shadow:0 0 0 4px rgba(0,113,227,.13)!important;
+        }
+
+        .brandShowcaseWide{
+          background:#f8f8fa!important;
+          border:1px solid #e5e5ea!important;
+          box-shadow:none!important;
+          border-radius:24px!important;
+          padding:18px!important;
+          margin-bottom:20px!important;
+        }
+
+        .brandLogoSlot{
+          height:86px!important;
+          border-radius:18px!important;
+          background:#fff!important;
+        }
+
+        .brandPngLogo{
+          max-height:62px!important;
+        }
+
+        .brandShowcaseCopy strong{
+          font-size:18px!important;
+        }
+
+        .brandShowcaseCopy small{
+          font-size:12px!important;
+          color:#86868b!important;
+        }
+
+        .subSectionBox,
+        .trustBox,
+        .structuredDocsGrid,
+        .fuelConditionalBox,
+        .descriptionAssistant{
+          background:#f8f8fa!important;
+          border:1px solid #e5e5ea!important;
+          border-radius:22px!important;
+          box-shadow:none!important;
+          padding:18px!important;
+        }
+
+        .optionBlock,
+        .fuelConditionalBox,
+        .trustBox{
+          margin-top:18px!important;
+        }
+
+        .optionBlock h3,
+        .trustBox h3,
+        .fuelConditionalBox h3,
+        .descriptionAssistant h3{
+          font-size:18px!important;
+          margin:0 0 12px!important;
+          letter-spacing:-.035em!important;
+        }
+
+        .pill,.optionItem,.colorItem{
+          background:#fff!important;
+          border:1px solid #e5e5ea!important;
+          border-radius:14px!important;
+          font-weight:600!important;
+          color:#1d1d1f!important;
+        }
+
+        .pricingGridExact{
+          grid-template-columns:repeat(3,1fr)!important;
+          gap:14px!important;
+        }
+
+        .pricingGridExact .priceBox{
+          aspect-ratio:auto!important;
+          min-height:220px!important;
+          border-radius:24px!important;
+          background:#f8f8fa!important;
+          border:1px solid #e5e5ea!important;
+          box-shadow:none!important;
+        }
+
+        .priceBoxDesired{
+          background:#f0f7ff!important;
+          border-color:rgba(0,113,227,.25)!important;
+        }
+
+        .priceBadge{
+          background:#0071e3!important;
+          color:#fff!important;
+        }
+
+        .critical{
+          background:#fff7f7!important;
+          border:1px solid #ffd6d6!important;
+          color:#b42318!important;
+          border-radius:18px!important;
+        }
+
+        .photoGrid{
+          grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))!important;
+          gap:14px!important;
+        }
+
+        .upload{
+          border-radius:22px!important;
+          background:#fff!important;
+          border:1px solid #e5e5ea!important;
+          box-shadow:none!important;
+        }
+
+        .photoGuideImage{
+          height:112px!important;
+          border-radius:16px!important;
+        }
+
+        .preview,
+        .finalReview{
+          border-radius:24px!important;
+        }
+
+        .preview{
+          background:#f8f8fa!important;
+          border:1px solid #e5e5ea!important;
+          box-shadow:none!important;
+        }
+
+        .stepActions.persistentStepActions{
+          position:sticky!important;
+          bottom:18px!important;
+          z-index:20!important;
+          margin-top:30px!important;
+          padding:12px!important;
+          border-radius:24px!important;
+          background:rgba(255,255,255,.82)!important;
+          backdrop-filter:blur(18px)!important;
+          border:1px solid #e5e5ea!important;
+          box-shadow:0 18px 50px rgba(0,0,0,.12)!important;
+        }
+
+        .primaryStep,.secondaryStep{
+          min-height:46px!important;
+          border-radius:999px!important;
+          padding:0 20px!important;
+          font-weight:700!important;
+        }
+
+        .primaryStep{
+          background:#0071e3!important;
+          color:#fff!important;
+          box-shadow:none!important;
+        }
+
+        .secondaryStep{
+          background:#f5f5f7!important;
+          color:#1d1d1f!important;
+        }
+
+        .stepValidationHint{
+          font-size:12px!important;
+        }
+
+        @media(max-width:900px){
+          .cleanStepIndicator{
+            grid-template-columns:1fr 1fr;
+          }
+
+          .cleanPanel,
+          .panel.stepPanel{
+            padding:22px!important;
+            border-radius:26px!important;
+          }
+
+          .stepHeader{
+            flex-direction:column!important;
+          }
+
+          .stepHeader h2{
+            font-size:34px!important;
+          }
+
+          .pricingGridExact{
+            grid-template-columns:1fr!important;
+          }
+
+          .stepActions.persistentStepActions{
             position:static!important;
           }
         }
