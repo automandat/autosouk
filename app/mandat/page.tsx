@@ -16,18 +16,96 @@ const CITIES = [
 ];
 
 const MOROCCAN_REGISTRATION_CITIES = [
-  "1 - Rabat","2 - Salé","3 - Skhirat-Témara","4 - Kénitra","5 - Sidi Kacem","6 - Sidi Slimane",
-  "7 - Casablanca","8 - Mohammedia","9 - El Jadida","10 - Settat","11 - Benslimane","12 - Berrechid","13 - Médiouna","14 - Nouaceur",
-  "15 - Fès","16 - Meknès","17 - Ifrane","18 - El Hajeb","19 - Sefrou","20 - Moulay Yacoub","21 - Taounate","22 - Taza","23 - Boulemane",
-  "24 - Marrakech","25 - Essaouira","26 - Chichaoua","27 - Al Haouz","28 - El Kelâa des Sraghna","29 - Rehamna","30 - Safi","31 - Youssoufia",
-  "32 - Agadir Ida-Outanane","33 - Inezgane-Aït Melloul","34 - Chtouka-Aït Baha","35 - Taroudant","36 - Tiznit","37 - Tata",
-  "38 - Tanger-Assilah","39 - M’diq-Fnideq","40 - Tétouan","41 - Fahs-Anjra","42 - Larache","43 - Chefchaouen","44 - Ouezzane","45 - Al Hoceïma",
-  "46 - Oujda-Angad","47 - Berkane","48 - Nador","49 - Driouch","50 - Taourirt","51 - Jerada","52 - Figuig","53 - Guercif",
-  "54 - Béni Mellal","55 - Fquih Ben Salah","56 - Azilal","57 - Khénifra","58 - Khouribga",
-  "59 - Errachidia","60 - Ouarzazate","61 - Zagora","62 - Midelt","63 - Tinghir",
-  "64 - Guelmim","65 - Sidi Ifni","66 - Tan-Tan","67 - Assa-Zag",
-  "68 - Laâyoune","69 - Tarfaya","70 - Boujdour","71 - Es-Semara",
-  "72 - Dakhla","73 - Aousserd","Autre"
+  "1 - Rabat",
+  "2 - Salé",
+  "3 - Sala Al Jadida",
+  "4 - Skhirat-Témara",
+  "5 - Khémisset",
+  "6 - Casablanca - Anfa",
+  "7 - Casablanca - Aïn Sebaâ - Hay Mohammadi",
+  "8 - Casablanca - Hay Hassani",
+  "9 - Casablanca - Ben M’Sick",
+  "10 - Casablanca - My Rachid",
+  "11 - Casablanca - Al Fida",
+  "12 - Casablanca - Mechouar",
+  "13 - Casablanca - Sidi Bernoussi",
+  "14 - Mohammédia",
+  "15 - Fès - Jdid",
+  "16 - Fès - Medina",
+  "17 - Fès - Zouagha Moulay Yacoub",
+  "18 - Sefrou",
+  "19 - Boulemane",
+  "20 - Meknès - Menzah",
+  "21 - Meknès - Ismailia",
+  "22 - El Hajeb",
+  "23 - Ifrane",
+  "24 - Khénifra",
+  "25 - Errachidia",
+  "26 - Marrakech - Menara",
+  "27 - Marrakech - Medina",
+  "28 - Marrakech - Sidi Youssef Ben Ali",
+  "29 - Marrakech - El Haouz",
+  "30 - Chichaoua",
+  "31 - Kelâat Es-Sraghna",
+  "32 - Essaouira",
+  "33 - Agadir - Ida Ouatanane",
+  "34 - Inezgane - Aït Melloul",
+  "35 - Chtouka - Aït Baha",
+  "36 - Taroudant",
+  "37 - Tiznit",
+  "38 - Ouarzazate",
+  "39 - Zagora",
+  "40 - Tanger - Asilah",
+  "41 - Tanger - Fahs Anjra",
+  "42 - Larache - Ksar El Kébir",
+  "43 - Chefchaouen",
+  "44 - Tétouan",
+  "45 - El Hoceima",
+  "46 - Taza",
+  "47 - Taounate",
+  "48 - Oujda-Angad",
+  "49 - Berkane",
+  "50 - Nador",
+  "51 - Taourirt",
+  "52 - Jerada",
+  "53 - Figuig",
+  "54 - Safi",
+  "55 - El Jadida",
+  "56 - Settat",
+  "57 - Khouribga",
+  "58 - Bouznika - Benslimane",
+  "59 - Kénitra",
+  "60 - Sidi Kacem",
+  "61 - Beni Mellal",
+  "62 - Azilal",
+  "63 - Smara",
+  "64 - Guelmim",
+  "65 - Tan-Tan",
+  "66 - Tata",
+  "67 - Assa-Zag",
+  "68 - Laâyoune",
+  "69 - Boujdour",
+  "70 - Oued Ed-Dahab",
+  "71 - Aousserd",
+  "72 - Casablanca - Aïn Chock",
+  "73 - Nouaceur",
+  "74 - Médiouna",
+  "75 - M’diq, Fnideq",
+  "76 - Driouch",
+  "77 - Guercif",
+  "78 - Ouezzane",
+  "79 - Sidi Slimane",
+  "80 - Midelt",
+  "81 - Berrechid",
+  "82 - Sidi Bennour",
+  "83 - Benguerir",
+  "84 - Fquih Ben Salah",
+  "85 - Youssoufia",
+  "86 - Tinghir",
+  "87 - Sidi Ifni",
+  "88 - Tarfaya",
+  "89 - Lagouira",
+  "Autre"
 ];
 
 const COUNTRIES = [
@@ -707,8 +785,6 @@ export default function MandatPage() {
             </Field>
           </div>
 
-          </div>
-
           <div className="subSectionBox">
             <h3>Immatriculation</h3>
             <p>Pays et lieu d’immatriculation du véhicule.</p>
@@ -730,7 +806,7 @@ export default function MandatPage() {
               </Field>
 
               {form.registrationCountry === "Maroc" && (
-                <Field label="Ville d’immatriculation" required>
+                <Field label="Ville / préfecture d’immatriculation" required>
                   <select value={form.registrationCity || ""} onChange={e => setValue("registrationCity", e.target.value)}>
                     <option value="" disabled>Sélectionner</option>
                     {MOROCCAN_REGISTRATION_CITIES.map(city => <option key={city}>{city}</option>)}
@@ -758,6 +834,7 @@ export default function MandatPage() {
               )}
             </div>
           </div>
+
           </div>
 
           <div className={`journeyPane ${activeStep === 2 ? "active" : ""}`}>
@@ -2241,7 +2318,7 @@ export default function MandatPage() {
         }
 
 
-        /* V33 - Registration section build-safe */
+        /* V34 - Registration section JSX fixed */
         .subSectionBox{
           margin-top:28px;
           background:#fff;
