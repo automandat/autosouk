@@ -523,7 +523,6 @@ export default function MandatPage() {
   const handleStepNavClick = (index: number) => {
     if (index <= maxUnlockedStep) {
       setActiveStep(index);
-      window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
     }
   };
 
@@ -583,7 +582,23 @@ export default function MandatPage() {
           <div className="grid">
             <Field label="Prénom" required><input placeholder="Mohammed" onChange={e => setValue("first", e.target.value)} /></Field>
             <Field label="Nom" required><input placeholder="El Fassi" onChange={e => setValue("last", e.target.value)} /></Field>
-            <Field label="Téléphone" required><input placeholder="06 XX XX XX XX" onChange={e => setValue("phone", e.target.value)} /></Field>
+            <Field label="Téléphone" required>
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9 ]*"
+                placeholder="06 XX XX XX XX"
+                value={form.phone || ""}
+                onKeyDown={e => {
+                  const allowed = ["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Home","End"," "];
+                  if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) e.preventDefault();
+                }}
+                onChange={e => {
+                  const cleaned = e.target.value.replace(/[^0-9 ]/g, "");
+                  setValue("phone", cleaned);
+                }}
+              />
+            </Field>
             <Field label="Ville" required><select defaultValue="" onChange={e => setValue("city", e.target.value)}><option value="" disabled>Sélectionner</option>{CITIES.map(x => <option key={x}>{x}</option>)}</select></Field>
           </div>
 
@@ -2114,6 +2129,12 @@ export default function MandatPage() {
           font-style:normal;
           font-size:11px;
           opacity:.72;
+        }
+
+
+        /* V30 - Phone numeric-only + stable left navigation */
+        input[type="tel"]{
+          letter-spacing:.01em;
         }
 
       `}</style>
