@@ -276,13 +276,39 @@ const YEARS = Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i)
 const MILEAGES = ["< 1 000 km", ...Array.from({ length: 199 }, (_, i) => `> ${(i + 1) * 1000} km`), "> 200 000 km"];
 const VEHICLE_TYPES = ["Cabriolet/Roadster","SUV / Tout-terrain / Pickup","Citadine","Break","Berline","Sport / Coupé","Monospace / Minibus","Utilitaire","Autre"];
 const BODY_COLORS = ["Beige","Bleu","Brun","Jaune","Or","Vert","Gris","Orange","Rouge","Noir","Argent","Violet","Blanc","Mat","Métallique"];
-const INTERIOR_COLORS = ["Beige","Noir","Bleu","Brun","Gris","Rouge","Autres"];
+const INTERIOR_COLORS = ["Beige","Noir","Bleu","Brun","Gris","Rouge","Blanc","Crème","Bordeaux","Cognac","Autres"];
+const INTERIOR_COLOR_PALETTE = ["Beige","Noir","Bleu","Brun","Gris","Rouge","Blanc","Crème","Bordeaux","Cognac","Autres"];
 const INTERIOR_MATERIALS = ["Alcantara","Tissu","Imitation cuir","Cuir partiel","Tout cuir","Velours","Autres"];
 
-const EXTERIOR_OPTIONS = ["Jantes alliage","Pack sport","Pack chrome","Phares LED","Phares Matrix LED","Phares xénon","Feux de jour LED","Phares antibrouillard","Attelage fixe","Attelage pivotant","Barres de toit","Vitres arrière surteintées"];
-const COMFORT_OPTIONS = ["Climatisation automatique","Climatisation bi-zone","Sièges chauffants","Sièges ventilés","Sièges électriques","Mémoire de siège","Volant chauffant","Volant multifonction","Accès sans clé","Démarrage sans clé","Hayon électrique","Vitres teintées","Toit ouvrant","Toit panoramique","Toit panoramique ouvrant","Suspension adaptative","Régulateur de vitesse","Régulateur adaptatif"];
-const INFOTAINMENT_OPTIONS = ["Apple CarPlay","Android Auto","Navigation GPS","Écran tactile","Cockpit numérique","Affichage tête haute","Bluetooth","Chargeur induction","USB arrière","Système audio premium","Burmester","Harman Kardon","Bose","TV","WLAN / Wi-Fi"];
-const SAFETY_OPTIONS = ["ABS","ESP","Airbags frontaux","Airbags latéraux","Freinage d’urgence","Détecteur angle mort","Aide maintien de voie","Assistant feux de route","Contrôle pression pneus","Alerte franchissement ligne","Reconnaissance panneaux","Appel d’urgence","Caméra 360°","Caméra de recul","Radars avant","Radars arrière","Park Assist"];
+const EXTERIOR_OPTIONS = [
+  "Jantes alliage","Jantes forgées","Pack sport","Pack chrome","Pack carbone","Phares LED","Phares Matrix LED","Phares laser","Phares xénon",
+  "Feux de jour LED","Phares antibrouillard","Toit ouvrant","Toit panoramique","Toit panoramique ouvrant","Attelage fixe","Attelage amovible",
+  "Attelage pivotant","Barres de toit","Rails de toit","Vitres arrière surteintées","Vitres teintées","Rétroviseurs rabattables électriquement",
+  "Rétroviseurs électrochromes","Hayon électrique","Portes coulissantes électriques","Peinture métallisée","Peinture mate","Pack off-road",
+  "Marchepieds","Becquet arrière","Étriers de frein sport","Suspension pneumatique","Suspension sport"
+];
+const COMFORT_OPTIONS = [
+  "Climatisation manuelle","Climatisation automatique","Climatisation bi-zone","Climatisation tri-zone","Climatisation quadrizone",
+  "Sièges chauffants","Sièges ventilés","Sièges massants","Sièges électriques","Mémoire de siège","Sièges sport","Sièges confort",
+  "Support lombaire","Volant chauffant","Volant multifonction","Palettes au volant","Accès sans clé","Démarrage sans clé",
+  "Fermeture soft-close","Hayon électrique","Rideaux pare-soleil","Vitres électriques","Vitres teintées","Toit ouvrant",
+  "Toit panoramique","Toit panoramique ouvrant","Suspension adaptative","Régulateur de vitesse","Régulateur adaptatif",
+  "Mode de conduite","Frein de parking électrique","Start & Stop","Chargeur 12V","Prise 230V"
+];
+const INFOTAINMENT_OPTIONS = [
+  "Apple CarPlay","Apple CarPlay sans fil","Android Auto","Android Auto sans fil","Navigation GPS","Écran tactile","Double écran",
+  "Cockpit numérique","Compteur digital","Affichage tête haute","Bluetooth","Commande vocale","Chargeur induction","USB avant",
+  "USB arrière","USB-C","Système audio premium","Burmester","Harman Kardon","Bose","Bang & Olufsen","Meridian","JBL",
+  "TV","WLAN / Wi-Fi","Hotspot Wi-Fi","Radio DAB","Caméra embarquée","Mise à jour OTA","Application mobile constructeur"
+];
+const SAFETY_OPTIONS = [
+  "ABS","ESP","Airbags frontaux","Airbags latéraux","Airbags rideaux","Airbag genoux","Freinage d’urgence","Détecteur angle mort",
+  "Aide maintien de voie","Alerte franchissement ligne","Assistant feux de route","Contrôle pression pneus","Reconnaissance panneaux",
+  "Appel d’urgence","Caméra 360°","Caméra de recul","Radars avant","Radars arrière","Park Assist","Aide au stationnement automatique",
+  "Régulateur adaptatif","Assistant embouteillage","Assistant conduite semi-autonome","Détection fatigue","Détection piétons",
+  "Détection cyclistes","Alerte trafic arrière","Freinage post-collision","Isofix","Contrôle descente","Aide démarrage en côte",
+  "Vision nocturne"
+];
 
 const PHOTOS: PhotoItem[] = [
   { label: "Arrière", image: "/photo-guides/arriere.png", instruction: "Arrière complet du véhicule", multiple: false },
@@ -382,6 +408,7 @@ export default function MandatPage() {
   const [publicationMode, setPublicationMode] = useState("Premium");
   const [validationAttempted, setValidationAttempted] = useState(false);
   const [firstInvalidKey, setFirstInvalidKey] = useState("");
+  const [expandedOptionBlocks, setExpandedOptionBlocks] = useState<Record<string, boolean>>({});
   const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({
     vehicleIdentity: true,
     registration: true,
@@ -816,6 +843,10 @@ export default function MandatPage() {
     setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const toggleOptionBlockExpansion = (key: string) => {
+    setExpandedOptionBlocks(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const handleStructuredDocUpload = (key: string, files: FileList | null) => {
     setStructuredDocs(prev => ({ ...prev, [key]: files?.length || 0 }));
   };
@@ -1073,15 +1104,26 @@ export default function MandatPage() {
           <Section id="s4" title="Design extérieur & intérieur" subtitle="Couleurs, matériaux et premiers éléments visuels." />
           <Field label="Couleur extérieure"><ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={v => { const next = exteriorColor === v ? "" : v; setExteriorColor(next); }} /></Field>
           <div className="grid">
-            <Field label="Couleur intérieure"><PillGroup items={INTERIOR_COLORS} onPick={v => setValue("interiorColor", v)} />{form.interiorColor === "Autres" && <input placeholder="Préciser la couleur intérieure" onChange={e => setValue("interiorColorOther", e.target.value)} />}</Field>
+            <Field label="Couleur intérieure">
+              <ColorGrid
+                items={INTERIOR_COLOR_PALETTE}
+                selectedColor={form.interiorColor || ""}
+                onPick={v => {
+                  const next = form.interiorColor === v ? "" : v;
+                  setValue("interiorColor", next);
+                  if (next !== "Autres") setValue("interiorColorOther", "");
+                }}
+              />
+              {form.interiorColor === "Autres" && <input placeholder="Préciser la couleur intérieure" onChange={e => setValue("interiorColorOther", e.target.value)} />}
+            </Field>
             <Field label="Matériau intérieur"><PillGroup items={INTERIOR_MATERIALS} onPick={v => setValue("interiorMaterial", v)} />{form.interiorMaterial === "Autres" && <input placeholder="Préciser le matériau" onChange={e => setValue("interiorMaterialOther", e.target.value)} />}</Field>
           </div>
 
           <Section id="s5" title="Équipements" subtitle="Sélectionnez les options présentes. Les champs Autre se vident automatiquement si décochés." />
-          <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="ext" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
-          <OptionBlock title="Confort & intérieur" items={COMFORT_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="comfort" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
-          <OptionBlock title="Infotainment" items={INFOTAINMENT_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="info" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
-          <OptionBlock title="Sécurité & aides à la conduite" items={SAFETY_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="safety" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} />
+          <OptionBlock title="Équipements extérieurs" items={EXTERIOR_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="ext" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.ext} onToggleExpanded={() => toggleOptionBlockExpansion("ext")} />
+          <OptionBlock title="Confort & intérieur" items={COMFORT_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="comfort" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.comfort} onToggleExpanded={() => toggleOptionBlockExpansion("comfort")} />
+          <OptionBlock title="Infotainment" items={INFOTAINMENT_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="info" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.info} onToggleExpanded={() => toggleOptionBlockExpansion("info")} />
+          <OptionBlock title="Sécurité & aides à la conduite" items={SAFETY_OPTIONS} selected={selectedOptions} toggle={toggleOption} customPrefix="safety" customFields={customFields} toggleCustom={toggleCustom} setCustomValue={setCustomValue} expanded={!!expandedOptionBlocks.safety} onToggleExpanded={() => toggleOptionBlockExpansion("safety")} />
 
           <Section id="s6" title="État, vendeur & historique" subtitle="Ces informations renforcent la confiance et réduisent les questions inutiles." />
           <div className="grid">
@@ -3504,6 +3546,132 @@ export default function MandatPage() {
           }
         }
 
+
+        /* V44 - Etat step: unified colors + compact exhaustive options */
+        .colorGrid{
+          grid-template-columns:repeat(auto-fit,minmax(96px,1fr))!important;
+          gap:8px!important;
+        }
+
+        .colorItem{
+          min-height:40px!important;
+          padding:8px 9px!important;
+          border-radius:13px!important;
+          font-size:12px!important;
+          font-weight:650!important;
+          justify-content:flex-start!important;
+        }
+
+        .swatch{
+          width:14px!important;
+          height:14px!important;
+          border-radius:50%!important;
+          flex:0 0 auto!important;
+        }
+
+        .colorGrid.hasSelection .colorItem{
+          opacity:.28!important;
+        }
+
+        .colorGrid.hasSelection .colorItem.selected{
+          opacity:1!important;
+          box-shadow:0 8px 22px rgba(0,113,227,.10)!important;
+          border-color:#0071e3!important;
+        }
+
+        .compactOptionBlock{
+          padding:16px!important;
+          border:1px solid #e5e5ea!important;
+          border-radius:22px!important;
+          background:#f8f8fa!important;
+        }
+
+        .optionBlockHeader{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          margin-bottom:12px;
+        }
+
+        .optionBlockHeader h3{
+          margin:0!important;
+          font-size:17px!important;
+          letter-spacing:-.03em!important;
+        }
+
+        .optionBlockHeader span{
+          color:#6e6e73;
+          font-size:12px;
+          font-weight:650;
+          white-space:nowrap;
+        }
+
+        .compactOptionsGrid{
+          grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;
+          gap:7px!important;
+        }
+
+        .compactOptionItem{
+          min-height:38px!important;
+          padding:8px 9px!important;
+          border-radius:12px!important;
+          font-size:12px!important;
+          line-height:1.2!important;
+          background:#fff!important;
+        }
+
+        .compactOptionItem input{
+          width:14px!important;
+          height:14px!important;
+          min-height:auto!important;
+          flex:0 0 auto!important;
+        }
+
+        .compactOptionItem.selected{
+          background:#f0f7ff!important;
+          border-color:#0071e3!important;
+          color:#0071e3!important;
+          box-shadow:none!important;
+        }
+
+        .showMoreOptions{
+          margin-top:10px;
+          border:1px solid #dcdce1;
+          background:#fff;
+          border-radius:999px;
+          min-height:36px;
+          padding:0 13px;
+          color:#0071e3;
+          font-size:12px;
+          font-weight:750;
+          cursor:pointer;
+        }
+
+        .compactCustomGrid{
+          grid-template-columns:repeat(auto-fit,minmax(190px,1fr))!important;
+          gap:8px!important;
+          margin-top:10px!important;
+        }
+
+        .customOtherBox{
+          padding:8px 9px!important;
+          border-radius:13px!important;
+        }
+
+        .customOtherInput{
+          min-height:34px!important;
+        }
+
+        @media(max-width:900px){
+          .compactOptionsGrid{
+            grid-template-columns:1fr!important;
+          }
+          .colorGrid{
+            grid-template-columns:repeat(2,1fr)!important;
+          }
+        }
+
       `}</style>
     </main>
   );
@@ -3526,20 +3694,47 @@ function PillGroup({ items, onPick }: { items: string[]; onPick: (value: string)
 }
 
 function ColorGrid({ items, selectedColor, onPick }: { items: string[]; selectedColor: string; onPick: (value: string) => void }) {
-  const colors: Record<string, string> = { Beige:"#d7b98c", Bleu:"#3267d6", Brun:"#7a4f16", Jaune:"#f1d000", Or:"#c9a227", Vert:"#73b63a", Gris:"#a8a8a8", Orange:"#f97316", Rouge:"#ef4444", Noir:"#2f3437", Argent:"#d8d8d8", Violet:"#8b5cf6", Blanc:"#fff", Mat:"#e5e7eb", Métallique:"#cbd5e1" };
+  const colors: Record<string, string> = { Beige:"#d7b98c", Bleu:"#3267d6", Brun:"#7a4f16", Jaune:"#f1d000", Or:"#c9a227", Vert:"#73b63a", Gris:"#a8a8a8", Orange:"#f97316", Rouge:"#ef4444", Noir:"#2f3437", Argent:"#d8d8d8", Violet:"#8b5cf6", Blanc:"#fff", Crème:"#f5ead8", Bordeaux:"#7f1d1d", Cognac:"#b56b2c", Mat:"#e5e7eb", Métallique:"#cbd5e1" };
   return <div className={`colorGrid ${selectedColor ? "hasSelection" : ""}`}>{items.map(item => <button key={item} type="button" className={`colorItem ${selectedColor === item ? "selected" : ""}`} onClick={() => onPick(item)}><span className="swatch" style={{ background: colors[item] || "#ddd" }} />{item}</button>)}</div>;
 }
 
-function OptionBlock({ title, items, selected, toggle, customPrefix, customFields, toggleCustom, setCustomValue }: { title: string; items: string[]; selected: string[]; toggle: (value: string) => void; customPrefix: string; customFields: Record<string, { checked: boolean; value: string }>; toggleCustom: (key: string) => void; setCustomValue: (key: string, value: string) => void }) {
+function OptionBlock({ title, items, selected, toggle, customPrefix, customFields, toggleCustom, setCustomValue, expanded, onToggleExpanded }: { title: string; items: string[]; selected: string[]; toggle: (value: string) => void; customPrefix: string; customFields: Record<string, { checked: boolean; value: string }>; toggleCustom: (key: string) => void; setCustomValue: (key: string, value: string) => void; expanded?: boolean; onToggleExpanded?: () => void }) {
   const customKeys = [`${customPrefix}_other1`, `${customPrefix}_other2`, `${customPrefix}_other3`];
+  const visibleItems = expanded ? items : items.slice(0, 12);
+
   return (
-    <div className="optionBlock">
-      <h3>{title}</h3>
-      <div className="optionsGrid">{items.map(item => <label key={item} className={`optionItem ${selected.includes(item) ? "selected" : ""}`}><input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} /><span>{item}</span></label>)}</div>
-      <div className="customOtherGrid">{customKeys.map((key, index) => {
-        const checked = customFields[key]?.checked || false;
-        return <div key={key} className={`customOtherBox ${checked ? "active" : ""}`}><label className="customOtherCheck"><input type="checkbox" checked={checked} onChange={() => toggleCustom(key)} /><span>Autre {index + 1}</span></label><input className="customOtherInput" type="text" placeholder="Préciser l’équipement" disabled={!checked} value={customFields[key]?.value || ""} onChange={e => setCustomValue(key, e.target.value)} /></div>;
-      })}</div>
+    <div className="optionBlock compactOptionBlock">
+      <div className="optionBlockHeader">
+        <h3>{title}</h3>
+        <span>{selected.filter(item => items.includes(item)).length} sélectionnée(s)</span>
+      </div>
+
+      <div className="optionsGrid compactOptionsGrid">
+        {visibleItems.map(item => (
+          <label key={item} className={`optionItem compactOptionItem ${selected.includes(item) ? "selected" : ""}`}>
+            <input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} />
+            <span>{item}</span>
+          </label>
+        ))}
+      </div>
+
+      {items.length > 12 && (
+        <button type="button" className="showMoreOptions" onClick={onToggleExpanded}>
+          {expanded ? "Afficher moins" : `Afficher toutes les options (${items.length})`}
+        </button>
+      )}
+
+      <div className="customOtherGrid compactCustomGrid">
+        {customKeys.map((key, index) => {
+          const checked = customFields[key]?.checked || false;
+          return (
+            <div key={key} className={`customOtherBox ${checked ? "active" : ""}`}>
+              <label className="customOtherCheck"><input type="checkbox" checked={checked} onChange={() => toggleCustom(key)} /><span>Autre {index + 1}</span></label>
+              <input className="customOtherInput" type="text" placeholder="Préciser" disabled={!checked} value={customFields[key]?.value || ""} onChange={e => setCustomValue(key, e.target.value)} />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
