@@ -96,10 +96,82 @@ const ENGINES: Record<string, string[]> = {
   "Lynk & Co|03":["1.5 T","2.0 T","03+","Autre"],
   "Lynk & Co|05":["2.0 T","Autre"],
   "Lynk & Co|06":["1.5 T","Hybrid","Autre"],
-  "Lynk & Co|08":["EM-P","Autre"]
+  "Lynk & Co|08":["EM-P","Autre"],
+  "BMW|Série 1":["116i","118i","120i","125i","M135i","M140i","116d","118d","120d","123d","125d","Autre"],
+  "BMW|Série 2":["218i","220i","225i","230i","M235i","M240i","216d","218d","220d","225d","225e","Autre"],
+  "BMW|Série 4":["420i","430i","440i","M440i","420d","430d","435d","M4","Autre"],
+  "BMW|Série 7":["730d","740d","740i","745e","750i","760i","i7 eDrive50","i7 xDrive60","i7 M70","Autre"],
+  "BMW|X1":["16d","18i","18d","20i","20d","23i","23d","25e","30e","M35i","iX1 eDrive20","iX1 xDrive30","Autre"],
+  "BMW|X3":["20i","20d","30i","30d","30e","40i","M40d","M40i","X3 M","Autre"],
+  "BMW|X5":["30d","40d","40i","45e","50e","M50d","M50i","X5 M","Autre"],
+  "Audi|A1":["25 TFSI","30 TFSI","35 TFSI","40 TFSI","Autre"],
+  "Audi|A5":["35 TFSI","40 TFSI","45 TFSI","35 TDI","40 TDI","S5","RS5","Autre"],
+  "Audi|A6":["40 TDI","45 TDI","50 TDI","55 TFSI","50 TFSI e","55 TFSI e","S6","RS6","Autre"],
+  "Audi|Q2":["30 TFSI","35 TFSI","30 TDI","35 TDI","SQ2","Autre"],
+  "Audi|Q3":["35 TFSI","40 TFSI","45 TFSI","35 TDI","40 TDI","45 TFSI e","RS Q3","Autre"],
+  "Audi|Q5":["40 TDI","45 TFSI","50 TDI","50 TFSI e","55 TFSI e","SQ5","Autre"],
+  "Audi|Q7":["45 TDI","50 TDI","55 TFSI","55 TFSI e","60 TFSI e","SQ7","Autre"],
+  "Audi|Q8":["45 TDI","50 TDI","55 TFSI","55 TFSI e","60 TFSI e","SQ8","RS Q8","Autre"],
+  "Mercedes-Benz|Classe A":["A160","A180","A200","A220","A250","A250e","A180d","A200d","A220d","A35 AMG","A45 AMG","Autre"],
+  "Mercedes-Benz|Classe B":["B160","B180","B200","B220","B250","B250e","B180d","B200d","B220d","Autre"],
+  "Mercedes-Benz|Classe CLA":["CLA180","CLA200","CLA220","CLA250","CLA250e","CLA180d","CLA200d","CLA220d","CLA35 AMG","CLA45 AMG","Autre"],
+  "Mercedes-Benz|Classe GLA":["GLA180","GLA200","GLA220","GLA250","GLA250e","GLA180d","GLA200d","GLA220d","GLA35 AMG","GLA45 AMG","Autre"],
+  "Mercedes-Benz|Classe GLB":["GLB180","GLB200","GLB220","GLB250","GLB180d","GLB200d","GLB220d","GLB35 AMG","Autre"],
+  "Mercedes-Benz|Classe GLE":["GLE300d","GLE350d","GLE350de","GLE400d","GLE450","GLE450e","GLE53 AMG","GLE63 AMG","Autre"],
+  "Volkswagen|Polo":["1.0 MPI","1.0 TSI","1.2 TSI","1.4 TSI","1.6 MPI","1.4 TDI","1.6 TDI","GTI","Autre"],
+  "Volkswagen|Passat":["1.4 TSI","1.5 TSI","1.8 TSI","2.0 TSI","1.6 TDI","2.0 TDI","GTE","Alltrack 2.0 TDI","Autre"],
+  "Volkswagen|Tiguan":["1.4 TSI","1.5 TSI","2.0 TSI","2.0 TDI","eHybrid","R","Autre"],
+  "Volkswagen|T-Roc":["1.0 TSI","1.5 TSI","2.0 TSI","1.6 TDI","2.0 TDI","R","Autre"],
+  "Volkswagen|Touareg":["3.0 V6 TDI","3.0 V6 TSI","eHybrid","R eHybrid","Autre"],
+  "Peugeot|2008":["1.2 PureTech 100","1.2 PureTech 130","1.2 PureTech 155","1.5 BlueHDi 100","1.5 BlueHDi 130","e-2008","Autre"],
+  "Peugeot|308":["1.2 PureTech 110","1.2 PureTech 130","1.5 BlueHDi 130","Hybrid 180","Hybrid 225","e-308","Autre"],
+  "Peugeot|5008":["1.2 PureTech 130","1.6 PureTech 180","1.5 BlueHDi 130","2.0 BlueHDi 180","Hybrid 136","Autre"],
+  "Peugeot|508":["1.2 PureTech 130","1.6 PureTech 180","1.6 PureTech 225","1.5 BlueHDi 130","2.0 BlueHDi 160","2.0 BlueHDi 180","Hybrid 225","PSE 360","Autre"],
+  "Renault|Captur":["0.9 TCe","1.0 TCe","1.2 TCe","1.3 TCe","1.5 dCi","E-Tech Hybrid","E-Tech Plug-in Hybrid","Autre"],
+  "Renault|Megane":["1.2 TCe","1.3 TCe","1.5 dCi","1.6 dCi","2.0 dCi","E-Tech Plug-in Hybrid","R.S.","Autre"],
+  "Renault|Kadjar":["1.2 TCe","1.3 TCe","1.5 dCi","1.6 dCi","Autre"],
+  "Renault|Koleos":["1.6 dCi","2.0 dCi","2.5 SCe","Autre"],
+  "Dacia|Sandero":["1.0 SCe","1.0 TCe","1.2 16V","1.5 dCi","ECO-G","Stepway TCe","Autre"],
+  "Dacia|Sandero Stepway":["1.0 TCe","1.0 ECO-G","1.5 dCi","Autre"],
+  "Dacia|Jogger":["1.0 TCe","1.0 ECO-G","Hybrid 140","Autre"],
+  "Toyota|Corolla":["1.2 Turbo","1.6 VVT-i","1.8 Hybrid","2.0 Hybrid","Autre"],
+  "Toyota|C-HR":["1.2 Turbo","1.8 Hybrid","2.0 Hybrid","2.0 Plug-in Hybrid","Autre"],
+  "Toyota|RAV4":["2.0 VVT-i","2.5 Hybrid","2.5 Plug-in Hybrid","Autre"],
+  "Toyota|Land Cruiser":["2.8 D-4D","3.0 D-4D","4.0 V6","Autre"],
+  "Hyundai|i10":["1.0 MPI","1.2 MPI","Autre"],
+  "Hyundai|i20":["1.0 T-GDi","1.2 MPI","1.4 MPI","1.4 CRDi","Autre"],
+  "Hyundai|Kona":["1.0 T-GDi","1.6 T-GDi","1.6 CRDi","Hybrid","Electric 39 kWh","Electric 64 kWh","Autre"],
+  "Kia|Picanto":["1.0 MPI","1.2 MPI","Autre"],
+  "Kia|Rio":["1.0 T-GDi","1.2 MPI","1.4 MPI","1.4 CRDi","Autre"],
+  "Kia|Stonic":["1.0 T-GDi","1.2 MPI","1.4 MPI","1.6 CRDi","Autre"],
+  "Ford|Fiesta":["1.0 EcoBoost","1.1 Ti-VCT","1.5 TDCi","ST 1.5 EcoBoost","Autre"],
+  "Ford|Focus":["1.0 EcoBoost","1.5 EcoBoost","2.0 EcoBlue","1.5 EcoBlue","ST 2.3 EcoBoost","Autre"],
+  "Ford|Kuga":["1.5 EcoBoost","1.5 EcoBlue","2.0 EcoBlue","Hybrid","Plug-in Hybrid","Autre"],
+  "Nissan|Qashqai":["1.2 DIG-T","1.3 DIG-T","1.5 dCi","1.6 dCi","e-Power","Autre"],
+  "Nissan|Juke":["1.0 DIG-T","1.2 DIG-T","1.5 dCi","Hybrid","Autre"],
+  "Citroën|C3":["1.2 PureTech","1.5 BlueHDi","Autre"],
+  "Citroën|C4":["1.2 PureTech","1.5 BlueHDi","Hybrid 136","ë-C4","Autre"],
+  "Citroën|C5 Aircross":["1.2 PureTech","1.5 BlueHDi","Hybrid 180","Hybrid 225","Autre"],
+  "Opel|Corsa":["1.2","1.2 Turbo","1.5 Diesel","Corsa-e","Autre"],
+  "Opel|Mokka":["1.2 Turbo","1.5 Diesel","Mokka-e","Autre"],
+  "Skoda|Octavia":["1.0 TSI","1.4 TSI","1.5 TSI","2.0 TSI","1.6 TDI","2.0 TDI","iV","RS","Autre"],
+  "Seat|Leon":["1.0 TSI","1.4 TSI","1.5 TSI","2.0 TSI","1.6 TDI","2.0 TDI","eHybrid","FR","Cupra","Autre"],
+  "Cupra|Formentor":["1.5 TSI","2.0 TSI","2.0 TSI VZ","1.4 e-Hybrid","VZ5","Autre"],
+  "Volvo|XC40":["T2","T3","T4","T5","B3","B4","B5","Recharge T4","Recharge Twin","Autre"],
+  "Volvo|XC60":["D4","D5","B4","B5","B6","T5","T6","T8 Recharge","Autre"],
+  "Porsche|Cayenne":["Cayenne","Cayenne S","Cayenne E-Hybrid","Cayenne Turbo","Cayenne Turbo S E-Hybrid","Autre"],
+  "Porsche|Macan":["Macan","Macan S","Macan GTS","Macan Turbo","Autre"],
+  "Tesla|Model 3":["Propulsion","Grande Autonomie","Performance","Autre"],
+  "Tesla|Model Y":["Propulsion","Grande Autonomie","Performance","Autre"],
+  "BYD|Atto 3":["Comfort","Design","Autre"],
+  "BYD|Dolphin":["Active","Boost","Comfort","Design","Autre"],
+  "BYD|Seal":["Design","Excellence AWD","Autre"],
+  "MG|ZS":["1.5 VTi-tech","1.0 T-GDI","ZS EV","Autre"],
+  "MG|HS":["1.5 T-GDI","EHS Plug-in Hybrid","Autre"],
+  "MG|MG4":["Standard","Comfort","Luxury","XPower","Autre"]
 };
 
-const DEFAULT_ENGINES = ["Essence","Diesel","Hybride","Hybride rechargeable","Électrique","GPL","Autre"];
+const DEFAULT_ENGINES = ["Autre"];
 const BRANDS = Object.keys(MODELS).sort();
 const YEARS = Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => String(new Date().getFullYear() - i));
 const MILEAGES = ["< 1 000 km", ...Array.from({ length: 199 }, (_, i) => `> ${(i + 1) * 1000} km`), "> 200 000 km"];
@@ -280,15 +352,15 @@ export default function MandatPage() {
             <Field label="Marque" required><select value={brand} onChange={e => { setBrand(e.target.value); setModel(""); setEngine(""); setBrandLogoMissing(false); }}><option value="">Sélectionner</option>{BRANDS.map(x => <option key={x}>{x}</option>)}</select></Field>
             <Field label="Modèle" required><select value={model} disabled={!brand} onChange={e => { setModel(e.target.value); setEngine(""); }}><option value="">{brand ? "Sélectionner" : "Choisissez une marque"}</option>{models.map(x => <option key={x}>{x}</option>)}</select></Field>
             {model === "Autre" && <Field label="Autre modèle"><input value={otherModel} onChange={e => setOtherModel(e.target.value)} placeholder="Préciser le modèle" /></Field>}
-            <Field label="Motorisation" required><select value={engine} disabled={!brand || !model} onChange={e => setEngine(e.target.value)}><option value="">{brand && model ? "Sélectionner" : "Choisissez marque et modèle"}</option>{engineOptions.map(x => <option key={x}>{x}</option>)}</select></Field>
+            <Field label="Motorisation constructeur" required><select value={engine} disabled={!brand || !model} onChange={e => setEngine(e.target.value)}><option value="">{brand && model ? "Sélectionner" : "Choisissez marque et modèle"}</option>{engineOptions.map(x => <option key={x}>{x}</option>)}</select><small className="fieldHint">Variante constructeur du modèle : ex. 320d, C300, 2.0 TDI, 1.2 PureTech.</small></Field>
             {engine === "Autre" && <Field label="Autre motorisation"><input value={otherEngine} onChange={e => setOtherEngine(e.target.value)} placeholder="Ex. 300e, 520d..." /></Field>}
             <Field label="Finition (Pack M, AMG Line, R Line...)" required><input value={trim} onChange={e => setTrim(e.target.value)} placeholder="Ex. Pack M, AMG Line..." /></Field>
-            <Field label="Type de véhicule"><PillGroup items={VEHICLE_TYPES} onPick={v => setValue("type", v)} /></Field>
+            <Field label="Type de véhicule"><select defaultValue="" onChange={e => setValue("type", e.target.value)}><option value="" disabled>Sélectionner</option>{VEHICLE_TYPES.map(x => <option key={x}>{x}</option>)}</select></Field>
             <Field label="Année" required><select defaultValue="" onChange={e => setValue("year", e.target.value)}><option value="" disabled>Sélectionner</option>{YEARS.map(x => <option key={x}>{x}</option>)}</select></Field>
             <Field label="Kilométrage" required><select defaultValue="" onChange={e => setValue("mileage", e.target.value)}><option value="" disabled>Sélectionner</option>{MILEAGES.map(x => <option key={x}>{x}</option>)}</select></Field>
           </div>
 
-          <Section id="s3" title="Caractéristiques techniques" subtitle="Carburant, transmission, puissance et caractéristiques mécaniques." />
+          <Section id="s3" title="Carburant & caractéristiques techniques" subtitle="Le carburant est séparé de la motorisation constructeur pour éviter les doublons et fiabiliser l’annonce." />
           <div className="grid">
             <Field label="Carburant" required><select defaultValue="" onChange={e => setValue("fuel", e.target.value)}><option value="" disabled>Sélectionner</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Hybride rechargeable</option><option>Électrique</option><option>GPL</option><option>Hydrogène</option><option>Bioéthanol</option><option>Gaz naturel CNG</option><option>Autre</option></select></Field>
             <Field label="Transmission" required><select defaultValue="" onChange={e => setValue("gearbox", e.target.value)}><option value="" disabled>Sélectionner</option><option>Boîte manuelle</option><option>Boîte automatique</option><option>Boîte semi-automatique</option></select></Field>
@@ -722,6 +794,9 @@ export default function MandatPage() {
           .draft{display:none!important}
           h1{font-size:clamp(44px,12vw,68px)!important}
         }
+
+
+        .fieldHint{display:block;color:#6e6e73;font-size:11px;line-height:1.4;margin-top:-2px}
 
       `}</style>
     </main>
