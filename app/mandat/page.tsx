@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 type PhotoItem = {
@@ -358,6 +358,7 @@ export default function MandatPage() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [customFields, setCustomFields] = useState<Record<string, { checked: boolean; value: string }>>({});
   const [docs, setDocs] = useState(false);
+  const [confidence, setConfidence] = useState<Record<string, string>>({});
   const [brandLogoMissing, setBrandLogoMissing] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
   const [priceMin, setPriceMin] = useState("");
@@ -373,6 +374,8 @@ export default function MandatPage() {
   const [previewPhoto, setPreviewPhoto] = useState("");
   const [activeStep, setActiveStep] = useState(0);
   const [maxUnlockedStep, setMaxUnlockedStep] = useState(7);
+  const [isRecipeMode, setIsRecipeMode] = useState(true);
+  const [draftSavedAt, setDraftSavedAt] = useState("");
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const displayModel = model === "Autre" ? otherModel : model;
@@ -508,7 +511,50 @@ export default function MandatPage() {
     setCustomFields(prev => ({ ...prev, [key]: { checked: true, value } }));
   };
 
-  const customOptions = Object.values(customFields).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
+
+  useEffect(() => {
+    setMaxUnlockedStep(isRecipeMode ? 7 : activeStep);
+  }, [isRecipeMode]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("autosoukDraftV37");
+      if (!saved) return;
+      const p = JSON.parse(saved);
+      if (p.form) setForm(p.form);
+      if (p.brand) setBrand(p.brand);
+      if (p.model) setModel(p.model);
+      if (p.otherModel) setOtherModel(p.otherModel);
+      if (p.engine) setEngine(p.engine);
+      if (p.otherEngine) setOtherEngine(p.otherEngine);
+      if (p.trim) setTrim(p.trim);
+      if (p.exteriorColor) setExteriorColor(p.exteriorColor);
+      if (p.selectedOptions) setSelectedOptions(p.selectedOptions);
+      if (p.customFields) setCustomFields(p.customFields);
+      if (p.docs) setDocs(p.docs);
+      if (p.confidence) setConfidence(p.confidence);
+      if (p.priceMin) setPriceMin(p.priceMin);
+      if (p.priceDesired) setPriceDesired(p.priceDesired);
+      if (p.priceInstant) setPriceInstant(p.priceInstant);
+      if (p.instantEnabled) setInstantEnabled(p.instantEnabled);
+      if (p.mileageRange) setMileageRange(p.mileageRange);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      const payload = { form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange };
+      localStorage.setItem("autosoukDraftV37", JSON.stringify(payload));
+      setDraftSavedAt(new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }));
+    } catch {}
+  }, [form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange]);
+
+  const resetDraft = () => {
+    try { localStorage.removeItem("autosoukDraftV37"); } catch {}
+    window.location.reload();
+  };
+
+  const customOptions = (Object.values(customFields) as Array<{ checked: boolean; value: string }>).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
   const allOptions = [...selectedOptions, ...customOptions];
 
   const registrationSummary =
@@ -632,15 +678,43 @@ export default function MandatPage() {
 
   const currentStepValid = stepRequiredOk[activeStep];
 
+  const stepCompletion = [
+    { done: [form.first, form.last, form.phone?.replace(/\D/g, "").length === 10, form.city].filter(Boolean).length, total: 4 },
+    { done: [brand, displayModel, displayEngine, trim, form.year, form.mileage].filter(Boolean).length, total: 6 },
+    { done: [form.fuel, form.gearbox].filter(Boolean).length, total: 2 },
+    { done: [exteriorColor, form.interiorColor, form.interiorMaterial, selectedOptions.length > 0].filter(Boolean).length, total: 4 },
+    { done: [priceMin, priceDesired, instantEnabled ? priceInstant : "optional"].filter(Boolean).length, total: 3 },
+    { done: uploadedRequiredPhotos, total: requiredPhotoLabels.length },
+    { done: [docs, confidence.firstOwner, confidence.spareKeys, confidence.serviceBook, confidence.invoices, confidence.technicalInspection, confidence.warranty, confidence.financing, confidence.pledge].filter(Boolean).length, total: 9 },
+    { done: missingItems.length === 0 ? 1 : 0, total: 1 }
+  ];
+
+  const stepStatuses = stepCompletion.map((item, index) => {
+    if (item.done >= item.total) return "complete";
+    if (index === activeStep || item.done > 0) return "current";
+    return "empty";
+  });
+
+  const smartAlerts = [
+    Number((form.mileage || "").replace(/\D/g, "")) > 200000 ? "Kilométrage élevé : ajoutez l’historique d’entretien et des factures." : "",
+    form.accidented === "Oui" ? "Véhicule accidenté : ajoutez les photos des réparations ou justificatifs disponibles." : "",
+    !docs ? "Documents absents : le badge Verified ne pourra pas être obtenu." : "",
+    priceDesired && Number(priceDesired) > recommendedHigh ? "Prix souhaité supérieur au marché : délai de vente probablement plus long." : ""
+  ].filter(Boolean);
+
+  const setConfidenceValue = (key: string, value: string) => {
+    setConfidence(prev => ({ ...prev, [key]: value }));
+  };
+
   const handleNextStep = () => {
-    if (!currentStepValid) return;
+    if (!isRecipeMode && !currentStepValid) return;
     const nextStep = Math.min(activeStep + 1, journeySteps.length - 1);
     setMaxUnlockedStep(prev => Math.max(prev, nextStep));
     setActiveStep(nextStep);
   };
 
   const handleStepNavClick = (index: number) => {
-    setActiveStep(index);
+    if (isRecipeMode || index <= maxUnlockedStep) setActiveStep(index);
   };
 
   return (
@@ -648,7 +722,7 @@ export default function MandatPage() {
       <nav className="topbar">
         <Link href="/" className="logo">Auto<span>Souk</span></Link>
         <div className="topRight">
-          <span className="draft">Sauvegarde automatique</span>
+          <span className="draft">Brouillon sauvegardé{draftSavedAt ? ` · ${draftSavedAt}` : ""}</span>
           <Link href="/" className="back">Retour au site</Link>
         </div>
       </nav>
@@ -668,16 +742,24 @@ export default function MandatPage() {
 
       <section className="workspace">
         <aside className="leftNav">
-          <div className="navTitle">Publication</div><div className="recetteBadge">Mode recette · navigation libre</div>
+          <div className="navTitle">Publication</div>
+          <label className="modeSwitch">
+            <input type="checkbox" checked={isRecipeMode} onChange={e => setIsRecipeMode(e.target.checked)} />
+            <span>{isRecipeMode ? "Recette" : "Production"}</span>
+          </label>
+          <button type="button" className="resetDraftBtn" onClick={resetDraft}>Réinitialiser</button>
           {journeySteps.map((step, i) => (
             <button
               type="button"
               key={step.title}
-              className={activeStep === i ? "activeStepNav" : ""}
+              className={`${activeStep === i ? "activeStepNav" : ""} ${stepStatuses[i] === "complete" ? "completeStepNav" : ""} ${!isRecipeMode && i > maxUnlockedStep ? "lockedStepNav" : ""}`}
               onClick={() => handleStepNavClick(i)}
+              disabled={!isRecipeMode && i > maxUnlockedStep}
             >
               <small>{String(i + 1).padStart(2, "0")}</small>
               <span>{step.title}</span>
+              <em>{stepStatuses[i] === "complete" ? "✓" : stepStatuses[i] === "current" ? "•" : (!isRecipeMode && i > maxUnlockedStep ? "🔒" : "○")}</em>
+              <b>{stepCompletion[i].done}/{stepCompletion[i].total}</b>
             </button>
           ))}
         </aside>
@@ -692,6 +774,12 @@ export default function MandatPage() {
             <div className="stepPercent">{stepProgress}%</div>
           </div>
           <div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
+          {smartAlerts.length > 0 && (
+            <div className="smartAlertsBox">
+              <strong>Alertes intelligentes</strong>
+              {smartAlerts.slice(0, 3).map(alert => <span key={alert}>{alert}</span>)}
+            </div>
+          )}
           <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
           <Section id="s1" title="Identité vendeur" subtitle="Ces informations restent privées et ne sont jamais publiées." />
           <div className="grid">
@@ -971,12 +1059,12 @@ export default function MandatPage() {
           <div className="photoGrid">
             {PHOTOS.map((photo, i) => (
               <label className={`upload ${photo.multiple ? "uploadDefects" : ""}`} key={photo.label}>
-                <b>{String(i + 1).padStart(2, "0")}</b>
+                <b>{String(i + 1).padStart(2, "0")}</b><i className="photoRequirement">{photo.multiple ? "Facultatif" : "Obligatoire"}</i>
                 <img src={photo.image} alt={photo.label} className="photoGuideImage" onError={e => { e.currentTarget.style.display = "none"; }} />
                 <span>{photo.label}</span>
                 <small>{photo.instruction}</small>
                 <input type="file" accept="image/*" multiple={photo.multiple} onChange={e => handlePhotoUpload(photo.label, e.target.files)} />
-                {(uploadedPhotos[photo.label] || 0) > 0 && <em className="photoAdded">✓ Photo ajoutée{photo.multiple && uploadedPhotos[photo.label] > 1 ? `s (${uploadedPhotos[photo.label]})` : ""}</em>}
+                {(uploadedPhotos[photo.label] || 0) > 0 && <em className="photoAdded">✓ Photo ajoutée{photo.multiple && uploadedPhotos[photo.label] > 1 ? `s (${uploadedPhotos[photo.label]})` : ""} · Remplacer</em>}
                 {photo.multiple && <em>Upload multiple autorisé</em>}
               </label>
             ))}
@@ -989,6 +1077,32 @@ export default function MandatPage() {
           <label className="check"><input type="checkbox" checked={docs} onChange={e => setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
           {docs && <div className="docs"><div className="verified">Verified potentiel</div><div className="grid"><Field label="Carte grise floutée"><input type="file" accept="image/*,.pdf" /></Field><Field label="Factures / carnet"><input type="file" accept="image/*,.pdf" multiple /></Field><Field label="Contrôle technique"><input type="file" accept="image/*,.pdf" /></Field><Field label="Autres documents"><input type="file" accept="image/*,.pdf" multiple /></Field></div></div>}
 
+          <div className="trustBox">
+            <h3>Confiance acheteur</h3>
+            <p>Ces éléments augmentent la crédibilité de l’annonce et réduisent les questions inutiles.</p>
+            <div className="grid">
+              {[
+                ["firstOwner","Première main ?"],
+                ["spareKeys","Double des clés disponible ?"],
+                ["serviceBook","Carnet d’entretien disponible ?"],
+                ["invoices","Factures disponibles ?"],
+                ["technicalInspection","Contrôle technique valide ?"],
+                ["warranty","Garantie restante ?"],
+                ["financing","Crédit / leasing en cours ?"],
+                ["pledge","Opposition / gage ?"]
+              ].map(([key,label]) => (
+                <Field key={key} label={label}>
+                  <select value={confidence[key] || ""} onChange={e => setConfidenceValue(key, e.target.value)}>
+                    <option value="" disabled>Sélectionner</option>
+                    <option>Oui</option>
+                    <option>Non</option>
+                    <option>Non applicable</option>
+                  </select>
+                </Field>
+              ))}
+            </div>
+          </div>
+
           </div>
 
           <div className={`journeyPane ${activeStep === 7 ? "active" : ""}`}>
@@ -996,8 +1110,15 @@ export default function MandatPage() {
           <div className="preview">{description}</div>
           <div className="finalReview">
             <div>
-              <strong>{missingItems.length ? "Derniers points avant publication" : "Votre annonce est prête"}</strong>
+              <div className="finalScorePill">Score qualité : {qualityScore}/100 · {qualityLabel}</div><strong>{missingItems.length ? "Derniers points avant publication" : "Votre annonce est prête"}</strong>
               <p>{missingItems.length ? "Complétez les éléments ci-dessous pour maximiser la confiance acheteur." : "Le dossier est suffisamment complet pour être envoyé en revue."}</p>
+              <div className="finalChecklist">
+                {journeySteps.map((step, index) => (
+                  <span key={step.title} className={stepStatuses[index] === "complete" ? "ok" : ""}>
+                    {stepStatuses[index] === "complete" ? "✓" : "•"} {step.title} · {stepCompletion[index].done}/{stepCompletion[index].total}
+                  </span>
+                ))}
+              </div>
               {missingItems.length > 0 && <ul>{missingItems.slice(0, 5).map(item => <li key={item}>{item}</li>)}</ul>}
             </div>
             <button type="button">{missingItems.length ? "Continuer à compléter" : "Finaliser mon annonce"}</button>
@@ -1006,8 +1127,8 @@ export default function MandatPage() {
           <div className="stepActions persistentStepActions">
             <button type="button" className="secondaryStep" onClick={goPrev} disabled={activeStep === 0}>Retour</button>
             <div className="stepActionRight">
-              {!currentStepValid && <span className="stepValidationHint">Complétez les champs obligatoires (*) pour continuer.</span>}
-              <button type="button" className="primaryStep" onClick={handleNextStep} disabled={!currentStepValid}>
+              {!currentStepValid && !isRecipeMode && <span className="stepValidationHint">Complétez les champs obligatoires (*) pour continuer.</span>}{!currentStepValid && isRecipeMode && <span className="stepValidationHint recipeHint">Mode recette : validation non bloquante.</span>}
+              <button type="button" className="primaryStep" onClick={handleNextStep} disabled={!isRecipeMode && !currentStepValid}>
                 {isLastStep ? "Finaliser" : "Continuer"}
               </button>
             </div>
@@ -1027,7 +1148,7 @@ export default function MandatPage() {
               <strong>{displayEngine || "Motorisation"} {trim || ""}</strong>
               <p>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.fuel || "Carburant"} · {form.city || "Ville"}</p>
               <b>{priceDesired ? formatDh(Number(priceDesired)) : "Prix à renseigner"}</b>
-              {docs && <small className="verifiedMini">Verified potentiel</small>}
+              <small className="scoreMini">Score annonce : {qualityScore}/100</small>{docs && <small className="verifiedMini">Verified potentiel</small>}
             </div>
           </div>
 
@@ -2358,6 +2479,34 @@ export default function MandatPage() {
           display:none!important;
         }
 
+
+        /* V37 - Premium upgrades */
+        .modeSwitch{margin:0 8px 10px;padding:8px 10px;border-radius:999px;background:#f0f7ff;color:#0071e3;font-size:11px;font-weight:760;display:flex;align-items:center;justify-content:center;gap:8px}
+        .modeSwitch input{width:auto!important;min-height:auto!important}
+        .resetDraftBtn{width:100%;border:0;border-radius:999px;background:#f5f5f7;color:#6e6e73;font-size:11px;font-weight:760;padding:9px 10px;margin:0 0 12px;cursor:pointer}
+        .leftNav button{position:relative;display:grid!important;grid-template-columns:auto 1fr auto;column-gap:10px;row-gap:2px}
+        .leftNav button b{grid-column:2 / 4;font-size:10px;color:#86868b;font-weight:650}
+        .leftNav button.activeStepNav b{color:rgba(255,255,255,.65)}
+        .leftNav button.completeStepNav:not(.activeStepNav){background:#f0faf4;color:#2d8653}
+        .leftNav button.completeStepNav:not(.activeStepNav) small{color:#2d8653}
+        .leftNav button.lockedStepNav{opacity:.42;cursor:not-allowed}
+        .smartAlertsBox{margin:0 0 26px;background:#fff8e8;border:1px solid rgba(176,124,0,.18);border-radius:22px;padding:14px 16px;display:grid;gap:8px}
+        .smartAlertsBox strong{font-size:13px;color:#8a5b00}
+        .smartAlertsBox span{font-size:12px;line-height:1.4;color:#6e4a00}
+        .trustBox{margin-top:24px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:28px;padding:22px;box-shadow:0 12px 38px rgba(0,0,0,.045)}
+        .trustBox h3{margin:0;font-size:22px;letter-spacing:-.04em}
+        .trustBox p{margin:6px 0 18px;color:#6e6e73}
+        .photoRequirement{width:max-content;border-radius:999px;background:#f0f7ff;color:#0071e3;font-size:10px;font-style:normal;font-weight:760;padding:4px 8px}
+        .upload:has(.photoAdded){border-color:rgba(45,134,83,.28)!important;background:#f9fffb!important}
+        .scoreMini{width:max-content;background:#f0f7ff;color:#0071e3;border:1px solid rgba(0,113,227,.16);border-radius:999px;padding:6px 9px;font-size:11px;font-weight:760}
+        .finalScorePill{width:max-content;background:rgba(0,113,227,.18);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:760;margin-bottom:10px}
+        .finalChecklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:16px}
+        .finalChecklist span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:9px 10px;font-size:12px;color:rgba(255,255,255,.72)}
+        .finalChecklist span.ok{color:#9ff0bb}
+        .recipeHint{color:#0071e3!important}
+        .journeyPane.active{animation:journeySlidePremium .5s cubic-bezier(.22,1,.36,1) both!important}
+        @keyframes journeySlidePremium{from{opacity:0;transform:translateX(24px) scale(.992)}to{opacity:1;transform:translateX(0) scale(1)}}
+
       `}</style>
     </main>
   );
@@ -2367,7 +2516,7 @@ function Section({ id, title, subtitle }: { id: string; title: string; subtitle:
   return <div id={id} className="sectionTitle"><h2>{title}</h2><p>{subtitle}</p></div>;
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: ReactNode }) {
+function Field({ label, required, children }: { label: string; required?: boolean; children?: ReactNode }) {
   return <div className="field"><label>{label} {required && <span className="req">*</span>}</label>{children}</div>;
 }
 
