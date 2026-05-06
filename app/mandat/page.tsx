@@ -270,6 +270,8 @@ export default function MandatPage() {
   const [instantCommitChecked, setInstantCommitChecked] = useState(false);
   const [instantLocked, setInstantLocked] = useState(false);
   const [instantCheckAnimation, setInstantCheckAnimation] = useState(false);
+  const [uploadedPhotos, setUploadedPhotos] = useState<Record<string, number>>({});
+  const [previewPhoto, setPreviewPhoto] = useState("");
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const displayModel = model === "Autre" ? otherModel : model;
@@ -409,6 +411,68 @@ export default function MandatPage() {
   const allOptions = [...selectedOptions, ...customOptions];
   const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
 
+
+  const requiredPhotoLabels = PHOTOS.filter(photo => !photo.multiple).map(photo => photo.label);
+  const uploadedRequiredPhotos = requiredPhotoLabels.filter(label => (uploadedPhotos[label] || 0) > 0).length;
+  const hasDefectPhotos = (uploadedPhotos["Défauts constatés"] || 0) > 0;
+  const photoCompletion = Math.round((uploadedRequiredPhotos / requiredPhotoLabels.length) * 100);
+
+  const priceWithinMarket = !!priceDesired && Math.abs((Number(priceDesired) - average) / average) <= 0.05;
+  const trustSignals = [
+    docs,
+    form.condition,
+    form.accidented,
+    form.smoker,
+    form.mileageEvolving,
+    form.fuel,
+    form.gearbox,
+    uploadedRequiredPhotos === requiredPhotoLabels.length,
+    priceWithinMarket
+  ];
+
+  const qualityScore = Math.min(
+    100,
+    Math.round(
+      completion * 0.42 +
+      photoCompletion * 0.30 +
+      (trustSignals.filter(Boolean).length / trustSignals.length) * 28
+    )
+  );
+
+  const qualityLabel =
+    qualityScore >= 90 ? "Excellent" :
+    qualityScore >= 75 ? "Très bon" :
+    qualityScore >= 55 ? "À renforcer" :
+    "Incomplet";
+
+  const missingItems = [
+    !brand || !displayModel ? "Identifier précisément le véhicule" : "",
+    !displayEngine ? "Renseigner la motorisation constructeur" : "",
+    !form.fuel ? "Sélectionner le carburant" : "",
+    !form.mileage ? "Renseigner le kilométrage" : "",
+    !form.condition ? "Préciser l’état général" : "",
+    !priceDesired ? "Ajouter un prix souhaité" : "",
+    uploadedRequiredPhotos < requiredPhotoLabels.length ? `Ajouter les photos obligatoires manquantes (${uploadedRequiredPhotos}/${requiredPhotoLabels.length})` : "",
+    !docs ? "Ajouter des documents publics pour renforcer la confiance" : ""
+  ].filter(Boolean);
+
+  const recommendedLow = Math.round(average * 0.96 / 1000) * 1000;
+  const recommendedHigh = Math.round(average * 1.05 / 1000) * 1000;
+  const estimatedDelay =
+    !priceDesired ? "—" :
+    Number(priceDesired) <= recommendedHigh && Number(priceDesired) >= recommendedLow ? "12 à 18 jours" :
+    Number(priceDesired) < recommendedLow ? "7 à 12 jours" :
+    "20 jours et +";
+
+  const handlePhotoUpload = (label: string, files: FileList | null) => {
+    const count = files?.length || 0;
+    setUploadedPhotos(prev => ({ ...prev, [label]: count }));
+
+    if (count > 0 && !previewPhoto && files && files[0]) {
+      const url = URL.createObjectURL(files[0]);
+      setPreviewPhoto(url);
+    }
+  };
   return (
     <main className="page">
       <nav className="topbar">
@@ -636,7 +700,8 @@ export default function MandatPage() {
                 <img src={photo.image} alt={photo.label} className="photoGuideImage" onError={e => { e.currentTarget.style.display = "none"; }} />
                 <span>{photo.label}</span>
                 <small>{photo.instruction}</small>
-                <input type="file" accept="image/*" multiple={photo.multiple} />
+                <input type="file" accept="image/*" multiple={photo.multiple} onChange={e => handlePhotoUpload(photo.label, e.target.files)} />
+                {(uploadedPhotos[photo.label] || 0) > 0 && <em className="photoAdded">✓ Photo ajoutée{photo.multiple && uploadedPhotos[photo.label] > 1 ? `s (${uploadedPhotos[photo.label]})` : ""}</em>}
                 {photo.multiple && <em>Upload multiple autorisé</em>}
               </label>
             ))}
@@ -648,17 +713,55 @@ export default function MandatPage() {
 
           <Section id="s10" title="Preview de l’annonce" subtitle="Résumé public généré automatiquement." />
           <div className="preview">{description}</div>
-          <div className="final"><div><strong>Soumettre pour revue</strong><p>AutoSouk vérifie le dossier avant publication.</p></div><button type="button">Envoyer ma demande gratuitement</button></div>
+          <div className="finalReview">
+            <div>
+              <strong>{missingItems.length ? "Derniers points avant publication" : "Votre annonce est prête"}</strong>
+              <p>{missingItems.length ? "Complétez les éléments ci-dessous pour maximiser la confiance acheteur." : "Le dossier est suffisamment complet pour être envoyé en revue."}</p>
+              {missingItems.length > 0 && <ul>{missingItems.slice(0, 5).map(item => <li key={item}>{item}</li>)}</ul>}
+            </div>
+            <button type="button">{missingItems.length ? "Continuer à compléter" : "Finaliser mon annonce"}</button>
+          </div>
         </form>
 
         <aside className="rightRail">
+          <div className="livePreviewCard">
+            <div className="livePreviewMedia">
+              {previewPhoto ? <img src={previewPhoto} alt="Photo principale" /> : <div className="livePreviewEmpty">Photo principale</div>}
+            </div>
+            <div className="livePreviewBody">
+              <div className="livePreviewBrand">
+                {brand && !brandLogoMissing && getBrandLogo(brand) && <img src={getBrandLogo(brand) || ""} alt={brand} onError={() => setBrandLogoMissing(true)} />}
+                <span>{brand || "Marque"} {displayModel || "Modèle"}</span>
+              </div>
+              <strong>{displayEngine || "Motorisation"} {trim || ""}</strong>
+              <p>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.fuel || "Carburant"} · {form.city || "Ville"}</p>
+              <b>{priceDesired ? formatDh(Number(priceDesired)) : "Prix à renseigner"}</b>
+              {docs && <small className="verifiedMini">Verified potentiel</small>}
+            </div>
+          </div>
+
+          <div className="qualityCard">
+            <div className="qualityHeader">
+              <span>Qualité annonce</span>
+              <strong>{qualityScore}/100</strong>
+            </div>
+            <div className="qualityTrack"><div style={{ width: `${qualityScore}%` }} /></div>
+            <b>{qualityLabel}</b>
+            <p>{uploadedRequiredPhotos}/{requiredPhotoLabels.length} photos obligatoires ajoutées · {missingItems.length ? `${missingItems.length} point(s) à compléter` : "Dossier prêt pour revue"}</p>
+          </div>
+
           <div className="marketCard">
             <div className="marketHeader"><span>Argus AutoSouk</span><b>Benchmark mensuel</b></div>
             <div className="marketIdentity"><strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong><small>{trim || "Finition"} · {form.year || "Année"} · {form.mileage || "Kilométrage"}</small></div>
+            <div className="recommendedBox">
+              <small>Fourchette recommandée</small>
+              <strong>{formatDh(recommendedLow)} – {formatDh(recommendedHigh)}</strong>
+              <span>Délai estimé : {estimatedDelay}</span>
+            </div>
             <div className="marketStats"><div><small>Min</small><strong>{formatDh(Math.min(...MARKET_PRICES))}</strong></div><div><small>Moy.</small><strong>{formatDh(average)}</strong></div><div><small>Médiane</small><strong>{formatDh(median(MARKET_PRICES))}</strong></div><div><small>Max</small><strong>{formatDh(Math.max(...MARKET_PRICES))}</strong></div></div>
             <div className="chart">{buildHistogram(MARKET_PRICES).map((bar, i) => <div className="barRow" key={i}><span>{Math.round(bar.low/1000)}-{Math.round(bar.high/1000)}k</span><div className="barTrack"><div style={{ width: `${Math.max(bar.pct,3)}%` }} /></div><b>{bar.pct}%</b></div>)}</div>
             <div className={`signal ${priceSignal.tone}`}><strong>{priceSignal.badge}</strong><p>{priceSignal.label}</p></div>
-            <p className="sourceNote">Base démo. À connecter ensuite à la table mensuelle benchmark légale.</p>
+            <p className="sourceNote">Base démo. À connecter ensuite à une base benchmark mensuelle réelle.</p>
           </div>
         </aside>
       </section>
@@ -1589,6 +1692,219 @@ export default function MandatPage() {
           98%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
           99%{opacity:1.000;transform:translate3d(-0.00px,0.00px,0) scale(1.000);}
           100%{opacity:1.000;transform:translate3d(0.00px,0.00px,0) scale(1.000);}
+        }
+
+
+        /* V25 - Premium experience: live preview, scoring, photo validation */
+        .livePreviewCard,.qualityCard{
+          border-radius:34px;
+          background:rgba(255,255,255,.84);
+          border:1px solid rgba(0,0,0,.06);
+          box-shadow:0 18px 60px rgba(0,0,0,.055);
+          overflow:hidden;
+          margin-bottom:18px;
+          backdrop-filter:blur(24px);
+        }
+
+        .livePreviewMedia{
+          height:168px;
+          background:#f5f5f7;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        }
+
+        .livePreviewMedia img{
+          width:100%;
+          height:100%;
+          object-fit:cover;
+        }
+
+        .livePreviewEmpty{
+          color:#86868b;
+          font-size:13px;
+          font-weight:650;
+        }
+
+        .livePreviewBody{
+          padding:18px;
+          display:grid;
+          gap:8px;
+        }
+
+        .livePreviewBrand{
+          display:flex;
+          align-items:center;
+          gap:9px;
+          color:#6e6e73;
+          font-size:13px;
+          font-weight:650;
+        }
+
+        .livePreviewBrand img{
+          width:24px;
+          height:24px;
+          object-fit:contain;
+        }
+
+        .livePreviewBody strong{
+          font-size:20px;
+          letter-spacing:-.04em;
+        }
+
+        .livePreviewBody p{
+          margin:0;
+          color:#6e6e73;
+          font-size:13px;
+          line-height:1.45;
+        }
+
+        .livePreviewBody b{
+          font-size:22px;
+          letter-spacing:-.04em;
+        }
+
+        .verifiedMini{
+          width:max-content;
+          background:#f0faf4;
+          color:#2d8653;
+          border:1px solid rgba(45,134,83,.18);
+          border-radius:999px;
+          padding:6px 9px;
+          font-size:11px;
+          font-weight:760;
+        }
+
+        .qualityCard{
+          padding:18px;
+        }
+
+        .qualityHeader{
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:12px;
+        }
+
+        .qualityHeader span{
+          color:#6e6e73;
+          font-size:13px;
+          font-weight:650;
+        }
+
+        .qualityHeader strong{
+          font-size:28px;
+          letter-spacing:-.05em;
+        }
+
+        .qualityTrack{
+          height:9px;
+          background:#e8e8ed;
+          border-radius:999px;
+          overflow:hidden;
+          margin:12px 0;
+        }
+
+        .qualityTrack div{
+          height:100%;
+          background:#0071e3;
+          border-radius:999px;
+        }
+
+        .qualityCard b{
+          display:block;
+          font-size:16px;
+          margin-bottom:4px;
+        }
+
+        .qualityCard p{
+          margin:0;
+          color:#6e6e73;
+          font-size:12px;
+          line-height:1.45;
+        }
+
+        .recommendedBox{
+          background:#f0f7ff;
+          border:1px solid rgba(0,113,227,.14);
+          border-radius:18px;
+          padding:13px;
+          margin-bottom:14px;
+          display:grid;
+          gap:4px;
+        }
+
+        .recommendedBox small{
+          color:#0071e3;
+          font-size:10px;
+          text-transform:uppercase;
+          font-weight:760;
+          letter-spacing:.04em;
+        }
+
+        .recommendedBox strong{
+          font-size:17px;
+          letter-spacing:-.03em;
+        }
+
+        .recommendedBox span{
+          color:#6e6e73;
+          font-size:12px;
+        }
+
+        .photoAdded{
+          display:inline-flex;
+          width:max-content;
+          background:#f0faf4!important;
+          color:#2d8653!important;
+          border:1px solid rgba(45,134,83,.18)!important;
+          border-radius:999px;
+          padding:5px 9px;
+          font-size:11px;
+          font-style:normal;
+          font-weight:760;
+        }
+
+        .finalReview{
+          margin-top:36px;
+          border-radius:34px;
+          background:#1d1d1f;
+          box-shadow:0 30px 90px rgba(0,0,0,.20);
+          color:white;
+          padding:26px;
+          display:flex;
+          justify-content:space-between;
+          gap:24px;
+          align-items:flex-start;
+        }
+
+        .finalReview p{
+          color:rgba(255,255,255,.64);
+          margin:6px 0 0;
+        }
+
+        .finalReview ul{
+          margin:14px 0 0;
+          padding-left:18px;
+          color:rgba(255,255,255,.78);
+          line-height:1.6;
+          font-size:13px;
+        }
+
+        .finalReview button{
+          background:#0071e3;
+          color:white;
+          border:0;
+          border-radius:999px;
+          padding:16px 24px;
+          font-weight:760;
+          white-space:nowrap;
+        }
+
+        @media(max-width:900px){
+          .finalReview{
+            flex-direction:column;
+          }
         }
 
       `}</style>
