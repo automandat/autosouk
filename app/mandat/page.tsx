@@ -1337,6 +1337,91 @@ export default function MandatPage() {
           }
         }
 
+
+        /* V22 - Smaller amount typography + smaller final check top-right */
+        .pricingGridExact .moneyInput input{
+          font-size:16px!important;
+          font-weight:600!important;
+          letter-spacing:-.01em!important;
+        }
+
+        .pricingGridExact .moneyInput input::placeholder{
+          font-size:14px!important;
+          font-weight:500!important;
+          color:#86868b!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput input{
+          font-size:18px!important;
+          font-weight:620!important;
+          letter-spacing:-.015em!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput input::placeholder{
+          font-size:15px!important;
+          font-weight:500!important;
+          color:#86868b!important;
+        }
+
+        .pricingGridExact .moneyInput span{
+          font-size:9px!important;
+          font-weight:650!important;
+          padding:0 9px!important;
+        }
+
+        .pricingGridExact .moneyInput{
+          min-height:46px!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput{
+          min-height:50px!important;
+        }
+
+        .instantFlyingCheck{
+          right:10px!important;
+          top:10px!important;
+          width:24px!important;
+          height:24px!important;
+          font-size:15px!important;
+          line-height:1!important;
+          box-shadow:0 8px 18px rgba(45,134,83,.22)!important;
+          animation:singleCheckTravelV22 .95s cubic-bezier(.16,.84,.28,1) forwards!important;
+        }
+
+        @keyframes singleCheckTravelV22{
+          0%{
+            opacity:0;
+            transform:translate(-165px,135px) scale(.35);
+          }
+          18%{
+            opacity:1;
+            transform:translate(-165px,135px) scale(3.00);
+          }
+          58%{
+            opacity:1;
+            transform:translate(-72px,58px) scale(1.55);
+          }
+          100%{
+            opacity:1;
+            transform:translate(0,0) scale(1);
+          }
+        }
+
+        @media(max-width:760px){
+          .pricingGridExact .moneyInput input,
+          .pricingGridExact .priceBoxDesired .moneyInput input{
+            font-size:17px!important;
+          }
+
+          .instantFlyingCheck{
+            right:10px!important;
+            top:10px!important;
+            width:24px!important;
+            height:24px!important;
+            font-size:15px!important;
+          }
+        }
+
       `}</style>
     </main>
   );
