@@ -261,6 +261,15 @@ export default function MandatPage() {
   const [docs, setDocs] = useState(false);
   const [brandLogoMissing, setBrandLogoMissing] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
+  const [priceMin, setPriceMin] = useState("");
+  const [priceDesired, setPriceDesired] = useState("");
+  const [priceInstant, setPriceInstant] = useState("");
+  const [priceMinError, setPriceMinError] = useState("");
+  const [priceInstantError, setPriceInstantError] = useState("");
+  const [instantEnabled, setInstantEnabled] = useState(false);
+  const [instantCommitChecked, setInstantCommitChecked] = useState(false);
+  const [instantLocked, setInstantLocked] = useState(false);
+  const [instantCheckAnimation, setInstantCheckAnimation] = useState(false);
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const displayModel = model === "Autre" ? otherModel : model;
@@ -270,7 +279,7 @@ export default function MandatPage() {
   }, [brand, model]);
 
   const displayEngine = engine === "Autre" ? otherEngine : engine;
-  const desired = Number(form.desired || 0);
+  const desired = Number(priceDesired || form.desired || 0);
   const average = Math.round(MARKET_PRICES.reduce((a,b) => a + b, 0) / MARKET_PRICES.length);
   const completionBase = [form.first, form.last, form.phone, form.city, brand, displayModel, displayEngine, trim, form.year, form.mileage, form.fuel, form.gearbox, form.condition, form.desired, form.floor, form.instantPrice];
   const completion = Math.round((completionBase.filter(Boolean).length / completionBase.length) * 100);
@@ -284,6 +293,102 @@ export default function MandatPage() {
   }, [desired, average]);
 
   const setValue = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
+
+  const rejectMinPrice = () => {
+    setPriceMin("");
+    setValue("floor", "");
+    setPriceMinError("Prix minimum supérieur au prix souhaité");
+  };
+
+  const rejectInstantPrice = () => {
+    setPriceInstant("");
+    setValue("instantPrice", "");
+    setInstantCommitChecked(false);
+    setInstantLocked(false);
+    setPriceInstantError("Prix minimum supérieur au prix de vente immédiat");
+  };
+
+  const handleDesiredPriceChange = (value: string) => {
+    setPriceDesired(value);
+    setValue("desired", value);
+    setPriceMinError("");
+    if (priceMin && value && Number(priceMin) >= Number(value)) {
+      setTimeout(rejectMinPrice, 0);
+    }
+    if (priceInstant && priceMin && Number(priceInstant) <= Number(priceMin)) {
+      setTimeout(rejectInstantPrice, 0);
+    }
+  };
+
+  const handleMinPriceChange = (value: string) => {
+    setPriceMin(value);
+    setValue("floor", value);
+    setPriceMinError("");
+    if (priceInstant && value && Number(priceInstant) <= Number(value)) {
+      setInstantCommitChecked(false);
+      setInstantLocked(false);
+      setPriceInstantError("");
+    }
+  };
+
+  const validateMinPrice = () => {
+    if (priceMin && priceDesired && Number(priceMin) >= Number(priceDesired)) {
+      rejectMinPrice();
+      return false;
+    }
+    setPriceMinError("");
+    return true;
+  };
+
+  const handleInstantEnable = (checked: boolean) => {
+    setInstantEnabled(checked);
+    setPriceInstantError("");
+    setInstantCommitChecked(false);
+    setInstantLocked(false);
+    setInstantCheckAnimation(false);
+    if (!checked) {
+      setPriceInstant("");
+      setValue("instantPrice", "");
+    }
+  };
+
+  const handleInstantPriceChange = (value: string) => {
+    if (instantLocked) return;
+    setPriceInstant(value);
+    setValue("instantPrice", value);
+    setPriceInstantError("");
+    setInstantCommitChecked(false);
+    setInstantLocked(false);
+  };
+
+  const validateInstantPrice = () => {
+    if (!instantEnabled || !priceInstant) return false;
+    if (priceMin && Number(priceInstant) <= Number(priceMin)) {
+      rejectInstantPrice();
+      return false;
+    }
+    setPriceInstantError("");
+    return true;
+  };
+
+  const handleInstantCommit = (checked: boolean) => {
+    if (!checked) {
+      setInstantCommitChecked(false);
+      setInstantLocked(false);
+      setInstantCheckAnimation(false);
+      return;
+    }
+
+    const valid = validateInstantPrice();
+    if (!valid) return;
+
+    setInstantCommitChecked(true);
+    setInstantLocked(true);
+    setInstantCheckAnimation(false);
+    window.setTimeout(() => setInstantCheckAnimation(true), 20);
+  };
+
+  const showInstantCommit = instantEnabled && priceInstant && !priceInstantError && (!priceMin || Number(priceInstant) > Number(priceMin));
   const toggleOption = (value: string) => setSelectedOptions(prev => prev.includes(value) ? prev.filter(x => x !== value) : [...prev, value]);
 
   const toggleCustom = (key: string) => {
@@ -430,10 +535,83 @@ export default function MandatPage() {
 
           <Section id="s7" title="Stratégie de prix" subtitle="Trois niveaux de décision : minimum accepté, prix souhaité et prix immédiat." />
           <div className="critical">🔒 <strong>Le prix minimum accepté reste confidentiel.</strong> Il n’est jamais montré aux acheteurs.</div>
-          <div className="pricingGrid">
-            <PriceBox label="Prix minimum accepté" placeholder="Ex. 145000" onChange={v => setValue("floor", v)} text="Prix minimum souhaité pour la voiture." />
-            <PriceBox main label="Prix souhaité" placeholder="Ex. 160000" onChange={v => setValue("desired", v)} text="Prix affiché comme base de discussion." />
-            <PriceBox label="Prix immédiat" placeholder="Ex. 155000" onChange={v => setValue("instantPrice", v)} text="Prix auquel vous vendez sans attendre." />
+          <div className="pricingGrid pricingGridExact">
+            <div className="priceBox priceBoxMinimum">
+              <div className="priceLabel">Prix minimum accepté <span>*</span></div>
+              <div className={`moneyInput ${priceMinError ? "priceInvalid shakeField" : ""}`}>
+                <input
+                  type="number"
+                  value={priceMin}
+                  placeholder={priceMinError || "Ex. 145000"}
+                  onChange={e => handleMinPriceChange(e.target.value)}
+                  onBlur={validateMinPrice}
+                />
+                <span>Dirhams</span>
+              </div>
+              {priceMinError && <div className="priceError">{priceMinError}</div>}
+              <p>Confidentiel. Il doit impérativement être inférieur au prix souhaité.</p>
+            </div>
+
+            <div className="priceBox priceBoxMain priceBoxDesired">
+              <div className="priceBadge">Prix affiché</div>
+              <div className="priceLabel">Prix souhaité <span>*</span></div>
+              <div className="moneyInput moneyInputDesired">
+                <input
+                  type="number"
+                  value={priceDesired}
+                  placeholder="Ex. 160000"
+                  onChange={e => handleDesiredPriceChange(e.target.value)}
+                />
+                <span>Dirhams</span>
+              </div>
+              <p>Montant central de l’annonce, utilisé comme base de discussion.</p>
+            </div>
+
+            <div className={`priceBox priceBoxInstantExact ${instantEnabled ? "instantEnabled" : ""} ${instantLocked ? "instantLocked" : ""}`}>
+              <div className="instantHeader">
+                <div>
+                  <div className="priceLabel">Prix de vente immédiat</div>
+                  <small>Optionnel</small>
+                </div>
+                {instantLocked && <div className="instantCornerCheck">✓</div>}
+              </div>
+
+              <div className={`moneyInput ${priceInstantError ? "priceInvalid shakeField" : ""}`}>
+                <input
+                  type="number"
+                  value={priceInstant}
+                  placeholder={priceInstantError || "Ex. 155000"}
+                  disabled={!instantEnabled || instantLocked}
+                  onChange={e => handleInstantPriceChange(e.target.value)}
+                  onBlur={validateInstantPrice}
+                />
+                <span>Dirhams</span>
+              </div>
+              {priceInstantError && <div className="priceError">{priceInstantError}</div>}
+
+              <label className="instantEnableLine">
+                <input
+                  type="checkbox"
+                  checked={instantEnabled}
+                  onChange={e => handleInstantEnable(e.target.checked)}
+                />
+                <span>Je souhaite renseigner un prix de vente immédiat</span>
+              </label>
+
+              {showInstantCommit && (
+                <label className={`instantCommitLine ${instantLocked ? "locked" : ""}`}>
+                  <input
+                    type="checkbox"
+                    checked={instantCommitChecked}
+                    disabled={instantLocked}
+                    onChange={e => handleInstantCommit(e.target.checked)}
+                  />
+                  <span>Je m’engage à céder mon véhicule si une offre atteint au minimum ce prix-là.</span>
+                </label>
+              )}
+
+              {instantCheckAnimation && <div className="instantFlyingCheck">✓</div>}
+            </div>
           </div>
           <Field label="Remarques vendeur"><textarea placeholder="Première main, carnet complet, pneus neufs, défauts éventuels..." /></Field>
 
@@ -842,6 +1020,31 @@ export default function MandatPage() {
         .mileageGaugeTop span:last-child{text-align:right}
         .mileageRange{padding:0!important;min-height:28px!important;background:transparent!important;border:0!important;box-shadow:none!important;accent-color:#0071e3}
         .mileagePrecise{min-height:46px!important;border-radius:14px!important;font-size:13px!important}
+
+
+        .pricingGridExact{grid-template-columns:minmax(0,.92fr) minmax(0,1.24fr) minmax(0,.92fr)!important;align-items:stretch!important}
+        .priceBoxMinimum{transform:scale(.97);transform-origin:center}
+        .priceBoxDesired{transform:translateY(-8px) scale(1.03)!important;z-index:2;border:2px solid var(--apple-blue)!important;background:#fff!important;box-shadow:0 24px 70px rgba(0,113,227,.16)!important}
+        .priceBoxDesired .priceLabel{font-size:18px!important}
+        .moneyInputDesired input{font-size:31px!important;font-weight:760!important}
+        .priceBoxInstantExact{position:relative;border:1.6px dashed rgba(0,0,0,.25)!important;background:#fff!important;overflow:hidden}
+        .priceBoxInstantExact.instantEnabled{border-color:rgba(0,113,227,.42)!important}
+        .priceBoxInstantExact.instantLocked{border:2px solid #2d8653!important;background:#f0faf4!important;box-shadow:0 22px 62px rgba(45,134,83,.16)!important}
+        .instantHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+        .instantHeader small{display:block;color:#6e6e73;font-size:11px;margin-top:3px}
+        .instantCornerCheck{width:30px;height:30px;border-radius:999px;background:#2d8653;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;box-shadow:0 10px 28px rgba(45,134,83,.28)}
+        .instantEnableLine,.instantCommitLine{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.4;color:#6e6e73;font-weight:650}
+        .instantEnableLine input,.instantCommitLine input{width:auto!important;min-height:auto!important;margin-top:2px}
+        .instantCommitLine{background:#f0faf4;border:1px solid rgba(45,134,83,.20);border-radius:14px;padding:10px;color:#2d8653}
+        .instantCommitLine.locked{opacity:.92}
+        .priceInvalid{border-color:#b42318!important;background:#fff5f5!important}
+        .priceInvalid input::placeholder{color:#b42318!important;opacity:1;font-size:12px}
+        .priceError{color:#b42318;font-size:12px;font-weight:700;margin-top:-2px}
+        .shakeField{animation:shakePrice .34s ease}
+        .instantFlyingCheck{position:absolute;left:50%;top:50%;width:58px;height:58px;border-radius:50%;background:#2d8653;color:white;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:950;animation:instantCheckTravel .9s cubic-bezier(.16,.84,.28,1) forwards;pointer-events:none;z-index:5}
+        @keyframes shakePrice{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+        @keyframes instantCheckTravel{0%{opacity:0;transform:translate(-50%,-50%) scale(.18)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}100%{opacity:1;transform:translate(calc(-50% + 128px),calc(-50% - 108px)) scale(.38)}}
+        @media(max-width:1280px){.pricingGridExact{grid-template-columns:1fr!important}.priceBoxMinimum,.priceBoxDesired{transform:none!important}}
 
       `}</style>
     </main>
