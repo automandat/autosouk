@@ -241,8 +241,8 @@ export default function MandatPage() {
       <section className="hero">
         <div>
           <div className="eyebrow">AutoSouk</div>
-          <h1>Vendez votre voiture avec une expérience <em>premium</em>, simple et guidée.</h1>
-          <p>Un parcours inspiré des meilleurs produits digitaux : clair, fluide, visuel et pensé pour inspirer confiance dès la première seconde.</p>
+          <h1>Vendez votre voiture avec une expérience <em>fluide</em>, claire et premium.</h1>
+          <p>Un parcours minimaliste, visuel et guidé — pensé pour créer une annonce fiable sans effort.</p>
         </div>
         <div className="heroGlass">
           <div className="heroMetric"><span>Annonce prête à publier</span><strong>{completion}%</strong></div>
@@ -379,6 +379,350 @@ export default function MandatPage() {
         .check{display:flex;gap:12px;background:#f8fafc;border:1px solid #dce3eb;border-radius:18px;padding:17px;font-weight:900}.check input{width:auto;min-height:auto}.docs{margin-top:18px;background:#eef8f2;border:1px solid #c7e8d3;border-radius:22px;padding:22px}.verified{display:inline-flex;background:#2d8653;color:white;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:950;margin-bottom:18px}.preview{border-radius:26px;background:linear-gradient(145deg,#fff,#f8fafc);border:1.5px solid #dce4ee;box-shadow:0 18px 44px rgba(22,28,36,.06);padding:22px;line-height:1.75}.final{margin-top:34px;border-radius:30px;background:linear-gradient(135deg,#111827,#1f2937);box-shadow:0 28px 80px rgba(17,24,39,.22);color:white;padding:24px;display:flex;justify-content:space-between;gap:22px;align-items:center}.final p{color:rgba(255,255,255,.62)}.final button{background:linear-gradient(135deg,#b8924a,#d9b56d);color:white;border:0;border-radius:18px;padding:15px 22px;font-weight:950}
         .marketCard{border-radius:32px;background:rgba(255,255,255,.80);border:1px solid #e2e8f0;box-shadow:0 30px 90px rgba(22,28,36,.10);padding:20px}.marketHeader{display:flex;justify-content:space-between;gap:10px}.marketHeader span{font-size:24px;font-weight:950}.marketHeader b{font-size:10px;text-transform:uppercase;color:#b8924a;background:#fff6e8;border-radius:999px;padding:7px 9px}.marketIdentity{background:linear-gradient(135deg,#111827,#27313c);border-radius:24px;color:white;padding:15px;margin:15px 0}.marketIdentity small{display:block;color:rgba(255,255,255,.6);margin-top:4px}.marketStats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.marketStats div{background:#f8fafc;border:1px solid #dce3eb;border-radius:15px;padding:11px}.marketStats small{display:block;color:#728196;font-size:10px;text-transform:uppercase;font-weight:900}.chart{display:grid;gap:8px;margin:16px 0}.barRow{display:grid;grid-template-columns:56px minmax(0,1fr) 34px;gap:8px;align-items:center;font-size:11px}.barTrack{height:9px;background:#e5eaf0;border-radius:999px;overflow:hidden}.barTrack div{height:100%;background:linear-gradient(90deg,#b8924a,#d9ad62)}.signal{border-radius:16px;padding:14px;margin-top:14px;border:1px solid #ddd}.signal p{margin:4px 0 0}.signal.green{background:#edf7f2;color:#2d8653}.signal.red{background:#fff2f0;color:#b42318}.signal.black{background:#f3f0ec;color:#111827}.signal.neutral{background:#f8fafc;color:#728196}.sourceNote{font-size:11px;color:#8090a3}
         @media(max-width:1280px){.workspace{grid-template-columns:220px minmax(0,1fr)}.rightRail{position:static;grid-column:2}.pricingGrid{grid-template-columns:1fr}.priceBoxMain{transform:none}}@media(max-width:900px){.topbar{padding:0 18px}.hero,.workspace{grid-template-columns:1fr;padding-left:18px;padding-right:18px}.leftNav,.rightRail{position:static}.brandShowcaseWide{grid-template-columns:1fr}.photoQualityPanel,.final{flex-direction:column;align-items:flex-start}.panel{padding:24px;border-radius:28px}h1{font-size:clamp(42px,12vw,64px)}}
+
+        /* V14 Apple-inspired minimal DA + subtle 3D scroll */
+        :root{
+          --apple-bg:#f5f5f7;
+          --apple-white:#ffffff;
+          --apple-ink:#1d1d1f;
+          --apple-muted:#6e6e73;
+          --apple-line:rgba(0,0,0,.075);
+          --apple-blue:#0071e3;
+          --apple-blue-soft:#f0f7ff;
+          --apple-shadow:0 18px 60px rgba(0,0,0,.055);
+          --apple-shadow-strong:0 28px 90px rgba(0,0,0,.09);
+        }
+
+        .page{
+          background:linear-gradient(180deg,#f5f5f7 0%,#ffffff 46%,#f5f5f7 100%)!important;
+          color:var(--apple-ink)!important;
+          font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Arial,sans-serif!important;
+          overflow-x:hidden!important;
+        }
+
+        .topbar{
+          height:74px!important;
+          background:rgba(245,245,247,.74)!important;
+          backdrop-filter:blur(28px)!important;
+          border-bottom:1px solid rgba(0,0,0,.045)!important;
+          position:sticky!important;
+          top:0!important;
+          z-index:50!important;
+        }
+
+        .logo{
+          color:var(--apple-ink)!important;
+          font-weight:760!important;
+          letter-spacing:-.045em!important;
+        }
+
+        .logo span{
+          color:var(--apple-ink)!important;
+          background:none!important;
+          -webkit-background-clip:initial!important;
+        }
+
+        .draft{
+          background:rgba(255,255,255,.72)!important;
+          border:1px solid rgba(0,0,0,.06)!important;
+          color:var(--apple-muted)!important;
+          box-shadow:none!important;
+        }
+
+        .back{
+          background:var(--apple-ink)!important;
+          color:white!important;
+          box-shadow:0 12px 30px rgba(0,0,0,.14)!important;
+        }
+
+        .hero{
+          padding-top:96px!important;
+          padding-bottom:58px!important;
+          perspective:1200px!important;
+        }
+
+        .eyebrow{
+          color:var(--apple-muted)!important;
+          background:transparent!important;
+          border:0!important;
+          box-shadow:none!important;
+          text-transform:none!important;
+          letter-spacing:0!important;
+          font-size:14px!important;
+          padding:0!important;
+        }
+
+        .eyebrow:before{
+          display:none!important;
+        }
+
+        h1{
+          font-weight:760!important;
+          letter-spacing:-.075em!important;
+          color:var(--apple-ink)!important;
+          font-size:clamp(56px,7vw,108px)!important;
+          line-height:.94!important;
+        }
+
+        h1 em{
+          color:var(--apple-blue)!important;
+          background:none!important;
+          -webkit-background-clip:initial!important;
+          font-style:normal!important;
+        }
+
+        .hero p{
+          color:var(--apple-muted)!important;
+          font-size:22px!important;
+          line-height:1.45!important;
+        }
+
+        .heroGlass,.panel,.leftNav,.marketCard{
+          background:rgba(255,255,255,.84)!important;
+          border:1px solid var(--apple-line)!important;
+          box-shadow:var(--apple-shadow)!important;
+          backdrop-filter:blur(26px)!important;
+        }
+
+        .heroGlass{
+          animation:appleFloatIn .9s ease both!important;
+          transform-style:preserve-3d!important;
+        }
+
+        .heroMetric strong{
+          color:var(--apple-ink)!important;
+          background:none!important;
+          -webkit-background-clip:initial!important;
+          font-weight:760!important;
+        }
+
+        .track div{
+          background:var(--apple-blue)!important;
+        }
+
+        .heroList span{
+          background:#f5f5f7!important;
+          border:1px solid rgba(0,0,0,.055)!important;
+          color:#333336!important;
+        }
+
+        .workspace{
+          perspective:1200px!important;
+        }
+
+        .leftNav{
+          top:94px!important;
+        }
+
+        .leftNav a{
+          color:var(--apple-muted)!important;
+          transition:transform .18s ease, background .18s ease, color .18s ease!important;
+        }
+
+        .leftNav a:hover{
+          background:#f5f5f7!important;
+          color:var(--apple-ink)!important;
+          transform:translateX(3px) translateZ(8px)!important;
+        }
+
+        .leftNav small,.req,.upload b{
+          color:var(--apple-blue)!important;
+        }
+
+        .sectionTitle{
+          animation:sectionReveal linear both!important;
+          animation-timeline:view()!important;
+          animation-range:entry 0% cover 28%!important;
+        }
+
+        .sectionTitle h2{
+          color:var(--apple-ink)!important;
+          font-weight:760!important;
+          letter-spacing:-.055em!important;
+        }
+
+        .sectionTitle p{
+          color:var(--apple-muted)!important;
+        }
+
+        input,select,textarea{
+          background:#f5f5f7!important;
+          border:1px solid rgba(0,0,0,.08)!important;
+          border-radius:16px!important;
+          color:var(--apple-ink)!important;
+          transition:border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease!important;
+        }
+
+        input:hover,select:hover,textarea:hover{
+          background:#fff!important;
+          border-color:rgba(0,113,227,.32)!important;
+        }
+
+        input:focus,select:focus,textarea:focus{
+          background:#fff!important;
+          border-color:var(--apple-blue)!important;
+          box-shadow:0 0 0 4px rgba(0,113,227,.16)!important;
+          transform:translateY(-1px)!important;
+        }
+
+        .brandShowcaseWide,.priceBox,.upload,.optionBlock,.field{
+          animation:cardReveal linear both!important;
+          animation-timeline:view()!important;
+          animation-range:entry 0% cover 22%!important;
+        }
+
+        .brandShowcaseWide{
+          background:linear-gradient(180deg,#fff,#f5f5f7)!important;
+          border:1px solid var(--apple-line)!important;
+          box-shadow:var(--apple-shadow)!important;
+          transform-style:preserve-3d!important;
+        }
+
+        .brandLogoSlot{
+          background:#fff!important;
+          box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 12px 32px rgba(0,0,0,.045)!important;
+          transform:translateZ(18px)!important;
+        }
+
+        .brandFallback{
+          background:var(--apple-ink)!important;
+          color:#fff!important;
+        }
+
+        .brandPngLogo{
+          transition:transform .22s ease!important;
+        }
+
+        .brandPngLogo:hover{
+          transform:scale(1.04) rotateX(3deg)!important;
+        }
+
+        .pill,.optionItem,.colorItem,.priceBox,.upload,.preview,.check{
+          background:#fff!important;
+          border:1px solid rgba(0,0,0,.08)!important;
+          box-shadow:0 8px 30px rgba(0,0,0,.035)!important;
+          transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease!important;
+          transform-style:preserve-3d!important;
+        }
+
+        .pill:hover,.optionItem:hover,.colorItem:hover,.upload:hover{
+          transform:translateY(-3px) rotateX(2deg)!important;
+          border-color:rgba(0,113,227,.30)!important;
+          box-shadow:0 18px 54px rgba(0,0,0,.075)!important;
+        }
+
+        .optionItem.selected,.colorGrid.hasSelection .colorItem.selected,.customOtherBox.active{
+          background:var(--apple-blue-soft)!important;
+          border-color:var(--apple-blue)!important;
+          box-shadow:0 16px 40px rgba(0,113,227,.12)!important;
+        }
+
+        .colorGrid.hasSelection .colorItem{
+          opacity:.30!important;
+          filter:grayscale(.9)!important;
+        }
+
+        .colorGrid.hasSelection .colorItem.selected{
+          opacity:1!important;
+          filter:none!important;
+        }
+
+        .colorItem.selected:after{
+          background:var(--apple-blue)!important;
+          color:white!important;
+        }
+
+        .critical{
+          background:#fff5f5!important;
+          border:1px solid rgba(180,35,24,.18)!important;
+          color:#b42318!important;
+        }
+
+        .priceBoxMain{
+          background:#fff!important;
+          border:2px solid var(--apple-blue)!important;
+          box-shadow:0 24px 70px rgba(0,113,227,.16)!important;
+        }
+
+        .priceBadge,.final button,.barTrack div{
+          background:var(--apple-blue)!important;
+          color:white!important;
+        }
+
+        .moneyInput span{
+          background:#f5f5f7!important;
+          color:var(--apple-muted)!important;
+        }
+
+        .photoQualityPanel{
+          background:#fff!important;
+          border:1px solid rgba(0,0,0,.07)!important;
+          box-shadow:var(--apple-shadow)!important;
+        }
+
+        .photoQualityPanel p{
+          color:var(--apple-muted)!important;
+        }
+
+        .photoQualityPanel span,.marketIdentity,.final{
+          background:var(--apple-ink)!important;
+          color:white!important;
+        }
+
+        .photoGuideImage{
+          background:#f5f5f7!important;
+          border:1px solid rgba(0,0,0,.06)!important;
+        }
+
+        .marketHeader b{
+          color:var(--apple-blue)!important;
+          background:var(--apple-blue-soft)!important;
+        }
+
+        .marketStats div{
+          background:#f5f5f7!important;
+          border:1px solid rgba(0,0,0,.06)!important;
+        }
+
+        .marketStats small,.sourceNote{
+          color:var(--apple-muted)!important;
+        }
+
+        .barTrack{
+          background:#e8e8ed!important;
+        }
+
+        .signal.green{background:#f0faf4!important;color:#2d8653!important}
+        .signal.red{background:#fff5f5!important;color:#b42318!important}
+        .signal.black{background:#f5f5f7!important;color:#1d1d1f!important}
+        .signal.neutral{background:#f5f5f7!important;color:#6e6e73!important}
+
+        @keyframes appleFloatIn{
+          from{opacity:0;transform:translateY(24px) rotateX(8deg) scale(.98)}
+          to{opacity:1;transform:translateY(0) rotateX(0) scale(1)}
+        }
+
+        @keyframes cardReveal{
+          from{opacity:.25;transform:translateY(34px) rotateX(7deg) scale(.985)}
+          to{opacity:1;transform:translateY(0) rotateX(0) scale(1)}
+        }
+
+        @keyframes sectionReveal{
+          from{opacity:.35;transform:translateY(26px)}
+          to{opacity:1;transform:translateY(0)}
+        }
+
+        @supports not (animation-timeline:view()){
+          .sectionTitle,.field,.optionBlock,.priceBox,.upload,.brandShowcaseWide{
+            animation:none!important;
+          }
+        }
+
+        @media(max-width:900px){
+          .draft{display:none!important}
+          h1{font-size:clamp(44px,12vw,68px)!important}
+        }
+
       `}</style>
     </main>
   );
