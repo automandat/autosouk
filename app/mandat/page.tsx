@@ -376,6 +376,23 @@ export default function MandatPage() {
   const [maxUnlockedStep, setMaxUnlockedStep] = useState(7);
   const [isRecipeMode, setIsRecipeMode] = useState(true);
   const [draftSavedAt, setDraftSavedAt] = useState("");
+  const [descriptionStyle, setDescriptionStyle] = useState("Premium");
+  const [publicationMode, setPublicationMode] = useState("Premium");
+  const [validationAttempted, setValidationAttempted] = useState(false);
+  const [firstInvalidKey, setFirstInvalidKey] = useState("");
+  const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({
+    vehicleIdentity: true,
+    registration: true,
+    mileage: true,
+    tech: true,
+    design: true,
+    options: true,
+    history: true,
+    documents: true
+  });
+  const [history, setHistory] = useState<Record<string, string>>({});
+  const [structuredDocs, setStructuredDocs] = useState<Record<string, number>>({});
+  const [fuelDetails, setFuelDetails] = useState<Record<string, string>>({});
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const displayModel = model === "Autre" ? otherModel : model;
@@ -538,16 +555,22 @@ export default function MandatPage() {
       if (p.priceInstant) setPriceInstant(p.priceInstant);
       if (p.instantEnabled) setInstantEnabled(p.instantEnabled);
       if (p.mileageRange) setMileageRange(p.mileageRange);
+      if (p.descriptionStyle) setDescriptionStyle(p.descriptionStyle);
+      if (p.publicationMode) setPublicationMode(p.publicationMode);
+      if (p.openBlocks) setOpenBlocks(p.openBlocks);
+      if (p.history) setHistory(p.history);
+      if (p.structuredDocs) setStructuredDocs(p.structuredDocs);
+      if (p.fuelDetails) setFuelDetails(p.fuelDetails);
     } catch {}
   }, []);
 
   useEffect(() => {
     try {
-      const payload = { form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange };
+      const payload = { form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange, descriptionStyle, publicationMode, openBlocks, history, structuredDocs, fuelDetails };
       localStorage.setItem("autosoukDraftV37", JSON.stringify(payload));
       setDraftSavedAt(new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }));
     } catch {}
-  }, [form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange]);
+  }, [form, brand, model, otherModel, engine, otherEngine, trim, exteriorColor, selectedOptions, customFields, docs, confidence, priceMin, priceDesired, priceInstant, instantEnabled, mileageRange, descriptionStyle, publicationMode, openBlocks, history, structuredDocs, fuelDetails]);
 
   const resetDraft = () => {
     try { localStorage.removeItem("autosoukDraftV37"); } catch {}
@@ -565,6 +588,15 @@ export default function MandatPage() {
         : "";
   const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${registrationSummary ? ` ${registrationSummary}` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
 
+  const descriptionVariants: Record<string, string> = {
+    Sobre: description,
+    Premium: `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""} ${form.year || ""}, présenté avec ${form.mileage || "kilométrage renseigné"}${form.city ? ` à ${form.city}` : ""}. ${form.condition ? `État déclaré : ${form.condition.toLowerCase()}.` : ""}${allOptions.length ? ` Options principales : ${allOptions.slice(0, 8).join(", ")}.` : ""}${priceDesired ? ` Prix souhaité : ${formatDh(Number(priceDesired))}.` : ""}`.replace(/\s+/g, " ").trim(),
+    Commercial: `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""} ${form.year || ""} à vendre${form.city ? ` à ${form.city}` : ""}. Configuration ${trim || "soignée"}, ${form.mileage || "kilométrage renseigné"} au compteur${allOptions.length ? `, avec ${allOptions.slice(0, 6).join(", ")}` : ""}. ${priceDesired ? `Disponible au prix de ${formatDh(Number(priceDesired))}.` : ""}`.replace(/\s+/g, " ").trim()
+  };
+
+  const generatedDescription = descriptionVariants[descriptionStyle] || description;
+
+
 
   const requiredPhotoLabels = PHOTOS.filter(photo => !photo.multiple).map(photo => photo.label);
   const uploadedRequiredPhotos = requiredPhotoLabels.filter(label => (uploadedPhotos[label] || 0) > 0).length;
@@ -572,6 +604,25 @@ export default function MandatPage() {
   const photoCompletion = Math.round((uploadedRequiredPhotos / requiredPhotoLabels.length) * 100);
 
   const priceWithinMarket = !!priceDesired && Math.abs((Number(priceDesired) - average) / average) <= 0.05;
+
+  const dynamicBadges = [
+    docs ? "Verified potentiel" : "",
+    priceWithinMarket ? "Prix marché" : "",
+    confidence.firstOwner === "Oui" ? "Première main" : "",
+    confidence.serviceBook === "Oui" ? "Carnet complet" : "",
+    Number((form.mileage || "").replace(/\D/g, "")) > 0 && Number((form.mileage || "").replace(/\D/g, "")) < 50000 ? "Faible kilométrage" : "",
+    form.customsCleared === "Oui" ? "Dédouané" : "",
+    form.accidented === "Non" ? "Non accidenté" : "",
+    uploadedRequiredPhotos === requiredPhotoLabels.length ? "12 photos" : ""
+  ].filter(Boolean);
+
+  const coherenceAlerts = [
+    displayEngine && form.fuel === "Diesel" && /(e|hybrid|phev|plug-in|electric)/i.test(displayEngine) ? "Motorisation et carburant potentiellement incohérents." : "",
+    form.fuel === "Électrique" && fuelDetails.engineDisplacement ? "Électrique + cylindrée renseignée : vérifiez la cohérence." : "",
+    form.year && Number(form.year) > new Date().getFullYear() ? "Année future non autorisée." : "",
+    priceInstant && priceDesired && Number(priceInstant) > Number(priceDesired) ? "Prix immédiat supérieur au prix souhaité : logique commerciale à vérifier." : "",
+    form.mileage && Number((form.mileage || "").replace(/\D/g, "")) === 0 && form.condition !== "Neuf" ? "Kilométrage 0 avec véhicule non neuf : à vérifier." : ""
+  ].filter(Boolean);
   const trustSignals = [
     docs,
     form.condition,
@@ -676,6 +727,35 @@ export default function MandatPage() {
     true
   ];
 
+  const invalidFieldsByStep = [
+    [
+      !form.first ? "first" : "",
+      !form.last ? "last" : "",
+      !form.phone || form.phone.replace(/\D/g, "").length !== 10 ? "phone" : "",
+      !form.city ? "city" : ""
+    ].filter(Boolean),
+    [
+      !brand ? "brand" : "",
+      !displayModel ? "model" : "",
+      !displayEngine ? "engine" : "",
+      !trim ? "trim" : "",
+      !form.year ? "year" : "",
+      !form.mileage ? "mileage" : ""
+    ].filter(Boolean),
+    [
+      !form.fuel ? "fuel" : "",
+      !form.gearbox ? "gearbox" : ""
+    ].filter(Boolean),
+    [],
+    [
+      !priceMin ? "priceMin" : "",
+      !priceDesired ? "priceDesired" : ""
+    ].filter(Boolean),
+    uploadedRequiredPhotos < requiredPhotoLabels.length ? ["photos"] : [],
+    [],
+    []
+  ];
+
   const currentStepValid = stepRequiredOk[activeStep];
 
   const stepCompletion = [
@@ -695,6 +775,22 @@ export default function MandatPage() {
     return "empty";
   });
 
+
+  const detailedScores = [
+    { label: "Identité", value: Math.round((stepCompletion[0].done / stepCompletion[0].total) * 100) },
+    { label: "Véhicule", value: Math.round((stepCompletion[1].done / stepCompletion[1].total) * 100) },
+    { label: "Prix", value: Math.round((stepCompletion[4].done / stepCompletion[4].total) * 100) },
+    { label: "Photos", value: Math.round((stepCompletion[5].done / stepCompletion[5].total) * 100) },
+    { label: "Confiance", value: Math.round((stepCompletion[6].done / stepCompletion[6].total) * 100) }
+  ];
+
+  const scoreRecommendations = [
+    uploadedRequiredPhotos < requiredPhotoLabels.length ? `Ajoutez ${requiredPhotoLabels.length - uploadedRequiredPhotos} photo(s) obligatoire(s) pour améliorer le score.` : "",
+    !docs ? "Ajoutez les documents publics pour renforcer le badge Verified." : "",
+    confidence.invoices !== "Oui" ? "Ajoutez les factures d’entretien pour rassurer l’acheteur." : "",
+    !priceWithinMarket && priceDesired ? "Ajustez le prix pour vous rapprocher de la fourchette recommandée." : ""
+  ].filter(Boolean);
+
   const smartAlerts = [
     Number((form.mileage || "").replace(/\D/g, "")) > 200000 ? "Kilométrage élevé : ajoutez l’historique d’entretien et des factures." : "",
     form.accidented === "Oui" ? "Véhicule accidenté : ajoutez les photos des réparations ou justificatifs disponibles." : "",
@@ -706,8 +802,35 @@ export default function MandatPage() {
     setConfidence(prev => ({ ...prev, [key]: value }));
   };
 
+  const setHistoryValue = (key: string, value: string) => {
+    setHistory(prev => ({ ...prev, [key]: value }));
+  };
+
+  const setFuelValue = (key: string, value: string) => {
+    setFuelDetails(prev => ({ ...prev, [key]: value }));
+  };
+
+  const toggleBlock = (key: string) => {
+    setOpenBlocks(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleStructuredDocUpload = (key: string, files: FileList | null) => {
+    setStructuredDocs(prev => ({ ...prev, [key]: files?.length || 0 }));
+  };
+
   const handleNextStep = () => {
-    if (!isRecipeMode && !currentStepValid) return;
+    setValidationAttempted(true);
+    const firstInvalid = invalidFieldsByStep[activeStep]?.[0] || "";
+    setFirstInvalidKey(firstInvalid);
+    if (!isRecipeMode && !currentStepValid) {
+      window.setTimeout(() => {
+        const el = document.querySelector(`[data-field-key="${firstInvalid}"]`) as HTMLElement | null;
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
+      return;
+    }
+    setValidationAttempted(false);
+    setFirstInvalidKey("");
     const nextStep = Math.min(activeStep + 1, journeySteps.length - 1);
     setMaxUnlockedStep(prev => Math.max(prev, nextStep));
     setActiveStep(nextStep);
@@ -773,20 +896,30 @@ export default function MandatPage() {
             </div>
             <div className="stepPercent">{stepProgress}%</div>
           </div>
+          <div className="activeStepSummary">
+            <strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong>
+            <span>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.city || "Ville"}</span>
+          </div>
+          <div className="publicationModeBox">
+            <button type="button" className={publicationMode === "Rapide" ? "selected" : ""} onClick={() => setPublicationMode("Rapide")}>Publication rapide · 3 min</button>
+            <button type="button" className={publicationMode === "Premium" ? "selected" : ""} onClick={() => setPublicationMode("Premium")}>Publication premium · dossier complet</button>
+          </div>
           <div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
           {smartAlerts.length > 0 && (
             <div className="smartAlertsBox">
               <strong>Alertes intelligentes</strong>
-              {smartAlerts.slice(0, 3).map(alert => <span key={alert}>{alert}</span>)}
+              {[...smartAlerts, ...coherenceAlerts].slice(0, 4).map(alert => <span key={alert}>{alert}</span>)}
             </div>
           )}
           <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>
           <Section id="s1" title="Identité vendeur" subtitle="Ces informations restent privées et ne sont jamais publiées." />
           <div className="grid">
-            <Field label="Prénom" required><input placeholder="Mohammed" onChange={e => setValue("first", e.target.value)} /></Field>
-            <Field label="Nom" required><input placeholder="El Fassi" onChange={e => setValue("last", e.target.value)} /></Field>
+            <Field label="Prénom" required><input data-field-key="first" className={validationAttempted && firstInvalidKey === "first" ? "invalidInput" : ""} placeholder="Mohammed" onChange={e => setValue("first", e.target.value)} />{validationAttempted && !form.first && <small className="inlineError">Champ requis</small>}</Field>
+            <Field label="Nom" required><input data-field-key="last" className={validationAttempted && firstInvalidKey === "last" ? "invalidInput" : ""} placeholder="El Fassi" onChange={e => setValue("last", e.target.value)} />{validationAttempted && !form.last && <small className="inlineError">Champ requis</small>}</Field>
             <Field label="Téléphone" required>
               <input
+                data-field-key="phone"
+                className={validationAttempted && firstInvalidKey === "phone" ? "invalidInput" : ""}
                 type="tel"
                 inputMode="numeric"
                 pattern="[0-9 ]*"
@@ -803,10 +936,10 @@ export default function MandatPage() {
                 }}
               />
               <small className={form.phone && form.phone.replace(/\D/g, "").length !== 10 ? "fieldHint fieldHintError" : "fieldHint"}>
-                10 chiffres obligatoires.
+                {form.phone && form.phone.replace(/\D/g, "").length === 10 ? "✓ Numéro valide" : "10 chiffres obligatoires."}
               </small>
             </Field>
-            <Field label="Ville" required><select defaultValue="" onChange={e => setValue("city", e.target.value)}><option value="" disabled>Sélectionner</option>{CITIES.map(x => <option key={x}>{x}</option>)}</select></Field>
+            <Field label="Ville" required><select data-field-key="city" className={validationAttempted && firstInvalidKey === "city" ? "invalidInput" : ""} defaultValue="" onChange={e => setValue("city", e.target.value)}><option value="" disabled>Sélectionner</option>{CITIES.map(x => <option key={x}>{x}</option>)}</select>{validationAttempted && !form.city && <small className="inlineError">Champ requis</small>}</Field>
           </div>
 
           </div>
@@ -928,8 +1061,31 @@ export default function MandatPage() {
             <Field label="Transmission" required><select defaultValue="" onChange={e => setValue("gearbox", e.target.value)}><option value="" disabled>Sélectionner</option><option>Boîte manuelle</option><option>Boîte automatique</option><option>Boîte semi-automatique</option></select></Field>
             <Field label="Motricité"><select defaultValue=""><option>Tous</option><option>Traction avant</option><option>Propulsion</option><option>4x4</option></select></Field>
             <Field label="Puissance"><input placeholder="Ex. 204 ch DIN" /></Field>
-            <Field label="Cylindrée"><input placeholder="Ex. 1998 ccm" /></Field>
+            <Field label="Cylindrée"><input value={fuelDetails.engineDisplacement || ""} onChange={e => setFuelValue("engineDisplacement", e.target.value)} placeholder="Ex. 1998 ccm" /></Field>
             <Field label="Nombre de portes"><select defaultValue=""><option>Tous</option><option>2 portes</option><option>3 portes</option><option>4 portes</option><option>5 portes</option></select></Field>
+          </div>
+
+          <div className="fuelConditionalBox">
+            <h3>Champs adaptés au carburant</h3>
+            {form.fuel === "Électrique" && (
+              <div className="grid">
+                <Field label="Capacité batterie"><input value={fuelDetails.battery || ""} onChange={e => setFuelValue("battery", e.target.value)} placeholder="Ex. 75 kWh" /></Field>
+                <Field label="Autonomie WLTP"><input value={fuelDetails.range || ""} onChange={e => setFuelValue("range", e.target.value)} placeholder="Ex. 520 km" /></Field>
+                <Field label="Type de recharge"><select value={fuelDetails.charging || ""} onChange={e => setFuelValue("charging", e.target.value)}><option value="" disabled>Sélectionner</option><option>AC</option><option>DC rapide</option><option>AC + DC</option></select></Field>
+              </div>
+            )}
+            {form.fuel === "Hybride rechargeable" && (
+              <div className="grid">
+                <Field label="Autonomie électrique"><input value={fuelDetails.evRange || ""} onChange={e => setFuelValue("evRange", e.target.value)} placeholder="Ex. 80 km" /></Field>
+                <Field label="Capacité batterie"><input value={fuelDetails.battery || ""} onChange={e => setFuelValue("battery", e.target.value)} placeholder="Ex. 25 kWh" /></Field>
+              </div>
+            )}
+            {form.fuel && !["Électrique","Hybride rechargeable"].includes(form.fuel) && (
+              <div className="grid">
+                <Field label="Puissance fiscale"><input value={fuelDetails.fiscalPower || ""} onChange={e => setFuelValue("fiscalPower", e.target.value)} placeholder="Ex. 8 CV" /></Field>
+                <Field label="Norme antipollution"><select value={fuelDetails.emission || ""} onChange={e => setFuelValue("emission", e.target.value)}><option value="" disabled>Sélectionner</option><option>Euro 4</option><option>Euro 5</option><option>Euro 6</option><option>Non renseigné</option></select></Field>
+              </div>
+            )}
           </div>
 
           </div>
@@ -1075,6 +1231,22 @@ export default function MandatPage() {
           <div className={`journeyPane ${activeStep === 6 ? "active" : ""}`}>
           <Section id="s9" title="Documents & confiance" subtitle="Documents publics facultatifs. Les informations sensibles doivent être floutées." />
           <label className="check"><input type="checkbox" checked={docs} onChange={e => setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
+          <div className="structuredDocsGrid">
+            {[
+              ["registration","Carte grise floutée","Obligatoire pour Verified"],
+              ["inspection","Contrôle technique","Recommandé"],
+              ["invoices","Factures d’entretien","Recommandé"],
+              ["serviceBook","Carnet d’entretien","Facultatif"],
+              ["customs","Certificat de dédouanement","Si import"],
+              ["expertise","Rapport d’expertise","Facultatif"]
+            ].map(([key,label,tag]) => (
+              <label key={key} className={`structuredDoc ${structuredDocs[key] ? "added" : ""}`}>
+                <strong>{label}</strong>
+                <span>{structuredDocs[key] ? "Ajouté" : tag}</span>
+                <input type="file" accept="image/*,.pdf" onChange={e => handleStructuredDocUpload(key, e.target.files)} />
+              </label>
+            ))}
+          </div>
           {docs && <div className="docs"><div className="verified">Verified potentiel</div><div className="grid"><Field label="Carte grise floutée"><input type="file" accept="image/*,.pdf" /></Field><Field label="Factures / carnet"><input type="file" accept="image/*,.pdf" multiple /></Field><Field label="Contrôle technique"><input type="file" accept="image/*,.pdf" /></Field><Field label="Autres documents"><input type="file" accept="image/*,.pdf" multiple /></Field></div></div>}
 
           <div className="trustBox">
@@ -1107,7 +1279,15 @@ export default function MandatPage() {
 
           <div className={`journeyPane ${activeStep === 7 ? "active" : ""}`}>
           <Section id="s10" title="Preview de l’annonce" subtitle="Résumé public généré automatiquement." />
-          <div className="preview">{description}</div>
+          <div className="descriptionAssistant">
+            <h3>Description assistée</h3>
+            <div className="descriptionStyles">
+              {["Sobre","Premium","Commercial"].map(style => (
+                <button type="button" key={style} className={descriptionStyle === style ? "selected" : ""} onClick={() => setDescriptionStyle(style)}>{style}</button>
+              ))}
+            </div>
+          </div>
+          <div className="preview">{generatedDescription}</div>
           <div className="finalReview">
             <div>
               <div className="finalScorePill">Score qualité : {qualityScore}/100 · {qualityLabel}</div><strong>{missingItems.length ? "Derniers points avant publication" : "Votre annonce est prête"}</strong>
@@ -1147,7 +1327,7 @@ export default function MandatPage() {
               </div>
               <strong>{displayEngine || "Motorisation"} {trim || ""}</strong>
               <p>{form.year || "Année"} · {form.mileage || "Kilométrage"} · {form.fuel || "Carburant"} · {form.city || "Ville"}</p>
-              <b>{priceDesired ? formatDh(Number(priceDesired)) : "Prix à renseigner"}</b>
+              <b>{priceDesired ? formatDh(Number(priceDesired)) : "Prix à renseigner"}</b><div className="dynamicBadges">{dynamicBadges.slice(0, 5).map(badge => <span key={badge}>{badge}</span>)}</div>
               <small className="scoreMini">Score annonce : {qualityScore}/100</small>{docs && <small className="verifiedMini">Verified potentiel</small>}
             </div>
           </div>
@@ -1159,13 +1339,13 @@ export default function MandatPage() {
             </div>
             <div className="qualityTrack"><div style={{ width: `${qualityScore}%` }} /></div>
             <b>{qualityLabel}</b>
-            <p>{uploadedRequiredPhotos}/{requiredPhotoLabels.length} photos obligatoires ajoutées · {missingItems.length ? `${missingItems.length} point(s) à compléter` : "Dossier prêt pour revue"}</p>
+            <p>{uploadedRequiredPhotos}/{requiredPhotoLabels.length} photos obligatoires ajoutées · {missingItems.length ? `${missingItems.length} point(s) à compléter` : "Dossier prêt pour revue"}</p><div className="scoreDetailList">{detailedScores.map(s => <span key={s.label}><b>{s.label}</b><em>{s.value}%</em></span>)}</div>{scoreRecommendations.length > 0 && <div className="scoreRecommendations">{scoreRecommendations.slice(0, 2).map(r => <small key={r}>{r}</small>)}</div>}
           </div>
 
           <div className="marketCard">
             <div className="marketHeader"><span>Argus AutoSouk</span><b>Benchmark mensuel</b></div>
             <div className="marketIdentity"><strong>{brand || "Marque"} {displayModel || "Modèle"} {displayEngine || ""}</strong><small>{trim || "Finition"} · {form.year || "Année"} · {form.mileage || "Kilométrage"}</small></div>
-            <div className="recommendedBox">
+            <div className="pricePercentileBox"><strong>{priceDesired ? `${Math.min(99, Math.max(1, Math.round((MARKET_PRICES.filter(p => p <= Number(priceDesired)).length / MARKET_PRICES.length) * 100)))}e percentile` : "Position à calculer"}</strong><span>{priceDesired ? `Écart médiane : ${Math.round(((Number(priceDesired) - median(MARKET_PRICES)) / median(MARKET_PRICES)) * 100)}%` : "Renseignez un prix souhaité"}</span></div><div className="recommendedBox">
               <small>Fourchette recommandée</small>
               <strong>{formatDh(recommendedLow)} – {formatDh(recommendedHigh)}</strong>
               <span>Délai estimé : {estimatedDelay}</span>
@@ -2507,16 +2687,54 @@ export default function MandatPage() {
         .journeyPane.active{animation:journeySlidePremium .5s cubic-bezier(.22,1,.36,1) both!important}
         @keyframes journeySlidePremium{from{opacity:0;transform:translateX(24px) scale(.992)}to{opacity:1;transform:translateX(0) scale(1)}}
 
+
+        /* V39 - 15 premium upgrades */
+        .inlineError{color:#b42318;font-size:11px;font-weight:650}
+        .invalidInput{border-color:#b42318!important;background:#fff5f5!important;box-shadow:0 0 0 4px rgba(180,35,24,.10)!important}
+        .activeStepSummary{margin-bottom:16px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:13px 15px;display:grid;gap:3px;box-shadow:0 10px 28px rgba(0,0,0,.035)}
+        .activeStepSummary strong{font-size:15px;letter-spacing:-.02em}
+        .activeStepSummary span{font-size:12px;color:#6e6e73}
+        .publicationModeBox{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}
+        .publicationModeBox button,.descriptionStyles button{border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:999px;padding:11px 13px;font-weight:760;color:#6e6e73;cursor:pointer}
+        .publicationModeBox button.selected,.descriptionStyles button.selected{background:#0071e3;color:white;border-color:#0071e3}
+        .collapsibleBlock{border:1px solid rgba(0,0,0,.07);border-radius:24px;background:#fff;margin:16px 0;overflow:hidden}
+        .collapsibleBlock>button{width:100%;border:0;background:#fff;padding:15px 18px;display:flex;justify-content:space-between;font-weight:760;cursor:pointer}
+        .collapsibleContent{padding:0 18px 18px}
+        .fuelConditionalBox,.structuredDocsGrid,.descriptionAssistant{margin-top:22px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:28px;padding:22px;box-shadow:0 12px 38px rgba(0,0,0,.045)}
+        .fuelConditionalBox h3,.descriptionAssistant h3{margin:0 0 14px;font-size:20px;letter-spacing:-.035em}
+        .pricePercentileBox{background:#f5f5f7;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px;margin:0 0 12px;display:grid;gap:3px}
+        .pricePercentileBox strong{font-size:17px}
+        .pricePercentileBox span{font-size:12px;color:#6e6e73}
+        .structuredDocsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+        .structuredDoc{display:grid;gap:6px;border:1px dashed rgba(0,0,0,.16);border-radius:18px;padding:13px;cursor:pointer;background:#fafafa}
+        .structuredDoc.added{background:#f0faf4;border-color:rgba(45,134,83,.25)}
+        .structuredDoc strong{font-size:13px}
+        .structuredDoc span{font-size:11px;color:#6e6e73}
+        .structuredDoc input{font-size:11px;min-height:38px!important}
+        .descriptionStyles{display:flex;gap:10px;flex-wrap:wrap}
+        .dynamicBadges{display:flex;flex-wrap:wrap;gap:6px}
+        .dynamicBadges span{background:#f0f7ff;color:#0071e3;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:760}
+        .scoreDetailList{display:grid;gap:7px;margin-top:14px}
+        .scoreDetailList span{display:flex;justify-content:space-between;background:#f5f5f7;border-radius:12px;padding:8px 10px;font-size:12px}
+        .scoreDetailList em{font-style:normal;color:#0071e3;font-weight:760}
+        .scoreRecommendations{display:grid;gap:6px;margin-top:10px}
+        .scoreRecommendations small{background:#fff8e8;color:#6e4a00;border-radius:10px;padding:7px 8px;line-height:1.35}
+        @media(max-width:900px){.publicationModeBox{grid-template-columns:1fr}}
+
       `}</style>
     </main>
   );
+}
+
+function CollapsibleBlock({ title, open, onToggle, children }: { title: string; open: boolean; onToggle: () => void; children?: ReactNode }) {
+  return <div className="collapsibleBlock"><button type="button" onClick={onToggle}><span>{title}</span><b>{open ? "−" : "+"}</b></button>{open && <div className="collapsibleContent">{children}</div>}</div>;
 }
 
 function Section({ id, title, subtitle }: { id: string; title: string; subtitle: string }) {
   return <div id={id} className="sectionTitle"><h2>{title}</h2><p>{subtitle}</p></div>;
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children?: ReactNode }) {
+function Field({ label, required, children }: { label: string; required?: boolean; children?: ReactNode; key?: string }) {
   return <div className="field"><label>{label} {required && <span className="req">*</span>}</label>{children}</div>;
 }
 
