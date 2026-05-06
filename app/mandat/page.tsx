@@ -27,8 +27,7 @@ const MOROCCAN_REGISTRATION_CITIES = [
   "59 - Errachidia","60 - Ouarzazate","61 - Zagora","62 - Midelt","63 - Tinghir",
   "64 - Guelmim","65 - Sidi Ifni","66 - Tan-Tan","67 - Assa-Zag",
   "68 - Laâyoune","69 - Tarfaya","70 - Boujdour","71 - Es-Semara",
-  "72 - Dakhla","73 - Aousserd",
-  "Autre"
+  "72 - Dakhla","73 - Aousserd","Autre"
 ];
 
 const COUNTRIES = [
@@ -433,7 +432,14 @@ export default function MandatPage() {
 
   const customOptions = Object.values(customFields).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
   const allOptions = [...selectedOptions, ...customOptions];
-  const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${form.registrationCountry ? ` Immatriculation : ${form.registrationCountry === "Maroc" ? `Maroc (${form.registrationCity || "ville non renseignée"})` : `${form.foreignRegistrationCountry || "pays étranger non renseigné"}${form.customsCleared ? `, dédouanée : ${form.customsCleared.toLowerCase()}` : ""}`}.` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
+
+  const registrationSummary =
+    form.registrationCountry === "Maroc"
+      ? `Immatriculation : Maroc${form.registrationCity ? ` (${form.registrationCity})` : ""}.`
+      : form.registrationCountry === "Étranger"
+        ? `Immatriculation : ${form.foreignRegistrationCountry || "Étranger"}${form.customsCleared ? `, dédouanée : ${form.customsCleared.toLowerCase()}` : ""}.`
+        : "";
+  const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${registrationSummary ? ` ${registrationSummary}` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
 
 
   const requiredPhotoLabels = PHOTOS.filter(photo => !photo.multiple).map(photo => photo.label);
@@ -708,21 +714,24 @@ export default function MandatPage() {
             <p>Pays et lieu d’immatriculation du véhicule.</p>
             <div className="grid">
               <Field label="Pays d’immatriculation" required>
-                <select defaultValue="" onChange={e => {
-                  setValue("registrationCountry", e.target.value);
-                  setValue("registrationCity", "");
-                  setValue("foreignRegistrationCountry", "");
-                  setValue("customsCleared", "");
-                }}>
+                <select
+                  value={form.registrationCountry || ""}
+                  onChange={e => {
+                    setValue("registrationCountry", e.target.value);
+                    setValue("registrationCity", "");
+                    setValue("foreignRegistrationCountry", "");
+                    setValue("customsCleared", "");
+                  }}
+                >
                   <option value="" disabled>Sélectionner</option>
-                  <option>Maroc</option>
-                  <option>Étranger</option>
+                  <option value="Maroc">Maroc</option>
+                  <option value="Étranger">Étranger</option>
                 </select>
               </Field>
 
               {form.registrationCountry === "Maroc" && (
                 <Field label="Ville d’immatriculation" required>
-                  <select defaultValue="" onChange={e => setValue("registrationCity", e.target.value)}>
+                  <select value={form.registrationCity || ""} onChange={e => setValue("registrationCity", e.target.value)}>
                     <option value="" disabled>Sélectionner</option>
                     {MOROCCAN_REGISTRATION_CITIES.map(city => <option key={city}>{city}</option>)}
                   </select>
@@ -732,17 +741,17 @@ export default function MandatPage() {
               {form.registrationCountry === "Étranger" && (
                 <>
                   <Field label="Pays d’immatriculation étranger" required>
-                    <select defaultValue="" onChange={e => setValue("foreignRegistrationCountry", e.target.value)}>
+                    <select value={form.foreignRegistrationCountry || ""} onChange={e => setValue("foreignRegistrationCountry", e.target.value)}>
                       <option value="" disabled>Sélectionner le pays</option>
                       {COUNTRIES.map(country => <option key={country}>{country}</option>)}
                     </select>
                   </Field>
 
                   <Field label="Voiture dédouanée ?" required>
-                    <select defaultValue="" onChange={e => setValue("customsCleared", e.target.value)}>
+                    <select value={form.customsCleared || ""} onChange={e => setValue("customsCleared", e.target.value)}>
                       <option value="" disabled>Sélectionner</option>
-                      <option>Oui</option>
-                      <option>Non</option>
+                      <option value="Oui">Oui</option>
+                      <option value="Non">Non</option>
                     </select>
                   </Field>
                 </>
@@ -2232,7 +2241,7 @@ export default function MandatPage() {
         }
 
 
-        /* V32 - Registration country conditional section */
+        /* V33 - Registration section build-safe */
         .subSectionBox{
           margin-top:28px;
           background:#fff;
@@ -2241,7 +2250,6 @@ export default function MandatPage() {
           padding:22px;
           box-shadow:0 12px 38px rgba(0,0,0,.045);
         }
-
         .subSectionBox h3{
           margin:0;
           font-size:22px;
@@ -2249,7 +2257,6 @@ export default function MandatPage() {
           letter-spacing:-.04em;
           color:#1d1d1f;
         }
-
         .subSectionBox p{
           margin:6px 0 18px;
           color:#6e6e73;
