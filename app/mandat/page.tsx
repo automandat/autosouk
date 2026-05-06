@@ -372,7 +372,7 @@ export default function MandatPage() {
   const [uploadedPhotos, setUploadedPhotos] = useState<Record<string, number>>({});
   const [previewPhoto, setPreviewPhoto] = useState("");
   const [activeStep, setActiveStep] = useState(0);
-  const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(7);
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const displayModel = model === "Autre" ? otherModel : model;
@@ -640,9 +640,7 @@ export default function MandatPage() {
   };
 
   const handleStepNavClick = (index: number) => {
-    if (index <= maxUnlockedStep) {
-      setActiveStep(index);
-    }
+    setActiveStep(index);
   };
 
   return (
@@ -670,18 +668,16 @@ export default function MandatPage() {
 
       <section className="workspace">
         <aside className="leftNav">
-          <div className="navTitle">Publication</div>
+          <div className="navTitle">Publication</div><div className="recetteBadge">Mode recette · navigation libre</div>
           {journeySteps.map((step, i) => (
             <button
               type="button"
               key={step.title}
-              className={`${activeStep === i ? "activeStepNav" : ""} ${i > maxUnlockedStep ? "lockedStepNav" : ""}`}
+              className={activeStep === i ? "activeStepNav" : ""}
               onClick={() => handleStepNavClick(i)}
-              disabled={i > maxUnlockedStep}
-              title={i > maxUnlockedStep ? "Complétez l’étape en cours pour débloquer cette rubrique" : ""}
             >
               <small>{String(i + 1).padStart(2, "0")}</small>
-              <span>{step.title}</span>{i > maxUnlockedStep && <em>🔒</em>}
+              <span>{step.title}</span>
             </button>
           ))}
         </aside>
@@ -2338,6 +2334,28 @@ export default function MandatPage() {
           margin:6px 0 18px;
           color:#6e6e73;
           line-height:1.5;
+        }
+
+
+        /* V36 - Recette: navigation libre */
+        .recetteBadge{
+          margin:0 8px 12px;
+          padding:8px 10px;
+          border-radius:999px;
+          background:#f0f7ff;
+          color:#0071e3;
+          font-size:11px;
+          font-weight:760;
+          text-align:center;
+        }
+
+        .leftNav button{
+          opacity:1!important;
+          cursor:pointer!important;
+        }
+
+        .leftNav button em{
+          display:none!important;
         }
 
       `}</style>
