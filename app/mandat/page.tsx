@@ -255,6 +255,7 @@ export default function MandatPage() {
   const [otherEngine, setOtherEngine] = useState("");
   const [trim, setTrim] = useState("");
   const [exteriorColor, setExteriorColor] = useState("");
+  const [mileageRange, setMileageRange] = useState("0");
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [customFields, setCustomFields] = useState<Record<string, { checked: boolean; value: string }>>({});
   const [docs, setDocs] = useState(false);
@@ -298,7 +299,7 @@ export default function MandatPage() {
 
   const customOptions = Object.values(customFields).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
   const allOptions = [...selectedOptions, ...customOptions];
-  const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
+  const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
 
   return (
     <main className="page">
@@ -357,7 +358,42 @@ export default function MandatPage() {
             <Field label="Finition (Pack M, AMG Line, R Line...)" required><input value={trim} onChange={e => setTrim(e.target.value)} placeholder="Ex. Pack M, AMG Line..." /></Field>
             <Field label="Type de véhicule"><select defaultValue="" onChange={e => setValue("type", e.target.value)}><option value="" disabled>Sélectionner</option>{VEHICLE_TYPES.map(x => <option key={x}>{x}</option>)}</select></Field>
             <Field label="Année" required><select defaultValue="" onChange={e => setValue("year", e.target.value)}><option value="" disabled>Sélectionner</option>{YEARS.map(x => <option key={x}>{x}</option>)}</select></Field>
-            <Field label="Kilométrage" required><select defaultValue="" onChange={e => setValue("mileage", e.target.value)}><option value="" disabled>Sélectionner</option>{MILEAGES.map(x => <option key={x}>{x}</option>)}</select></Field>
+            <Field label="Kilométrage" required>
+              <div className="mileageGaugeBox">
+                <div className="mileageGaugeTop">
+                  <span>0 km</span>
+                  <strong>{mileageRange === "200000" ? "+200 000 km" : `${Number(mileageRange).toLocaleString("fr-FR")} km`}</strong>
+                  <span>+200 000 km</span>
+                </div>
+                <input
+                  className="mileageRange"
+                  type="range"
+                  min="0"
+                  max="200000"
+                  step="1000"
+                  value={mileageRange}
+                  onChange={e => {
+                    setMileageRange(e.target.value);
+                    setValue("mileage", e.target.value === "200000" ? "+200 000 km" : `${Number(e.target.value).toLocaleString("fr-FR")} km`);
+                  }}
+                />
+                <input
+                  className="mileagePrecise"
+                  type="number"
+                  placeholder="Corriger manuellement, ex. 18 350"
+                  onChange={e => {
+                    setValue("mileage", e.target.value ? `${Number(e.target.value).toLocaleString("fr-FR")} km` : "");
+                  }}
+                />
+              </div>
+            </Field>
+            <Field label="Kilométrage évolutif ?">
+              <select defaultValue="" onChange={e => setValue("mileageEvolving", e.target.value)}>
+                <option value="" disabled>Sélectionner</option>
+                <option>Oui, j’utilise encore la voiture au quotidien</option>
+                <option>Non, le véhicule ne roule presque plus</option>
+              </select>
+            </Field>
           </div>
 
           <Section id="s3" title="Carburant & caractéristiques techniques" subtitle="Le carburant est séparé de la motorisation constructeur pour éviter les doublons et fiabiliser l’annonce." />
@@ -388,7 +424,8 @@ export default function MandatPage() {
             <Field label="État général" required><select defaultValue="" onChange={e => setValue("condition", e.target.value)}><option value="" disabled>Sélectionner</option><option>Neuf</option><option>Excellent état</option><option>Très bon état</option><option>Bon état</option><option>État correct</option><option>Petits frais à prévoir</option></select></Field>
             <Field label="Vendeur"><select defaultValue=""><option>Particulier</option><option>Concessionnaire</option><option>Voiture de société</option></select></Field>
             <Field label="Entretien"><select defaultValue=""><option>Non renseigné</option><option>Carnet complet</option><option>Factures disponibles</option><option>Historique partiel</option><option>Non disponible</option></select></Field>
-            <Field label="Véhicule fumeur ?"><select defaultValue=""><option value="" disabled>Sélectionner</option><option>Oui</option><option>Non</option></select></Field>
+            <Field label="Véhicule fumeur ?"><select defaultValue="" onChange={e => setValue("smoker", e.target.value)}><option value="" disabled>Sélectionner</option><option>Oui</option><option>Non</option></select></Field>
+            <Field label="Véhicule accidenté ?"><select defaultValue="" onChange={e => setValue("accidented", e.target.value)}><option value="" disabled>Sélectionner</option><option>Oui</option><option>Non</option></select></Field>
           </div>
 
           <Section id="s7" title="Stratégie de prix" subtitle="Trois niveaux de décision : minimum accepté, prix souhaité et prix immédiat." />
@@ -797,6 +834,14 @@ export default function MandatPage() {
 
 
         .fieldHint{display:block;color:#6e6e73;font-size:11px;line-height:1.4;margin-top:-2px}
+
+
+        .mileageGaugeBox{display:grid;gap:12px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:22px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.035)}
+        .mileageGaugeTop{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;color:#6e6e73;font-size:11px;font-weight:650}
+        .mileageGaugeTop strong{font-size:18px;color:#1d1d1f;letter-spacing:-.03em;text-align:center}
+        .mileageGaugeTop span:last-child{text-align:right}
+        .mileageRange{padding:0!important;min-height:28px!important;background:transparent!important;border:0!important;box-shadow:none!important;accent-color:#0071e3}
+        .mileagePrecise{min-height:46px!important;border-radius:14px!important;font-size:13px!important}
 
       `}</style>
     </main>
