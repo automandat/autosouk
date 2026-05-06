@@ -491,16 +491,14 @@ export default function MandatPage() {
 
   const goNext = () => {
     setActiveStep(prev => Math.min(prev + 1, journeySteps.length - 1));
-    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
   };
 
   const goPrev = () => {
     setActiveStep(prev => Math.max(prev - 1, 0));
-    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
   };
 
   const stepRequiredOk = [
-    Boolean(form.first && form.last && form.phone && form.city),
+    Boolean(form.first && form.last && form.phone && form.phone.replace(/\D/g, "").length === 10 && form.city),
     Boolean(brand && displayModel && displayEngine && trim && form.year && form.mileage),
     Boolean(form.fuel && form.gearbox),
     true,
@@ -517,7 +515,6 @@ export default function MandatPage() {
     const nextStep = Math.min(activeStep + 1, journeySteps.length - 1);
     setMaxUnlockedStep(prev => Math.max(prev, nextStep));
     setActiveStep(nextStep);
-    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
   };
 
   const handleStepNavClick = (index: number) => {
@@ -594,10 +591,14 @@ export default function MandatPage() {
                   if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) e.preventDefault();
                 }}
                 onChange={e => {
-                  const cleaned = e.target.value.replace(/[^0-9 ]/g, "");
-                  setValue("phone", cleaned);
+                  const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  const grouped = digits.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+                  setValue("phone", grouped);
                 }}
               />
+              <small className={form.phone && form.phone.replace(/\D/g, "").length !== 10 ? "fieldHint fieldHintError" : "fieldHint"}>
+                10 chiffres obligatoires.
+              </small>
             </Field>
             <Field label="Ville" required><select defaultValue="" onChange={e => setValue("city", e.target.value)}><option value="" disabled>Sélectionner</option>{CITIES.map(x => <option key={x}>{x}</option>)}</select></Field>
           </div>
@@ -2135,6 +2136,13 @@ export default function MandatPage() {
         /* V30 - Phone numeric-only + stable left navigation */
         input[type="tel"]{
           letter-spacing:.01em;
+        }
+
+
+        /* V31 - Phone 10 digits required + no scroll on step navigation */
+        .fieldHintError{
+          color:#b42318!important;
+          font-weight:650;
         }
 
       `}</style>
