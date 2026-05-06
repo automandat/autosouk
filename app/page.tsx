@@ -27,16 +27,90 @@ const steps = [
 export default function HomePage() {
   return (
     <main className="home">
-      <header className="blueBar">
-        <div className="blueInner">
-          <div className="headerSide" />
+      <header
+        className="blueBar"
+        style={{
+          height: "80px",
+          background: "#2f5bea",
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+          boxShadow: "0 10px 28px rgba(47,91,234,.16)",
+          borderBottom: "1px solid rgba(255,255,255,.18)"
+        }}
+      >
+        <div
+          className="blueInner"
+          style={{
+            height: "80px",
+            maxWidth: "1180px",
+            margin: "0 auto",
+            padding: "0 28px",
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
+            alignItems: "center",
+            gap: "24px"
+          }}
+        >
+          <div />
 
-          <Link href="/" className="centerHeaderLogo" aria-label="Accueil AutoSouk">
-            <img src="/autosouk-logo-header.svg.png" alt="AutoSouk - Le prix, le bon, pour tous !" />
+          <Link
+            href="/"
+            className="centerHeaderLogo"
+            aria-label="Accueil AutoSouk"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "80px",
+              lineHeight: 0,
+              textDecoration: "none"
+            }}
+          >
+            <img
+              src="/autosouk-logo-header.svg.png"
+              alt="AutoSouk - Le prix, le bon, pour tous !"
+              style={{
+                height: "60px",
+                maxHeight: "60px",
+                width: "auto",
+                maxWidth: "360px",
+                objectFit: "contain",
+                display: "block"
+              }}
+            />
           </Link>
 
-          <div className="headerSide headerRight">
-            <Link href="/espace" className="accountPill">
+          <div
+            className="headerRight"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              minWidth: 0
+            }}
+          >
+            <Link
+              href="/espace"
+              className="accountPill"
+              style={{
+                minHeight: "40px",
+                padding: "0 18px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "999px",
+                background: "#ffffff",
+                color: "#2f5bea",
+                textDecoration: "none",
+                border: "1px solid rgba(255,255,255,.72)",
+                boxShadow: "0 10px 24px rgba(0,35,110,.14)",
+                fontSize: "14px",
+                fontWeight: 750,
+                letterSpacing: "-.01em",
+                whiteSpace: "nowrap"
+              }}
+            >
               Accéder à mon espace personnel
             </Link>
           </div>
@@ -824,6 +898,62 @@ export default function HomePage() {
 
           .centerHeaderLogo {
             justify-content: center !important;
+          }
+        }
+
+
+        /* V6 - Header logo fixed sizing */
+        @media (max-width: 760px) {
+          .blueBar,
+          .blueInner {
+            height: 70px !important;
+          }
+
+          .blueInner {
+            grid-template-columns: auto 1fr !important;
+            padding: 0 18px !important;
+          }
+
+          .blueInner > div:first-child {
+            display: none !important;
+          }
+
+          .centerHeaderLogo {
+            height: 70px !important;
+            justify-content: flex-start !important;
+          }
+
+          .centerHeaderLogo img {
+            height: 52px !important;
+            max-height: 52px !important;
+            max-width: 260px !important;
+          }
+
+          .accountPill {
+            min-height: 36px !important;
+            padding: 0 12px !important;
+            font-size: 12px !important;
+          }
+        }
+
+        @media (max-width: 520px) {
+          .accountPill {
+            display: none !important;
+          }
+
+          .blueInner {
+            display: flex !important;
+            justify-content: center !important;
+          }
+
+          .centerHeaderLogo {
+            justify-content: center !important;
+          }
+
+          .centerHeaderLogo img {
+            height: 52px !important;
+            max-height: 52px !important;
+            max-width: 280px !important;
           }
         }
 
