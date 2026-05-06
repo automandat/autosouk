@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 type PhotoItem = {
   label: string;
@@ -239,9 +240,9 @@ export default function MandatPage() {
 
       <section className="hero">
         <div>
-          <div className="eyebrow">AutoSouk Studio</div>
-          <h1>Publier votre voiture devrait être <em>simple</em>, beau et rassurant.</h1>
-          <p>Une expérience de mise en vente fluide, guidée et premium — pensée pour créer une annonce fiable, lisible et immédiatement attractive.</p>
+          <div className="eyebrow">AutoSouk</div>
+          <h1>Vendez votre voiture avec une expérience <em>premium</em>, simple et guidée.</h1>
+          <p>Un parcours inspiré des meilleurs produits digitaux : clair, fluide, visuel et pensé pour inspirer confiance dès la première seconde.</p>
         </div>
         <div className="heroGlass">
           <div className="heroMetric"><span>Annonce prête à publier</span><strong>{completion}%</strong></div>
@@ -387,7 +388,7 @@ function Section({ id, title, subtitle }: { id: string; title: string; subtitle:
   return <div id={id} className="sectionTitle"><h2>{title}</h2><p>{subtitle}</p></div>;
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({ label, required, children }: { label: string; required?: boolean; children: ReactNode }) {
   return <div className="field"><label>{label} {required && <span className="req">*</span>}</label>{children}</div>;
 }
 
