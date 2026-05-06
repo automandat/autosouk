@@ -29,21 +29,17 @@ export default function HomePage() {
     <main className="home">
       <header className="blueBar">
         <div className="blueInner">
-          <Link href="/" className="headerLogo" aria-label="Accueil AutoSouk">
-            <img src="/autosouk-mark.svg" alt="" className="logoMark" />
-            <div className="brandTexts">
-              <div className="brandLine">
-                <span className="brandAuto">Auto</span>
-                <span className="brandSouk">Souk</span>
-                <span className="brandDot">.</span>
-              </div>
-              <span className="brandSlogan">Le prix, le bon, pour tous !</span>
-            </div>
+          <div className="headerSide" />
+
+          <Link href="/" className="centerHeaderLogo" aria-label="Accueil AutoSouk">
+            <img src="/autosouk-logo-header.svg.png" alt="AutoSouk - Le prix, le bon, pour tous !" />
           </Link>
 
-          <Link href="/espace" className="accountPill">
-            Accéder à mon espace personnel
-          </Link>
+          <div className="headerSide headerRight">
+            <Link href="/espace" className="accountPill">
+              Accéder à mon espace personnel
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -717,6 +713,120 @@ export default function HomePage() {
             flex-direction: column;
           }
         }
+
+        /* V5 - Centered logo in blue header */
+        .blueBar {
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 50 !important;
+          background: #2f5bea !important;
+          border-bottom: 1px solid rgba(255,255,255,.18) !important;
+          box-shadow: 0 10px 28px rgba(47,91,234,.16) !important;
+        }
+
+        .blueInner {
+          max-width: 1180px !important;
+          height: 82px !important;
+          margin: 0 auto !important;
+          padding: 0 28px !important;
+          display: grid !important;
+          grid-template-columns: 1fr auto 1fr !important;
+          align-items: center !important;
+          gap: 24px !important;
+        }
+
+        .headerSide {
+          min-width: 0 !important;
+        }
+
+        .headerRight {
+          display: flex !important;
+          justify-content: flex-end !important;
+          align-items: center !important;
+        }
+
+        .centerHeaderLogo {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-decoration: none !important;
+          line-height: 0 !important;
+        }
+
+        .centerHeaderLogo img {
+          display: block !important;
+          height: 54px !important;
+          width: auto !important;
+          max-width: 360px !important;
+          object-fit: contain !important;
+        }
+
+        .accountPill {
+          min-height: 40px !important;
+          padding: 0 18px !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          border-radius: 999px !important;
+          background: #ffffff !important;
+          color: #2f5bea !important;
+          text-decoration: none !important;
+          border: 1px solid rgba(255,255,255,.72) !important;
+          box-shadow: 0 10px 24px rgba(0,35,110,.14) !important;
+          font-size: 14px !important;
+          font-weight: 750 !important;
+          letter-spacing: -.01em !important;
+          white-space: nowrap !important;
+        }
+
+        .accountPill:hover {
+          transform: translateY(-1px) !important;
+          background: #f7fbff !important;
+          box-shadow: 0 14px 28px rgba(0,35,110,.18) !important;
+        }
+
+        @media (max-width: 760px) {
+          .blueInner {
+            height: 72px !important;
+            grid-template-columns: auto 1fr !important;
+            padding: 0 18px !important;
+          }
+
+          .blueInner .headerSide:first-child {
+            display: none !important;
+          }
+
+          .centerHeaderLogo {
+            justify-content: flex-start !important;
+          }
+
+          .centerHeaderLogo img {
+            height: 44px !important;
+            max-width: 220px !important;
+          }
+
+          .accountPill {
+            min-height: 36px !important;
+            padding: 0 12px !important;
+            font-size: 12px !important;
+          }
+        }
+
+        @media (max-width: 520px) {
+          .accountPill {
+            display: none !important;
+          }
+
+          .blueInner {
+            display: flex !important;
+            justify-content: center !important;
+          }
+
+          .centerHeaderLogo {
+            justify-content: center !important;
+          }
+        }
+
       `}</style>
     </main>
   );
