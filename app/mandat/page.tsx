@@ -201,7 +201,7 @@ const PHOTOS: PhotoItem[] = [
   { label: "Défauts constatés", image: "/photo-guides/defauts.png", instruction: "Toutes les photos nécessaires des défauts", multiple: true }
 ];
 
-const STEPS = ["Identité","Véhicule","Technique","Design","Options","État","Prix","Photos","Documents","Aperçu"];
+const STEPS = ["Vendeur","Véhicule","Technique","Design & options","Prix","Photos","Confiance","Aperçu"];
 const MARKET_PRICES = [104000,108000,109000,112000,115000,117000,118000,121000,123000,125000,128000,131000,135000,139000,142000,148000,152000,158000];
 
 const BRAND_LOGO_OVERRIDES: Record<string, string> = {
@@ -272,6 +272,7 @@ export default function MandatPage() {
   const [instantCheckAnimation, setInstantCheckAnimation] = useState(false);
   const [uploadedPhotos, setUploadedPhotos] = useState<Record<string, number>>({});
   const [previewPhoto, setPreviewPhoto] = useState("");
+  const [activeStep, setActiveStep] = useState(0);
 
   const models = useMemo(() => brand ? MODELS[brand] || ["Autre"] : [], [brand]);
   const displayModel = model === "Autre" ? otherModel : model;
@@ -473,6 +474,29 @@ export default function MandatPage() {
       setPreviewPhoto(url);
     }
   };
+
+  const journeySteps = [
+    { title: "Vendeur", sections: ["s1"] },
+    { title: "Véhicule", sections: ["s2"] },
+    { title: "Technique", sections: ["s3"] },
+    { title: "Design & options", sections: ["s4", "s5", "s6"] },
+    { title: "Prix", sections: ["s7"] },
+    { title: "Photos", sections: ["s8"] },
+    { title: "Confiance", sections: ["s9"] },
+    { title: "Aperçu", sections: ["s10"] }
+  ];
+
+  const stepProgress = Math.round(((activeStep + 1) / journeySteps.length) * 100);
+  const isLastStep = activeStep === journeySteps.length - 1;
+  const goNext = () => {
+    setActiveStep(prev => Math.min(prev + 1, journeySteps.length - 1));
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+  };
+  const goPrev = () => {
+    setActiveStep(prev => Math.max(prev - 1, 0));
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+  };
+
   return (
     <main className="page">
       <nav className="topbar">
@@ -499,11 +523,30 @@ export default function MandatPage() {
       <section className="workspace">
         <aside className="leftNav">
           <div className="navTitle">Publication</div>
-          {STEPS.map((step, i) => <a key={step} href={`#s${i + 1}`}><small>{String(i + 1).padStart(2, "0")}</small><span>{step}</span></a>)}
+          {journeySteps.map((step, i) => (
+            <button
+              type="button"
+              key={step.title}
+              className={activeStep === i ? "activeStepNav" : ""}
+              onClick={() => setActiveStep(i)}
+            >
+              <small>{String(i + 1).padStart(2, "0")}</small>
+              <span>{step.title}</span>
+            </button>
+          ))}
         </aside>
 
-        <form className="panel">
-          <Section id="s1" title="Identité vendeur" subtitle="Ces informations restent privées et ne sont jamais publiées." />
+        <form className="panel stepPanel">
+          <div className="stepHeader">
+            <div>
+              <span>Étape {activeStep + 1} sur {journeySteps.length}</span>
+              <h2>{journeySteps[activeStep].title}</h2>
+              <p>Complétez cette étape, puis avancez vers la suivante. Votre annonce se construit progressivement.</p>
+            </div>
+            <div className="stepPercent">{stepProgress}%</div>
+          </div>
+          <div className="stepProgress"><div style={{ width: `${stepProgress}%` }} /></div>
+          <div className={`journeyPane ${activeStep === 0 ? "active" : ""}`}>\n          <Section id="s1" title="Identité vendeur" subtitle="Ces informations restent privées et ne sont jamais publiées." />
           <div className="grid">
             <Field label="Prénom" required><input placeholder="Mohammed" onChange={e => setValue("first", e.target.value)} /></Field>
             <Field label="Nom" required><input placeholder="El Fassi" onChange={e => setValue("last", e.target.value)} /></Field>
@@ -511,7 +554,7 @@ export default function MandatPage() {
             <Field label="Ville" required><select defaultValue="" onChange={e => setValue("city", e.target.value)}><option value="" disabled>Sélectionner</option>{CITIES.map(x => <option key={x}>{x}</option>)}</select></Field>
           </div>
 
-          <Section id="s2" title="Identification du véhicule" subtitle="Commencez par les informations clés. Le reste s’ajuste progressivement autour de votre véhicule." />
+          </div>\n\n          <div className={`journeyPane ${activeStep === 1 ? "active" : ""}`}>\n          <Section id="s2" title="Identification du véhicule" subtitle="Commencez par les informations clés. Le reste s’ajuste progressivement autour de votre véhicule." />
           <div className="brandShowcaseWide">
             <div className="brandLogoSlot">
               {brand && !brandLogoMissing && getBrandLogo(brand) ? <img src={getBrandLogo(brand) || ""} alt={brand} className="brandPngLogo" onError={() => setBrandLogoMissing(true)} /> : <div className="brandFallback"><span>{brand ? brand.slice(0, 2).toUpperCase() : "AS"}</span></div>}
@@ -568,7 +611,7 @@ export default function MandatPage() {
             </Field>
           </div>
 
-          <Section id="s3" title="Carburant & caractéristiques techniques" subtitle="Le carburant est séparé de la motorisation constructeur pour éviter les doublons et fiabiliser l’annonce." />
+          </div>\n\n          <div className={`journeyPane ${activeStep === 2 ? "active" : ""}`}>\n          <Section id="s3" title="Carburant & caractéristiques techniques" subtitle="Le carburant est séparé de la motorisation constructeur pour éviter les doublons et fiabiliser l’annonce." />
           <div className="grid">
             <Field label="Carburant" required><select defaultValue="" onChange={e => setValue("fuel", e.target.value)}><option value="" disabled>Sélectionner</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Hybride rechargeable</option><option>Électrique</option><option>GPL</option><option>Hydrogène</option><option>Bioéthanol</option><option>Gaz naturel CNG</option><option>Autre</option></select></Field>
             <Field label="Transmission" required><select defaultValue="" onChange={e => setValue("gearbox", e.target.value)}><option value="" disabled>Sélectionner</option><option>Boîte manuelle</option><option>Boîte automatique</option><option>Boîte semi-automatique</option></select></Field>
@@ -578,7 +621,7 @@ export default function MandatPage() {
             <Field label="Nombre de portes"><select defaultValue=""><option>Tous</option><option>2 portes</option><option>3 portes</option><option>4 portes</option><option>5 portes</option></select></Field>
           </div>
 
-          <Section id="s4" title="Design extérieur & intérieur" subtitle="Couleurs, matériaux et premiers éléments visuels." />
+          </div>\n\n          <div className={`journeyPane ${activeStep === 3 ? "active" : ""}`}>\n          <Section id="s4" title="Design extérieur & intérieur" subtitle="Couleurs, matériaux et premiers éléments visuels." />
           <Field label="Couleur extérieure"><ColorGrid items={BODY_COLORS} selectedColor={exteriorColor} onPick={v => { const next = exteriorColor === v ? "" : v; setExteriorColor(next); }} /></Field>
           <div className="grid">
             <Field label="Couleur intérieure"><PillGroup items={INTERIOR_COLORS} onPick={v => setValue("interiorColor", v)} />{form.interiorColor === "Autres" && <input placeholder="Préciser la couleur intérieure" onChange={e => setValue("interiorColorOther", e.target.value)} />}</Field>
@@ -600,7 +643,7 @@ export default function MandatPage() {
             <Field label="Véhicule accidenté ?"><select defaultValue="" onChange={e => setValue("accidented", e.target.value)}><option value="" disabled>Sélectionner</option><option>Oui</option><option>Non</option></select></Field>
           </div>
 
-          <Section id="s7" title="Stratégie de prix" subtitle="Trois niveaux de décision : minimum accepté, prix souhaité et prix immédiat." />
+          </div>\n\n          <div className={`journeyPane ${activeStep === 4 ? "active" : ""}`}>\n          <Section id="s7" title="Stratégie de prix" subtitle="Trois niveaux de décision : minimum accepté, prix souhaité et prix immédiat." />
           <div className="critical">🔒 <strong>Le prix minimum accepté reste confidentiel.</strong> Il n’est jamais montré aux acheteurs.</div>
           <div className="pricingGrid pricingGridExact">
             <div className="priceBox priceBoxMinimum">
@@ -691,7 +734,7 @@ export default function MandatPage() {
           </div>
           <Field label="Remarques vendeur"><textarea placeholder="Première main, carnet complet, pneus neufs, défauts éventuels..." /></Field>
 
-          <Section id="s8" title="Guide photo" subtitle="12 photos principales avec une limite de 1 photo par section, plus un espace illimité pour les défauts." />
+          </div>\n\n          <div className={`journeyPane ${activeStep === 5 ? "active" : ""}`}>\n          <Section id="s8" title="Guide photo" subtitle="12 photos principales avec une limite de 1 photo par section, plus un espace illimité pour les défauts." />
           <div className="photoQualityPanel"><div><strong>Checklist qualité photo</strong><p>Photos nettes, lumière naturelle, véhicule propre, plaque masquée si nécessaire.</p></div><span>12 photos + défauts illimités</span></div>
           <div className="photoGrid">
             {PHOTOS.map((photo, i) => (
@@ -707,11 +750,11 @@ export default function MandatPage() {
             ))}
           </div>
 
-          <Section id="s9" title="Documents & confiance" subtitle="Documents publics facultatifs. Les informations sensibles doivent être floutées." />
+          </div>\n\n          <div className={`journeyPane ${activeStep === 6 ? "active" : ""}`}>\n          <Section id="s9" title="Documents & confiance" subtitle="Documents publics facultatifs. Les informations sensibles doivent être floutées." />
           <label className="check"><input type="checkbox" checked={docs} onChange={e => setDocs(e.target.checked)} /> Ajouter carte grise floutée, contrôle technique ou factures partageables</label>
           {docs && <div className="docs"><div className="verified">Verified potentiel</div><div className="grid"><Field label="Carte grise floutée"><input type="file" accept="image/*,.pdf" /></Field><Field label="Factures / carnet"><input type="file" accept="image/*,.pdf" multiple /></Field><Field label="Contrôle technique"><input type="file" accept="image/*,.pdf" /></Field><Field label="Autres documents"><input type="file" accept="image/*,.pdf" multiple /></Field></div></div>}
 
-          <Section id="s10" title="Preview de l’annonce" subtitle="Résumé public généré automatiquement." />
+          </div>\n\n          <div className={`journeyPane ${activeStep === 7 ? "active" : ""}`}>\n          <Section id="s10" title="Preview de l’annonce" subtitle="Résumé public généré automatiquement." />
           <div className="preview">{description}</div>
           <div className="finalReview">
             <div>
@@ -721,6 +764,13 @@ export default function MandatPage() {
             </div>
             <button type="button">{missingItems.length ? "Continuer à compléter" : "Finaliser mon annonce"}</button>
           </div>
+          <div className="stepActions">
+            <button type="button" className="secondaryStep" onClick={goPrev} disabled={activeStep === 0}>Retour</button>
+            <button type="button" className="primaryStep" onClick={goNext}>
+              {isLastStep ? "Finaliser" : "Continuer"}
+            </button>
+          </div>
+        </div>
         </form>
 
         <aside className="rightRail">
@@ -1907,6 +1957,178 @@ export default function MandatPage() {
           }
         }
 
+
+        /* V26 - True multi-step journey */
+        .stepPanel{
+          min-height:680px;
+        }
+
+        .stepHeader{
+          display:flex;
+          justify-content:space-between;
+          gap:24px;
+          align-items:flex-start;
+          margin-bottom:18px;
+          padding-bottom:18px;
+          border-bottom:1px solid rgba(0,0,0,.06);
+        }
+
+        .stepHeader span{
+          color:#0071e3;
+          font-size:12px;
+          font-weight:760;
+        }
+
+        .stepHeader h2{
+          margin:6px 0 6px;
+          font-size:42px;
+          line-height:1;
+          letter-spacing:-.06em;
+          font-weight:760;
+          color:#1d1d1f;
+        }
+
+        .stepHeader p{
+          margin:0;
+          color:#6e6e73;
+          line-height:1.5;
+          max-width:660px;
+        }
+
+        .stepPercent{
+          min-width:76px;
+          height:76px;
+          border-radius:50%;
+          background:#f0f7ff;
+          color:#0071e3;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:20px;
+          font-weight:760;
+          box-shadow:inset 0 0 0 1px rgba(0,113,227,.14);
+        }
+
+        .stepProgress{
+          height:8px;
+          background:#e8e8ed;
+          border-radius:999px;
+          overflow:hidden;
+          margin-bottom:32px;
+        }
+
+        .stepProgress div{
+          height:100%;
+          background:#0071e3;
+          border-radius:999px;
+          transition:width .45s cubic-bezier(.22,1,.36,1);
+        }
+
+        .journeyPane{
+          display:none;
+          animation:journeyPaneIn .42s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .journeyPane.active{
+          display:block;
+        }
+
+        .stepActions{
+          margin-top:34px;
+          padding-top:22px;
+          border-top:1px solid rgba(0,0,0,.06);
+          display:flex;
+          justify-content:space-between;
+          gap:14px;
+        }
+
+        .primaryStep,.secondaryStep{
+          min-height:48px;
+          border:0;
+          border-radius:999px;
+          padding:0 22px;
+          font-weight:760;
+          cursor:pointer;
+        }
+
+        .primaryStep{
+          background:#0071e3;
+          color:white;
+          box-shadow:0 16px 38px rgba(0,113,227,.22);
+        }
+
+        .secondaryStep{
+          background:#f5f5f7;
+          color:#1d1d1f;
+        }
+
+        .secondaryStep:disabled{
+          opacity:.4;
+          cursor:not-allowed;
+        }
+
+        .leftNav a{
+          display:none!important;
+        }
+
+        .leftNav button{
+          width:100%;
+          display:flex;
+          align-items:center;
+          gap:10px;
+          padding:10px 11px;
+          border-radius:16px;
+          border:0;
+          background:transparent;
+          color:#6e6e73;
+          font-size:13px;
+          font-weight:650;
+          cursor:pointer;
+          text-align:left;
+          transition:transform .18s ease, background .18s ease, color .18s ease;
+        }
+
+        .leftNav button:hover{
+          background:#f5f5f7;
+          color:#1d1d1f;
+          transform:translateX(3px);
+        }
+
+        .leftNav button small{
+          color:#0071e3;
+          font-weight:760;
+        }
+
+        .leftNav button.activeStepNav{
+          background:#1d1d1f;
+          color:#fff;
+        }
+
+        .leftNav button.activeStepNav small{
+          color:#fff;
+          opacity:.72;
+        }
+
+        @keyframes journeyPaneIn{
+          from{opacity:0;transform:translateY(18px) scale(.992)}
+          to{opacity:1;transform:translateY(0) scale(1)}
+        }
+
+        @media(max-width:900px){
+          .stepHeader{
+            flex-direction:column;
+          }
+          .stepPercent{
+            width:64px;
+            height:64px;
+            min-width:64px;
+            font-size:17px;
+          }
+          .stepHeader h2{
+            font-size:34px;
+          }
+        }
+
       `}</style>
     </main>
   );
@@ -1931,6 +2153,29 @@ function ColorGrid({ items, selectedColor, onPick }: { items: string[]; selected
 
 function OptionBlock({ title, items, selected, toggle, customPrefix, customFields, toggleCustom, setCustomValue }: { title: string; items: string[]; selected: string[]; toggle: (value: string) => void; customPrefix: string; customFields: Record<string, { checked: boolean; value: string }>; toggleCustom: (key: string) => void; setCustomValue: (key: string, value: string) => void }) {
   const customKeys = [`${customPrefix}_other1`, `${customPrefix}_other2`, `${customPrefix}_other3`];
+
+  const journeySteps = [
+    { title: "Vendeur", sections: ["s1"] },
+    { title: "Véhicule", sections: ["s2"] },
+    { title: "Technique", sections: ["s3"] },
+    { title: "Design & options", sections: ["s4", "s5", "s6"] },
+    { title: "Prix", sections: ["s7"] },
+    { title: "Photos", sections: ["s8"] },
+    { title: "Confiance", sections: ["s9"] },
+    { title: "Aperçu", sections: ["s10"] }
+  ];
+
+  const stepProgress = Math.round(((activeStep + 1) / journeySteps.length) * 100);
+  const isLastStep = activeStep === journeySteps.length - 1;
+  const goNext = () => {
+    setActiveStep(prev => Math.min(prev + 1, journeySteps.length - 1));
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+  };
+  const goPrev = () => {
+    setActiveStep(prev => Math.max(prev - 1, 0));
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+  };
+
   return (
     <div className="optionBlock">
       <h3>{title}</h3>
