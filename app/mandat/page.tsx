@@ -573,7 +573,7 @@ export default function MandatPage() {
                   <div className="priceLabel">Prix de vente immédiat</div>
                   <small>Optionnel</small>
                 </div>
-                {instantLocked && <div className="instantCornerCheck">✓</div>}
+                
               </div>
 
               <div className={`moneyInput ${priceInstantError ? "priceInvalid shakeField" : ""}`}>
@@ -1113,6 +1113,159 @@ export default function MandatPage() {
           }
           .pricingGridExact .priceBoxDesired{
             scale:1!important;
+          }
+        }
+
+
+        /* V20 - Pricing typography polish + single animated check */
+        .pricingGridExact{
+          gap:18px!important;
+        }
+
+        .pricingGridExact .priceBox{
+          min-height:255px!important;
+          padding:20px!important;
+          border-radius:28px!important;
+        }
+
+        .pricingGridExact .priceLabel{
+          font-size:17px!important;
+          line-height:1.18!important;
+          letter-spacing:-.025em!important;
+          font-weight:740!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .priceLabel{
+          font-size:18px!important;
+          line-height:1.15!important;
+        }
+
+        .pricingGridExact .priceBadge{
+          font-size:11px!important;
+          padding:7px 11px!important;
+          margin-bottom:2px!important;
+        }
+
+        .pricingGridExact .moneyInput{
+          min-height:52px!important;
+          border-radius:18px!important;
+        }
+
+        .pricingGridExact .moneyInput input{
+          font-size:22px!important;
+          line-height:1!important;
+          padding:12px 14px!important;
+          font-weight:720!important;
+        }
+
+        .pricingGridExact .moneyInput span{
+          font-size:11px!important;
+          padding:0 12px!important;
+          letter-spacing:.02em!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput{
+          min-height:58px!important;
+        }
+
+        .pricingGridExact .priceBoxDesired .moneyInput input{
+          font-size:28px!important;
+          font-weight:740!important;
+        }
+
+        .pricingGridExact .priceBox p{
+          font-size:15px!important;
+          line-height:1.42!important;
+          margin:8px 0 0!important;
+          color:#6e6e73!important;
+        }
+
+        .priceBoxMinimum p,
+        .priceBoxDesired p{
+          font-size:15px!important;
+        }
+
+        .instantHeader{
+          min-height:42px!important;
+        }
+
+        .instantHeader small{
+          font-size:12px!important;
+          line-height:1.2!important;
+        }
+
+        .instantEnableLine,
+        .instantCommitLine{
+          font-size:12px!important;
+          line-height:1.32!important;
+          gap:8px!important;
+        }
+
+        .instantCommitLine{
+          padding:9px 10px!important;
+          border-radius:13px!important;
+        }
+
+        .instantCornerCheck{
+          display:none!important;
+        }
+
+        .priceBoxInstantExact.instantLocked{
+          position:relative!important;
+        }
+
+        .instantFlyingCheck{
+          position:absolute!important;
+          left:50%!important;
+          top:50%!important;
+          width:60px!important;
+          height:60px!important;
+          border-radius:50%!important;
+          background:#2d8653!important;
+          color:#fff!important;
+          display:flex!important;
+          align-items:center!important;
+          justify-content:center!important;
+          font-size:34px!important;
+          font-weight:900!important;
+          z-index:8!important;
+          pointer-events:none!important;
+          animation:singleCheckTravel .9s cubic-bezier(.16,.84,.28,1) forwards!important;
+          box-shadow:0 18px 45px rgba(45,134,83,.28)!important;
+        }
+
+        @keyframes singleCheckTravel{
+          0%{
+            opacity:0;
+            transform:translate(-50%,-50%) scale(.25);
+          }
+          18%{
+            opacity:1;
+            transform:translate(-50%,-50%) scale(1.18);
+          }
+          72%{
+            opacity:1;
+          }
+          100%{
+            opacity:1;
+            left:calc(100% - 26px);
+            top:28px;
+            transform:translate(-50%,-50%) scale(.72);
+          }
+        }
+
+        @media(max-width:1280px){
+          .pricingGridExact .priceBox{
+            min-height:245px!important;
+          }
+        }
+
+        @media(max-width:760px){
+          .pricingGridExact .priceBox{
+            min-height:auto!important;
+          }
+          .pricingGridExact .priceBoxDesired .moneyInput input{
+            font-size:24px!important;
           }
         }
 
