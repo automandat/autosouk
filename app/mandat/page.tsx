@@ -15,6 +15,28 @@ const CITIES = [
   "Casablanca","Rabat","Marrakech","Fès","Tanger","Agadir","Meknès","Oujda","Kénitra","Tétouan","Safi","Mohammedia","El Jadida","Béni Mellal","Nador","Khouribga","Settat","Taza","Larache","Ksar El Kébir","Khemisset","Guelmim","Berrechid","Wad Zem","Fquih Ben Salah","Taourirt","Berkane","Sidi Slimane","Errachidia","Guercif","Ouarzazate","Tiznit","Taroudant","Essaouira","Al Hoceïma","Chefchaouen","Sidi Kacem","Youssoufia","Tan-Tan","Dakhla","Laâyoune","Boujdour","Ifrane","Azrou","Midelt","Zagora","Tinghir","Skhirat","Temara","Salé","Bouskoura","Nouaceur","Mediouna","Dar Bouazza","Autre"
 ];
 
+const MOROCCAN_REGISTRATION_CITIES = [
+  "1 - Rabat","2 - Salé","3 - Skhirat-Témara","4 - Kénitra","5 - Sidi Kacem","6 - Sidi Slimane",
+  "7 - Casablanca","8 - Mohammedia","9 - El Jadida","10 - Settat","11 - Benslimane","12 - Berrechid","13 - Médiouna","14 - Nouaceur",
+  "15 - Fès","16 - Meknès","17 - Ifrane","18 - El Hajeb","19 - Sefrou","20 - Moulay Yacoub","21 - Taounate","22 - Taza","23 - Boulemane",
+  "24 - Marrakech","25 - Essaouira","26 - Chichaoua","27 - Al Haouz","28 - El Kelâa des Sraghna","29 - Rehamna","30 - Safi","31 - Youssoufia",
+  "32 - Agadir Ida-Outanane","33 - Inezgane-Aït Melloul","34 - Chtouka-Aït Baha","35 - Taroudant","36 - Tiznit","37 - Tata",
+  "38 - Tanger-Assilah","39 - M’diq-Fnideq","40 - Tétouan","41 - Fahs-Anjra","42 - Larache","43 - Chefchaouen","44 - Ouezzane","45 - Al Hoceïma",
+  "46 - Oujda-Angad","47 - Berkane","48 - Nador","49 - Driouch","50 - Taourirt","51 - Jerada","52 - Figuig","53 - Guercif",
+  "54 - Béni Mellal","55 - Fquih Ben Salah","56 - Azilal","57 - Khénifra","58 - Khouribga",
+  "59 - Errachidia","60 - Ouarzazate","61 - Zagora","62 - Midelt","63 - Tinghir",
+  "64 - Guelmim","65 - Sidi Ifni","66 - Tan-Tan","67 - Assa-Zag",
+  "68 - Laâyoune","69 - Tarfaya","70 - Boujdour","71 - Es-Semara",
+  "72 - Dakhla","73 - Aousserd",
+  "Autre"
+];
+
+const COUNTRIES = [
+  "France","Espagne","Belgique","Allemagne","Italie","Pays-Bas","Portugal","Suisse","Royaume-Uni","Luxembourg",
+  "États-Unis","Canada","Émirats Arabes Unis","Arabie Saoudite","Qatar","Turquie","Chine","Japon","Corée du Sud",
+  "Algérie","Tunisie","Égypte","Sénégal","Côte d’Ivoire","Mauritanie","Autre"
+];
+
 const MODELS: Record<string, string[]> = {
   "Abarth":["500","595","695","124 Spider","Autre"],
   "Alfa Romeo":["Giulia","Giulietta","MiTo","Stelvio","Tonale","Autre"],
@@ -411,7 +433,7 @@ export default function MandatPage() {
 
   const customOptions = Object.values(customFields).filter(x => x.checked && x.value.trim()).map(x => x.value.trim());
   const allOptions = [...selectedOptions, ...customOptions];
-  const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
+  const description = `${brand || "Véhicule"} ${displayModel || ""} ${displayEngine || ""}${trim ? ` finition ${trim}` : ""}${form.year ? ` ${form.year}` : ""}${form.fuel ? ` ${form.fuel.toLowerCase()}` : ""}${form.gearbox ? ` ${form.gearbox.toLowerCase()}` : ""} à vendre${form.mileage ? ` avec ${form.mileage} au compteur` : ""}${form.city ? `, disponible à ${form.city}` : ""}.${form.condition ? ` État déclaré : ${form.condition.toLowerCase()}.` : ""}${form.registrationCountry ? ` Immatriculation : ${form.registrationCountry === "Maroc" ? `Maroc (${form.registrationCity || "ville non renseignée"})` : `${form.foreignRegistrationCountry || "pays étranger non renseigné"}${form.customsCleared ? `, dédouanée : ${form.customsCleared.toLowerCase()}` : ""}`}.` : ""}${form.accidented ? ` Véhicule accidenté : ${form.accidented.toLowerCase()}.` : ""}${form.mileageEvolving ? ` Kilométrage évolutif : ${form.mileageEvolving.toLowerCase()}.` : ""}${exteriorColor ? ` Couleur extérieure : ${exteriorColor.toLowerCase()}.` : ""}${allOptions.length ? ` Équipements notables : ${allOptions.slice(0, 10).join(", ")}.` : ""}${form.desired ? ` Prix souhaité : ${formatDh(Number(form.desired))}.` : ""}`.replace(/\s+/g, " ").trim();
 
 
   const requiredPhotoLabels = PHOTOS.filter(photo => !photo.multiple).map(photo => photo.label);
@@ -453,6 +475,10 @@ export default function MandatPage() {
     !form.fuel ? "Sélectionner le carburant" : "",
     !form.mileage ? "Renseigner le kilométrage" : "",
     !form.condition ? "Préciser l’état général" : "",
+    !form.registrationCountry ? "Préciser le pays d’immatriculation" : "",
+    form.registrationCountry === "Maroc" && !form.registrationCity ? "Sélectionner la ville d’immatriculation" : "",
+    form.registrationCountry === "Étranger" && !form.foreignRegistrationCountry ? "Sélectionner le pays d’immatriculation étranger" : "",
+    form.registrationCountry === "Étranger" && !form.customsCleared ? "Indiquer si la voiture est dédouanée" : "",
     !priceDesired ? "Ajouter un prix souhaité" : "",
     uploadedRequiredPhotos < requiredPhotoLabels.length ? `Ajouter les photos obligatoires manquantes (${uploadedRequiredPhotos}/${requiredPhotoLabels.length})` : "",
     !docs ? "Ajouter des documents publics pour renforcer la confiance" : ""
@@ -499,7 +525,19 @@ export default function MandatPage() {
 
   const stepRequiredOk = [
     Boolean(form.first && form.last && form.phone && form.phone.replace(/\D/g, "").length === 10 && form.city),
-    Boolean(brand && displayModel && displayEngine && trim && form.year && form.mileage),
+    Boolean(
+      brand &&
+      displayModel &&
+      displayEngine &&
+      trim &&
+      form.year &&
+      form.mileage &&
+      form.registrationCountry &&
+      (
+        (form.registrationCountry === "Maroc" && form.registrationCity) ||
+        (form.registrationCountry === "Étranger" && form.foreignRegistrationCountry && form.customsCleared)
+      )
+    ),
     Boolean(form.fuel && form.gearbox),
     true,
     Boolean(priceMin && priceDesired && Number(priceMin) < Number(priceDesired) && (!instantEnabled || !priceInstant || Number(priceInstant) > Number(priceMin))),
@@ -663,6 +701,54 @@ export default function MandatPage() {
             </Field>
           </div>
 
+          </div>
+
+          <div className="subSectionBox">
+            <h3>Immatriculation</h3>
+            <p>Pays et lieu d’immatriculation du véhicule.</p>
+            <div className="grid">
+              <Field label="Pays d’immatriculation" required>
+                <select defaultValue="" onChange={e => {
+                  setValue("registrationCountry", e.target.value);
+                  setValue("registrationCity", "");
+                  setValue("foreignRegistrationCountry", "");
+                  setValue("customsCleared", "");
+                }}>
+                  <option value="" disabled>Sélectionner</option>
+                  <option>Maroc</option>
+                  <option>Étranger</option>
+                </select>
+              </Field>
+
+              {form.registrationCountry === "Maroc" && (
+                <Field label="Ville d’immatriculation" required>
+                  <select defaultValue="" onChange={e => setValue("registrationCity", e.target.value)}>
+                    <option value="" disabled>Sélectionner</option>
+                    {MOROCCAN_REGISTRATION_CITIES.map(city => <option key={city}>{city}</option>)}
+                  </select>
+                </Field>
+              )}
+
+              {form.registrationCountry === "Étranger" && (
+                <>
+                  <Field label="Pays d’immatriculation étranger" required>
+                    <select defaultValue="" onChange={e => setValue("foreignRegistrationCountry", e.target.value)}>
+                      <option value="" disabled>Sélectionner le pays</option>
+                      {COUNTRIES.map(country => <option key={country}>{country}</option>)}
+                    </select>
+                  </Field>
+
+                  <Field label="Voiture dédouanée ?" required>
+                    <select defaultValue="" onChange={e => setValue("customsCleared", e.target.value)}>
+                      <option value="" disabled>Sélectionner</option>
+                      <option>Oui</option>
+                      <option>Non</option>
+                    </select>
+                  </Field>
+                </>
+              )}
+            </div>
+          </div>
           </div>
 
           <div className={`journeyPane ${activeStep === 2 ? "active" : ""}`}>
@@ -2143,6 +2229,31 @@ export default function MandatPage() {
         .fieldHintError{
           color:#b42318!important;
           font-weight:650;
+        }
+
+
+        /* V32 - Registration country conditional section */
+        .subSectionBox{
+          margin-top:28px;
+          background:#fff;
+          border:1px solid rgba(0,0,0,.07);
+          border-radius:28px;
+          padding:22px;
+          box-shadow:0 12px 38px rgba(0,0,0,.045);
+        }
+
+        .subSectionBox h3{
+          margin:0;
+          font-size:22px;
+          line-height:1.1;
+          letter-spacing:-.04em;
+          color:#1d1d1f;
+        }
+
+        .subSectionBox p{
+          margin:6px 0 18px;
+          color:#6e6e73;
+          line-height:1.5;
         }
 
       `}</style>
